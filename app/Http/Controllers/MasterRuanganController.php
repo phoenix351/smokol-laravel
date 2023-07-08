@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\MasterRuangan;
 use App\Http\Requests\StoreMasterRuanganRequest;
 use App\Http\Requests\UpdateMasterRuanganRequest;
-use Illuminate\Http\Request;
 
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

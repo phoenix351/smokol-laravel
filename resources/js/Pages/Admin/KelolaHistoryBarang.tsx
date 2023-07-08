@@ -118,6 +118,7 @@ const HistoryBarang = ({
         setOpenModalUbah(false);
     };
     //end modal
+    console.log({ history_barang });
 
     const data_master = history_barang.map(
         ({

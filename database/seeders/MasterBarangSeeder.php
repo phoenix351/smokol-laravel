@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\MasterBarang;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 

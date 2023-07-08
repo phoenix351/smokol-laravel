@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HistoryBarang;
-use App\Http\Requests\StoreHistoryBarangRequest;
-use App\Http\Requests\UpdateHistoryBarangRequest;
+use App\Models\Barang;
+use App\Http\Requests\StoreBarangRequest;
+use App\Http\Requests\UpdateBarangRequest;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,14 +14,14 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 
-class HistoryBarangController extends Controller
+class BarangController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Admin/KelolaHistoryBarang', ['history_barang' => DB::table('view_barang_details')->get()]);
+        return Inertia::render('Admin/KelolaBarang', ['history_barang' => Barang::all()]);
     }
 
     /**
@@ -35,7 +35,7 @@ class HistoryBarangController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreHistoryBarangRequest $request)
+    public function store(StoreBarangRequest $request)
     {
         try {
             $validatedData = $request->validate($request->rules());
@@ -44,8 +44,8 @@ class HistoryBarangController extends Controller
                 'message' => 'Data berhasil ditambahkan',
             ];
 
-            HistoryBarang::create($validatedData);
-            $history_barang = HistoryBarang::all();
+            Barang::create($validatedData);
+            $history_barang = Barang::all();
         } catch (QueryException $e) {
             $response = [
                 'message' => 'Koneksi gagal',
@@ -67,7 +67,7 @@ class HistoryBarangController extends Controller
             $history_barang = [];
         }
 
-        return Inertia::render('Admin/HistoryBarang', [
+        return Inertia::render('Admin/Barang', [
             'response' => $response,
             'history_barang' => $history_barang
         ]);
@@ -76,7 +76,7 @@ class HistoryBarangController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(HistoryBarang $historyBarang)
+    public function show(Barang $Barang)
     {
         //
     }
@@ -84,7 +84,7 @@ class HistoryBarangController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(HistoryBarang $historyBarang)
+    public function edit(Barang $Barang)
     {
         //
     }
@@ -92,14 +92,14 @@ class HistoryBarangController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateHistoryBarangRequest $request, HistoryBarang $historyBarang)
+    public function update(UpdateBarangRequest $request, Barang $Barang)
     {
 
         try {
             $validatedData = $request->validate($request->rules());
             // $validatedData['tahun_peroleh'] = Carbon::parse($validatedData['tahun_peroleh'])->format('Y-m-d H:i:s');
 
-            $updateRecord = HistoryBarang::findOrFail($request->id);
+            $updateRecord = Barang::findOrFail($request->id);
 
             $updateRecord->update($validatedData);
 
@@ -107,7 +107,7 @@ class HistoryBarangController extends Controller
                 'message' => 'Berhasil melakukan update data'
             ];
 
-            $history_barang = HistoryBarang::all();
+            $history_barang = Barang::all();
         } catch (QueryException $e) {
             $response = [
                 'message' => 'An error occurred',
@@ -133,7 +133,7 @@ class HistoryBarangController extends Controller
             $history_barang = [];
         }
 
-        return Inertia::render('Admin/HistoryBarang', [
+        return Inertia::render('Admin/Barang', [
             'response' => $response,
             'history_barang' => $history_barang
         ]);
@@ -146,7 +146,7 @@ class HistoryBarangController extends Controller
     {
         try {
 
-            $updateRecord = HistoryBarang::findOrFail($request->query('id'));
+            $updateRecord = Barang::findOrFail($request->query('id'));
 
             $updateRecord->delete();
 
@@ -155,7 +155,7 @@ class HistoryBarangController extends Controller
                 'req' => $request->query('id')
             ];
 
-            $history_barang = HistoryBarang::all();
+            $history_barang = Barang::all();
         } catch (QueryException $e) {
             $response = [
                 'message' => 'An error occurred',
@@ -180,7 +180,7 @@ class HistoryBarangController extends Controller
             ];
             $history_barang = [];
         }
-        return Inertia::render('Admin/HistoryBarang', [
+        return Inertia::render('Admin/Barang', [
             'response' => $response,
             'history_barang' => $history_barang
         ]);
