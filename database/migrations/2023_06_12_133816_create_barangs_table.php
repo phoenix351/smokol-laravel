@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('status_pemeliharaan', 20)->default('Operasional');
             $table->string('bast_path', 255)->nullable();
 
-            $table->binary('is_approved')->default(false);
+            $table->boolean('is_approved')->default(false);
         });
     }
 

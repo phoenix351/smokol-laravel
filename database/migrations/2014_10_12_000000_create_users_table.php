@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('email');
             $table->string('nip');
             $table->string('bidang');
+            $table->unsignedBigInteger('jabatan_id')->default(5);
+            $table->foreign('jabatan_id')->references('id')->on('master_jabatan')->onDelete('cascade');
+
             $table->string('username');
             $table->string('foto_url');
             $table->timestamp('email_verified_at')->nullable();

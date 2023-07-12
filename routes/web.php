@@ -4,10 +4,10 @@ use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\MasterJabatanController;
 use App\Http\Controllers\MasterRuanganController;
 use App\Http\Controllers\MasterSistemOperasiController;
-use App\Http\Controllers\HistoryBarangController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\HistoryBarangUserController;
 use App\Http\Controllers\ProfileController;
-use App\Models\HistoryBarang;
+use App\Models\Barang;
 use App\Models\MasterBarang;
 use App\Models\MasterJabatan;
 use App\Models\MasterRuangan;
@@ -64,10 +64,10 @@ Route::middleware('auth')->group(function () {
     })->name('admin.master.ruangan.nama');
 
     //route master kelola barang
-    route::get('/admin/history-barang', [HistoryBarangController::class, 'index'])->name('admin.kelola.history_barang.index');
-    Route::patch('/admin/history-barang', [HistoryBarangController::class, 'update'])->name('admin.kelola.history_barang.update');
-    Route::post('/admin/history-barang', [HistoryBarangController::class, 'store'])->name('admin.kelola.history_barang.store');
-    Route::delete('/admin/history-barang', [HistoryBarangController::class, 'destroy'])->name('admin.kelola.history_barang.destroy');
+    route::get('/admin/barang', [BarangController::class, 'index'])->name('admin.kelola.history_barang.index');
+    Route::patch('/admin/barang', [BarangController::class, 'update'])->name('admin.kelola.history_barang.update');
+    Route::post('/admin/barang', [BarangController::class, 'store'])->name('admin.kelola.history_barang.store');
+    Route::delete('/admin/barang', [BarangController::class, 'destroy'])->name('admin.kelola.history_barang.destroy');
 
 
 

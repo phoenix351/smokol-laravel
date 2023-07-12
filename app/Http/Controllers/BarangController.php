@@ -21,7 +21,7 @@ class BarangController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/KelolaBarang', ['history_barang' => Barang::all()]);
+        return Inertia::render('Admin/KelolaBarang', ['history_barang' => DB::table('barang_view')->get()]);
     }
 
     /**
