@@ -11,7 +11,7 @@ class UpdateBarangRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,7 @@ class UpdateBarangRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "id", "id_barang", "id_sistem_operasi", "tanggal_terima", "tanggal_serah", "id_ruangan", "kondisi", "status_pemeliharaan", "bast_path", "bast_status", "tanggal_perubahan", "id_pengguna"
+            "id", "id_barang", "id_sistem_operasi", "tanggal_terima", "tanggal_serah", "id_ruangan", "kondisi", "status_pemeliharaan", "bast_path", "bast_status", "tanggal_perubahan", "users_id"
         ];
     }
 }

@@ -1,21 +1,40 @@
-import InputError from "@/Components/InputError";
-import InputLabel from "@/Components/InputLabel";
-import PrimaryButton from "@/Components/PrimaryButton";
-import TextInput from "@/Components/TextInput";
 import { router } from "@inertiajs/react";
-import { Transition } from "@headlessui/react";
-
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, message } from "antd";
 
 export default function UpdatePasswordForm() {
+    const [messageApi, contextHolder] = message.useMessage();
+    const saveKey = "updatable";
     const updatePassword = (values: any) => {
-        console.log(values);
-        //submit
-        router.visit(route("password.update", { method: "put", data: values }));
+        router.put(route("password.update"), values, {
+            preserveState: true,
+            preserveScroll: true,
+            onStart: () => {
+                messageApi.open({
+                    key: saveKey,
+                    content: "Menyimpan perubahan...",
+                    type: "loading",
+                });
+            },
+            onSuccess: () => {
+                messageApi.open({
+                    key: saveKey,
+                    content: "Berhasil menyimpan perubahan...",
+                    type: "success",
+                });
+            },
+            onError: () => {
+                messageApi.open({
+                    key: saveKey,
+                    content: "current password is incorrect",
+                    type: "error",
+                });
+            },
+        });
     };
 
     return (
         <section>
+            {contextHolder}
             <header>
                 <h2 className="text-lg font-medium text-gray-900">
                     Update Password
@@ -59,6 +78,11 @@ export default function UpdatePasswordForm() {
                         {
                             required: true,
                             message: "Please input your new password!",
+                        },
+                        {
+                            min: 8,
+                            message:
+                                "Minimal length for password is 8 characters!",
                         },
                     ]}
                 >

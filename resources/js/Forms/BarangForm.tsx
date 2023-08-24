@@ -25,6 +25,8 @@ const HistoryBarangForm: React.FC<{
     form: any;
     onFinish: (values: any) => void;
 }> = ({ form, onFinish }) => {
+    const [penggunaName, setPenggunaName] = useState("");
+    const [penggunaItems, setPenggunaItems] = useState<string[]>([]);
     const [jenisItems, setJenisItems] = useState<string[]>([]);
     const [jenisName, setJenisName] = useState("");
     const [merkItems, setMerkItems] = useState<string[]>([]);
@@ -35,6 +37,11 @@ const HistoryBarangForm: React.FC<{
     const [messageApi, contextHolder] = message.useMessage();
     const saveKey = "updatable";
 
+    const onPenggunaNameChanged = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setPenggunaName(event.target.value);
+    };
     const onJenisNameChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
         setJenisName(event.target.value);
     };
@@ -48,11 +55,20 @@ const HistoryBarangForm: React.FC<{
         // call api jenis
         const fetchData = async () => {
             try {
+                const penggunaResponse = await axios.get(route("users.get"));
                 const jenisResponse = await axios.get(route("jenis.get"));
                 const merkResponse = await axios.get(route("merk.get"));
                 const tipeResponse = await axios.get(route("tipe.get"));
 
                 // console.log({ arr: response.data[0] });
+                let penggunaItemsDB = penggunaResponse.data[0].map(
+                    (item: any) => ({
+                        id: item.id,
+                        nama_lengkap: item.nama_lengkap,
+                    })
+                );
+                setPenggunaItems([...penggunaItems, ...penggunaItemsDB]);
+
                 let jenisItemsDB = jenisResponse.data[0].map(
                     (item: any) => item?.jenis
                 );
@@ -133,6 +149,32 @@ const HistoryBarangForm: React.FC<{
                 style={{ display: "none" }}
             >
                 <Input />
+            </Form.Item>
+            <Form.Item
+                {...formItemLayout}
+                label="Pegawai Pengguna"
+                name="users_id"
+                rules={[
+                    {
+                        required: true,
+                        message: "Isian Pengguna harus diisi",
+                    },
+                ]}
+            >
+                <Select
+                    showSearch
+                    placeholder="Pilih Pengguna"
+                    dropdownRender={(menu) => (
+                        <>
+                            {menu}
+                            <Divider style={{ margin: "8px 0" }} />
+                        </>
+                    )}
+                    options={penggunaItems.map((item: any) => ({
+                        label: item.nama_lengkap,
+                        value: item.id,
+                    }))}
+                />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}
@@ -258,8 +300,8 @@ const HistoryBarangForm: React.FC<{
 
             <Form.Item
                 {...formItemLayout}
-                label="Tahun Perolehan"
-                name="tahun_peroleh"
+                label="Tanggal Peroleh"
+                name="tanggal_peroleh"
                 rules={[
                     {
                         required: true,
@@ -267,7 +309,7 @@ const HistoryBarangForm: React.FC<{
                     },
                 ]}
             >
-                <DatePicker picker="year" />
+                <DatePicker />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}

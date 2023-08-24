@@ -1,8 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
 import { BastType, PageProps } from "@/types";
-import dayjs from "dayjs";
-// import { Table } from "ant-table-extensions";
 
 import {
     ReactElement,
@@ -46,7 +44,6 @@ import {
 import MyModal from "@/Components/Modal";
 import Bast from "@/Components/Bast";
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
-import { findSourceMap } from "module";
 import { Barang, DataType } from "@/types";
 import axios from "axios";
 
@@ -489,34 +486,34 @@ const BarangPage = ({
             fixed: "right",
             render: (_, record: Barang) => {
                 const items: MenuProps["items"] = [
-                    {
-                        label: (
-                            <a>
-                                <EditOutlined /> Ubah
-                            </a>
-                        ),
-                        key: "0",
-                        onClick: () => {
-                            setOpenModalUbah(true);
-                            const recordEdited = {
-                                jenis: record.barang_jenis,
-                                merk: record.barang_merk,
-                                tipe: record.barang_tipe,
-                                nomor_seri: record.barang_nomor_seri,
-                                id: record.key,
-                            };
-                            itemAddForm.setFieldsValue(recordEdited);
-                            itemAddForm.setFieldValue(
-                                "tanggal_peroleh",
-                                dayjs(
-                                    record.tanggal_peroleh !== "0"
-                                        ? record.tanggal_peroleh
-                                        : "2000-01-01",
-                                    "YYYY-MM-DD"
-                                )
-                            );
-                        },
-                    },
+                    // {
+                    //     label: (
+                    //         <a>
+                    //             <EditOutlined /> Ubah
+                    //         </a>
+                    //     ),
+                    //     key: "0",
+                    //     onClick: () => {
+                    //         setOpenModalUbah(true);
+                    //         const recordEdited = {
+                    //             jenis: record.barang_jenis,
+                    //             merk: record.barang_merk,
+                    //             tipe: record.barang_tipe,
+                    //             nomor_seri: record.barang_nomor_seri,
+                    //             id: record.key,
+                    //         };
+                    //         itemAddForm.setFieldsValue(recordEdited);
+                    //         itemAddForm.setFieldValue(
+                    //             "tanggal_peroleh",
+                    //             dayjs(
+                    //                 record.tanggal_peroleh !== "0"
+                    //                     ? record.tanggal_peroleh
+                    //                     : "2000-01-01",
+                    //                 "YYYY-MM-DD"
+                    //             )
+                    //         );
+                    //     },
+                    // },
                     {
                         label: (
                             <>
@@ -647,6 +644,7 @@ const BarangPage = ({
                 cancelText="Batal"
                 width={600}
             >
+                <Divider />
                 <PemeliharaanForm
                     form={pengajuanForm}
                     onFinish={pengajuanFinish}

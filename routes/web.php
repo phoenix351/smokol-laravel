@@ -14,8 +14,7 @@ use App\Models\MasterBarang;
 use App\Models\MasterJabatan;
 use App\Models\MasterRuangan;
 use App\Models\MasterSistemOperasi;
-
-
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -92,7 +91,11 @@ Route::middleware('auth')->group(function () {
     })->name('admin.master.sistem_operasi.arsitektur');
 
 
-    // route api for master barang
+    // route api for master barang just for admin
+    route::get('/api/users', function () {
+        $users = User::select('id', 'nama_lengkap')->get();
+        return response()->json([$users]);
+    })->name('users.get');
     route::get('/api/jenis', function () {
         $jenisList = MasterBarang::select(["jenis"])->groupBy(['jenis'])->get();
         return response()->json([$jenisList]);
@@ -161,10 +164,10 @@ Route::middleware('auth')->group(function () {
 
 
     //route barang untuk user
-    route::get('/barang', [HistoryBarangUserController::class, 'index'])->name('barang');
-    Route::patch('/barang', [HistoryBarangUserController::class, 'update'])->name('barang.update');
-    Route::post('/barang', [HistoryBarangUserController::class, 'store'])->name('barang.store');
-    Route::delete('/barang', [HistoryBarangUserController::class, 'destroy'])->name('barang.destroy');
+    route::get('/barang', [BarangController::class, 'index'])->name('barang');
+    Route::patch('/barang', [BarangController::class, 'update'])->name('barang.update');
+    Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
+    Route::delete('/barang', [BarangController::class, 'destroy'])->name('barang.destroy');
 
     Route::get('/files', [BastController::class, 'show_file'])->name('file.show');
 

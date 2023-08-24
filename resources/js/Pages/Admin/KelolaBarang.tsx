@@ -50,6 +50,7 @@ import MyModal from "@/Components/Modal";
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
 import { findSourceMap } from "module";
 import { Barang, DataType } from "@/types";
+import BarangForm from "@/Forms/BarangForm";
 
 // const ExportableTablex = ExportableTable(Table);
 
@@ -260,30 +261,32 @@ const BarangPage = ({
         }
     };
     const onFinishEdit: (values: any) => any = (values: any) => {
-        messageApi.open({
-            key: saveKey,
-            content: "Sedang menambahkan data...",
-            type: "loading",
-        });
         try {
-            router.patch(route("history_barang.update"), values, {
+            router.patch(route("barang.update"), values, {
+                preserveScroll: true,
+                preserveState: true,
+                onStart: () => {
+                    messageApi.open({
+                        key: saveKey,
+                        content: "Sedang menyimpan perubahan...",
+                        type: "loading",
+                    });
+                },
                 onSuccess: (responsePage) => {
                     const response: any = responsePage.props.response;
-                    console.log({ response });
-                    if (response.errors?.length > 1) {
-                        return messageApi.open({
-                            key: saveKey,
-                            content: response.errors,
-                            type: "error",
-                        });
-                    }
-                    messageApi.open({
+
+                    return messageApi.open({
                         key: saveKey,
                         content: "Berhasil menyimpan perubahan data",
                         type: "success",
                     });
-
-                    return 1;
+                },
+                onError: (errors) => {
+                    return messageApi.open({
+                        key: saveKey,
+                        content: "error",
+                        type: "error",
+                    });
                 },
             });
         } catch (error: any) {
@@ -421,6 +424,7 @@ const BarangPage = ({
                         onClick: () => {
                             setOpenModalUbah(true);
                             const recordEdited = {
+                                users_id: record.pengguna_id,
                                 jenis: record.barang_jenis,
                                 merk: record.barang_merk,
                                 tipe: record.barang_tipe,
@@ -504,7 +508,7 @@ const BarangPage = ({
                 cancelText="Batal"
             >
                 <Divider />
-                <HistoryBarangForm form={itemAddForm} onFinish={onFinishEdit} />
+                <BarangForm form={itemAddForm} onFinish={onFinishEdit} />
             </MyModal>
 
             {contextHolder}
