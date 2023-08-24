@@ -365,7 +365,12 @@ class BarangSeeder extends Seeder
             ['id' => '349', 'barang_id' => '699', 'sistem_operasi_id' => '3', 'tanggal_peroleh' => '2014-01-01',  'ruangan_id' => '33', 'kondisi' => 'Baik', 'status_pemeliharaan' => 'Operasional',   'tanggal_peroleh' => '2023-03-05', 'pengguna_id' => '256'],
             ['id' => '350', 'barang_id' => '700', 'sistem_operasi_id' => '12', 'tanggal_peroleh' => '2020-01-01',  'ruangan_id' => '27', 'kondisi' => 'Rusak Ringan', 'status_pemeliharaan' => 'Operasional',   'tanggal_peroleh' => '2023-03-05', 'pengguna_id' => '267'],
             ['id' => '351', 'barang_id' => '701', 'sistem_operasi_id' => '12', 'tanggal_peroleh' => '2021-01-01',  'ruangan_id' => '27', 'kondisi' => 'Baik', 'status_pemeliharaan' => 'Operasional',   'tanggal_peroleh' => '2023-03-05', 'pengguna_id' => '274'],
-            ['id' => '541', 'barang_id' => '344', 'sistem_operasi_id' => '11', 'tanggal_peroleh' => '2023-03-08',  'ruangan_id' => '28', 'kondisi' => 'Baik', 'status_pemeliharaan' => '',   'tanggal_peroleh' => '2023-03-08', 'pengguna_id' => '1'],
+
+
+            ['id' => '352', 'barang_id' => '703', 'sistem_operasi_id' => '5', 'tanggal_peroleh' => '2018-01-01',  'ruangan_id' => '38', 'kondisi' => 'Baik', 'status_pemeliharaan' => 'Operasional',   'tanggal_peroleh' => '2023-03-05', 'pengguna_id' => '218'],
+            ['id' => '353', 'barang_id' => '704', 'sistem_operasi_id' => '5', 'tanggal_peroleh' => '2018-01-01',  'ruangan_id' => '30', 'kondisi' => 'Baik', 'status_pemeliharaan' => 'Operasional',   'tanggal_peroleh' => '2023-03-05', 'pengguna_id' => '293'],
+            ['id' => '354', 'barang_id' => '705', 'sistem_operasi_id' => '3', 'tanggal_peroleh' => '2010-01-01',  'ruangan_id' => '42', 'kondisi' => 'Baik', 'status_pemeliharaan' => 'Operasional',   'tanggal_peroleh' => '2023-03-05', 'pengguna_id' => '212'],
+
         ];
         Barang::insert($data);
     }

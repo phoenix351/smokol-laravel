@@ -62,6 +62,16 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
                 >
                     {user.bidang}
                 </li>
+                <li
+                    style={{
+                        listStyleType: "none",
+                        fontWeight: "400",
+                        color: "GrayText",
+                        marginBottom: "3px",
+                    }}
+                >
+                    {user.role}
+                </li>
             </div>
             <Divider style={{ margin: "0 0" }} />
             <li
@@ -84,7 +94,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
                 style={{
                     listStyleType: "none",
                     cursor: "pointer",
-                    backgroundColor: "blueviolet",
+                    backgroundColor: "#4e54c8",
                     paddingLeft: "20px",
                     paddingTop: "10px",
                     paddingBottom: "10px",

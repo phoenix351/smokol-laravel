@@ -365,6 +365,10 @@ class MasterBarangSeeder extends Seeder
             ['id' => '699', 'jenis' => 'PC', 'merk' => 'ASUS', 'tipe' => 'Lainnya', 'tahun_peroleh' => Carbon::now()->setYear('2014')->format('Y-m-d H:i:s'), 'nomor_seri' => 'E9PTBX003480'],
             ['id' => '700', 'jenis' => 'PC', 'merk' => 'EPSON', 'tipe' => 'L6170', 'tahun_peroleh' => Carbon::now()->setYear('2020')->format('Y-m-d H:i:s'), 'nomor_seri' => 'X4EZ008456'],
             ['id' => '701', 'jenis' => 'PC', 'merk' => 'EPSON', 'tipe' => 'L15160', 'tahun_peroleh' => Carbon::now()->setYear('2021')->format('Y-m-d H:i:s'), 'nomor_seri' => 'X6MQ003583'],
+            ['id' => '703', 'jenis' => 'Laptop', 'merk' => 'LENOVO', 'tipe' => 'V330', 'tahun_peroleh' => Carbon::now()->setYear('2018')->format('Y-m-d H:i:s'), 'nomor_seri' => 'MP1DAV2E'],
+            ['id' => '704', 'jenis' => 'Laptop', 'merk' => 'HP', 'tipe' => '440 G5', 'tahun_peroleh' => Carbon::now()->setYear('2018')->format('Y-m-d H:i:s'), 'nomor_seri' => '5CD8327X62'],
+            ['id' => '705', 'jenis' => 'PC', 'merk' => 'DELL', 'tipe' => 'OPTIPLEX 780', 'tahun_peroleh' => Carbon::now()->setYear('2010')->format('Y-m-d H:i:s'), 'nomor_seri' => '81BHS2S'],
+
 
         ];
         MasterBarang::insert($data);

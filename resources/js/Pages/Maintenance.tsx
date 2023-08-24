@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
-import { PageProps } from "@/types";
+import { BastType, PageProps } from "@/types";
 import dayjs from "dayjs";
 
 import {
@@ -16,10 +16,7 @@ import {
     Button,
     Divider,
     Form,
-    FormInstance,
     Input,
-    InputRef,
-    Modal,
     Space,
     // Table,
     message,
@@ -32,32 +29,35 @@ import {
 import {
     EditOutlined,
     CaretDownOutlined,
-    DeleteOutlined,
-    PlusOutlined,
-    CheckCircleOutlined,
+    MedicineBoxOutlined,
+    MailOutlined,
     WarningOutlined,
     StopOutlined,
+    CheckCircleOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
     ColumnFilterItem,
-    ColumnType,
     ColumnsType,
     CompareFn,
     SortOrder,
 } from "antd/es/table/interface";
 import MyModal from "@/Components/Modal";
+import Bast from "@/Components/Bast";
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
-import { findSourceMap } from "module";
-import { Barang, DataType } from "@/types";
 
-// const ExportableTablex = ExportableTable(Table);
+import { Maintenance, DataType } from "@/types";
+import axios from "axios";
+
+import PemeliharaanForm from "@/Forms/PemeliharaanForm";
 
 const { Search } = Input;
+
 const BarangPage = ({
-    history_barang,
-}: PageProps & { history_barang: Barang[] }) => {
-    // console.log({ history_barang });
+    maintenance_list,
+}: PageProps & { maintenance_list: Maintenance[] }) => {
+    // console.log({ maintenance_list });
+
     const csrfTokenRef = useRef<string | null>(null);
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     const [searchText, setSearchText] = useState("");
@@ -65,13 +65,38 @@ const BarangPage = ({
     const [messageApi, contextHolder] = message.useMessage();
     const saveKey = "updatable";
     const [itemAddForm] = Form.useForm();
+    const [currentMaintenanceId, setCurrentMaintenanceId] = useState(0); //
 
     // modal
     const [openModal, setOpenModal] = useState(false);
+
+    const handleCancel = () => {
+        setOpenModal(false);
+    };
+
     const [openModalUbah, setOpenModalUbah] = useState(false);
+
+    const [openBast, setOpenBast] = useState(false);
+
+    const [openPengajuan, setOpenPengajuan] = useState(false);
+
     const [confirmLoadingModal, setConfirmLoadingModal] = useState(false);
     const [confirmLoadingModalUbah, setConfirmLoadingModalUbah] =
         useState(false);
+    const [confirmLoadingBast, setConfirmLoadingBast] = useState(false);
+    const [confirmLoadingPengajuan, setConfirmLoadingPengajuan] =
+        useState(false);
+
+    const handleOkPengajuan = async () => {
+        // handle opening
+        pengajuanForm.submit();
+        setOpenPengajuan(false);
+        setConfirmLoadingPengajuan(false);
+    };
+    const handleCancelPengajuan = () => {
+        setOpenPengajuan(false);
+    };
+
     const handleOk = async () => {
         itemAddForm.submit();
         setOpenModal(false);
@@ -82,43 +107,62 @@ const BarangPage = ({
         setOpenModalUbah(false);
         setConfirmLoadingModalUbah(false);
     };
-    const handleCancel = () => {
-        setOpenModal(false);
+    const handleOkBast = async () => {
+        // handle opening
+        setOpenBast(false);
+        setConfirmLoadingBast(false);
     };
+
     const handleCancelUbah = () => {
         setOpenModalUbah(false);
     };
-    //end modal
+    const handleCancelBast = () => {
+        setOpenBast(false);
+    };
 
-    const data_master = history_barang.map(
+    console.log({ maintenance_list });
+
+    const data_master = maintenance_list.map(
         ({
             id,
-            barang_jenis,
-            barang_merk,
-            barang_tipe,
-            tanggal_peroleh,
-            barang_nomor_seri,
-            kondisi,
-            ruangan_nama,
-            users_nama_lengkap,
             barang_id,
-            pengguna_id,
-        }): Barang => ({
+            biaya,
+            bukti_rusak_berat,
+            catatan_admin,
+            created_at,
+            updated_at,
+            keluhan,
+            kondisi_final,
+            status,
+            users_id,
+            maintenance_id,
+            jenis,
+            merk,
+            tipe,
+            nomor_seri,
+        }): Maintenance => ({
             id,
             key: id,
-            barang_jenis,
-            barang_merk,
-            barang_tipe,
-            tanggal_peroleh,
-            barang_nomor_seri,
-            kondisi,
-            ruangan_nama,
-            users_nama_lengkap,
             barang_id,
-            pengguna_id,
+            biaya,
+            bukti_rusak_berat,
+            catatan_admin,
+            created_at,
+            updated_at,
+            keluhan,
+            kondisi_final,
+            status,
+            users_id,
+            maintenance_id,
+            jenis,
+            merk,
+            tipe,
+            nomor_seri,
         })
     );
-    const [dataSource, setDataSource] = useState<Barang[]>(data_master);
+    const [dataSource, setDataSource] = useState<Maintenance[]>(data_master);
+    // data for current barang bast
+    const [dataBast, setDataBast] = useState<BastType[]>([]);
 
     useEffect(() => {
         if (csrfTokenMeta) {
@@ -127,38 +171,48 @@ const BarangPage = ({
     }, []);
     useEffect(() => {
         setTimeout(() => {
-            let data_master = history_barang.map(
+            let data_master = maintenance_list.map(
                 ({
                     id,
-                    barang_jenis,
-                    barang_merk,
-                    barang_tipe,
-                    tanggal_peroleh,
-                    barang_nomor_seri,
-                    kondisi,
-                    ruangan_nama,
-                    users_nama_lengkap,
                     barang_id,
-                    pengguna_id,
-                }) => ({
+                    biaya,
+                    bukti_rusak_berat,
+                    catatan_admin,
+                    created_at,
+                    updated_at,
+                    keluhan,
+                    kondisi_final,
+                    status,
+                    users_id,
+                    maintenance_id,
+                    jenis,
+                    merk,
+                    tipe,
+                    nomor_seri,
+                }): Maintenance => ({
+                    id,
                     key: id,
-                    barang_jenis,
-                    barang_merk,
-                    barang_tipe,
-                    tanggal_peroleh,
-                    barang_nomor_seri,
-                    kondisi,
-                    ruangan_nama,
-                    users_nama_lengkap,
                     barang_id,
-                    pengguna_id,
+                    biaya,
+                    bukti_rusak_berat,
+                    catatan_admin,
+                    created_at,
+                    updated_at,
+                    keluhan,
+                    kondisi_final,
+                    status,
+                    users_id,
+                    maintenance_id,
+                    jenis,
+                    merk,
+                    tipe,
+                    nomor_seri,
                 })
-            ) as Barang[];
+            ) as Maintenance[];
 
             setDataSource(data_master);
-            // console.log("changeeeee", { dataSource });
         }, 0);
-    }, [history_barang]);
+    }, [maintenance_list]);
 
     const onSearch = async (value: string) => {
         setSearchLoading(true);
@@ -178,8 +232,6 @@ const BarangPage = ({
             const valueB = String(b[property]);
 
             if (sortOrder === "ascend") {
-                // if (valueA < valueB) return -1;
-                // if (valueA > valueB) return 1;
                 return valueA.localeCompare(valueB);
             }
 
@@ -192,7 +244,7 @@ const BarangPage = ({
     }
     function handleDelete(key: React.Key | string): void {
         if (key === 0) return;
-        router.delete(route("history_barang.destroy", { id: key }), {
+        router.delete(route("maintenance_list.destroy", { id: key }), {
             // method: "delete",
             preserveState: true,
             preserveScroll: true,
@@ -203,6 +255,7 @@ const BarangPage = ({
                     type: "loading",
                 }),
             onSuccess: (responsePage) => {
+                console.log({ responsePage });
                 const response: any = responsePage.props.response;
                 if (response.errors?.length > 1) {
                     return messageApi.open({
@@ -230,7 +283,7 @@ const BarangPage = ({
             type: "loading",
         });
         try {
-            router.post(route("history_barang.store"), values, {
+            router.post(route("maintenance_list.store"), values, {
                 onSuccess: (responsePage) => {
                     const response: any = responsePage.props.response;
                     console.log({ response });
@@ -266,10 +319,10 @@ const BarangPage = ({
             type: "loading",
         });
         try {
-            router.patch(route("history_barang.update"), values, {
+            router.patch(route("maintenance_list.update"), values, {
                 onSuccess: (responsePage) => {
                     const response: any = responsePage.props.response;
-                    console.log({ response });
+                    // console.log({ response });
                     if (response.errors?.length > 1) {
                         return messageApi.open({
                             key: saveKey,
@@ -295,11 +348,46 @@ const BarangPage = ({
             return 0;
         }
     };
-    const jenisSorter: Sorter<Barang> = createSorter("barang_jenis");
-    const tipeSorter: Sorter<Barang> = createSorter("barang_tipe");
-    const merkSorter: Sorter<Barang> = createSorter("barang_merk");
-    const nomorSeriSorter: Sorter<Barang> = createSorter("barang_nomor_seri");
-    const tahunPerolehSorter: Sorter<Barang> = createSorter("tanggal_peroleh");
+    const [pengajuanForm] = Form.useForm();
+    const pengajuanFinish = (values: any) => {
+        try {
+            router.post(route("maintenance.update"), values, {
+                onStart: () => {
+                    messageApi.open({
+                        key: saveKey,
+                        content: "Sedang menyimpan...",
+                        type: "loading",
+                    });
+                },
+                onSuccess: (responsePage) => {
+                    const response: any = responsePage.props;
+                    // console.log({ response });
+                    if (response.errors?.length > 1) {
+                        return messageApi.open({
+                            key: saveKey,
+                            content: response.errors,
+                            type: "error",
+                        });
+                    }
+                    messageApi.open({
+                        key: saveKey,
+                        content: "Berhasil menyimpan data",
+                        type: "success",
+                    });
+
+                    return 1;
+                },
+            });
+        } catch (error: any) {
+            messageApi.open({
+                key: saveKey,
+                content: error.message,
+                type: "error",
+            });
+            return 0;
+        }
+    };
+    const biayaSorter: Sorter<Maintenance> = createSorter("biaya");
     interface Column {
         key?: React.Key;
         title: string;
@@ -308,50 +396,56 @@ const BarangPage = ({
         editable?: boolean;
         filters?: ColumnFilterItem[];
         onCell?: (record: DataType) => object;
-        render?: (value: any, record: Barang) => React.ReactNode;
+        render?: (value: any, record: Maintenance) => React.ReactNode;
     }
 
-    const defaultColumns: ColumnsType<Barang> = [
+    const defaultColumns: ColumnsType<Maintenance> = [
+        // {
+        //     title: "sequence_id",
+        //     dataIndex: "id",
+
+        // },
+        // {
+        //     title: "maintenance_id",
+        //     dataIndex: "maintenance_id",
+        // },
         {
-            title: "jenis",
-            dataIndex: "barang_jenis",
+            title: "nama barang",
+            render: (value: any, record: Maintenance) =>
+                record.merk + record.tipe,
+        },
+        {
+            title: "status",
+            dataIndex: "status",
             filters: [
-                {
-                    text: "PC",
-                    value: "PC",
-                },
-                {
-                    text: "Laptop",
-                    value: "Laptop",
-                },
+                { text: "Pending", value: "Pending" },
+                { text: "Dalam Proses IPDS", value: "Dalam Proses IPDS" },
+                { text: "Dalam Proses Rekanan", value: "Dalam Proses Rekanan" },
+                { text: "Diperiksa IPDS", value: "Diperiksa IPDS" },
+                { text: "Diperiksa Pengguna", value: "Diperiksa Pengguna" },
+                { text: "Selesai", value: "Selesai" },
             ],
-            onFilter: (value: string | number | boolean, record: Barang) =>
-                record.barang_jenis === value,
-            sorter: jenisSorter as CompareFn<object>,
+            onFilter: (value: string | number | boolean, record: Maintenance) =>
+                record.status.trim().toLowerCase() ===
+                String(value).toLowerCase(),
+        },
+
+        {
+            title: "bukti rusak berat",
+            dataIndex: "bukti_rusak_berat",
         },
         {
-            title: "merk",
-            dataIndex: "barang_merk",
-            sorter: merkSorter as CompareFn<object>,
+            title: "catatan admin",
+            dataIndex: "catatan_admin",
         },
         {
-            title: "tipe",
-            dataIndex: "barang_tipe",
-            sorter: tipeSorter as CompareFn<object>,
+            title: "keluhan",
+            dataIndex: "keluhan",
         },
+
         {
-            title: "tanggal_peroleh",
-            dataIndex: "tanggal_peroleh",
-            sorter: tahunPerolehSorter as CompareFn<object>,
-        },
-        {
-            title: "barang_nomor_seri",
-            dataIndex: "barang_nomor_seri",
-            sorter: nomorSeriSorter as CompareFn<object>,
-        },
-        {
-            title: "kondisi",
-            dataIndex: "kondisi",
+            title: "kondisi final",
+            dataIndex: "kondisi_final",
             filters: [
                 {
                     text: "Baik",
@@ -366,8 +460,8 @@ const BarangPage = ({
                     value: "Rusak Berat",
                 },
             ],
-            onFilter: (value: string | number | boolean, record: Barang) =>
-                record.kondisi.trim().toLowerCase() ===
+            onFilter: (value: string | number | boolean, record: Maintenance) =>
+                record.kondisi_final.trim().toLowerCase() ===
                 String(value).toLowerCase(),
             render: (value: string) => {
                 if (value === "Baik")
@@ -393,23 +487,13 @@ const BarangPage = ({
                     );
                 return value;
             },
-            // sorter: nomorSeriSorter as CompareFn<object>,
         },
-        {
-            title: "ruangan_nama",
-            dataIndex: "ruangan_nama",
-            // sorter: nomorSeriSorter as CompareFn<object>,
-        },
-        {
-            title: "users_nama_lengkap",
-            dataIndex: "users_nama_lengkap",
-            // sorter: nomorSeriSorter as CompareFn<object>,
-        },
+
         {
             title: "operation",
             dataIndex: "operation",
             fixed: "right",
-            render: (_, record: Barang) => {
+            render: (_, record: Maintenance) => {
                 const items: MenuProps["items"] = [
                     {
                         label: (
@@ -419,40 +503,27 @@ const BarangPage = ({
                         ),
                         key: "0",
                         onClick: () => {
-                            setOpenModalUbah(true);
-                            const recordEdited = {
-                                jenis: record.barang_jenis,
-                                merk: record.barang_merk,
-                                tipe: record.barang_tipe,
-                                nomor_seri: record.barang_nomor_seri,
-                                id: record.key,
-                            };
-                            itemAddForm.setFieldsValue(recordEdited);
-                            itemAddForm.setFieldValue(
-                                "tanggal_peroleh",
-                                dayjs(
-                                    record.tanggal_peroleh !== "0"
-                                        ? record.tanggal_peroleh
-                                        : "2000-01-01",
-                                    "YYYY-MM-DD"
-                                )
+                            pengajuanForm.setFieldValue(
+                                "sequence_id",
+                                record.id
                             );
+                            pengajuanForm.setFieldValue(
+                                "barang_id",
+                                record.barang_id
+                            );
+                            pengajuanForm.setFieldValue(
+                                "users_id",
+                                record.users_id
+                            );
+                            pengajuanForm.setFieldValue("merk", record.merk);
+                            pengajuanForm.setFieldValue("tipe", record.tipe);
+
+                            pengajuanForm.setFieldValue(
+                                "keluhan",
+                                record.keluhan
+                            );
+                            setOpenPengajuan(true);
                         },
-                    },
-                    {
-                        label: (
-                            <Popconfirm
-                                title="Hapus dari master"
-                                description="Apakah anda yakin akan menghapus ini ? "
-                                onConfirm={() => handleDelete(record.key ?? 0)}
-                                onCancel={() => console.log("Cancel")}
-                                okText="Ya"
-                                cancelText="Batalkan"
-                            >
-                                <DeleteOutlined /> Hapus
-                            </Popconfirm>
-                        ),
-                        key: "1",
                     },
                 ];
                 return dataSource.length >= 1 ? (
@@ -494,44 +565,41 @@ const BarangPage = ({
                 <Divider />
                 <HistoryBarangForm form={itemAddForm} onFinish={onFinishAdd} />
             </MyModal>
+
             <MyModal
-                title={"Ubah History Barang"}
-                openModal={openModalUbah}
-                handleOk={handleOkUbah}
-                confirmLoadingModal={confirmLoadingModalUbah}
-                handleCancel={handleCancelUbah}
-                okText="Simpan"
+                title="Form Pemeliharaan Barang"
+                openModal={openPengajuan}
+                handleOk={handleOkPengajuan}
+                confirmLoadingModal={confirmLoadingPengajuan}
+                handleCancel={handleCancelPengajuan}
+                okText="Simpan Perubahan"
                 cancelText="Batal"
+                width={600}
             >
                 <Divider />
-                <HistoryBarangForm form={itemAddForm} onFinish={onFinishEdit} />
+                <PemeliharaanForm
+                    form={pengajuanForm}
+                    onFinish={pengajuanFinish}
+                />
             </MyModal>
 
             {contextHolder}
-            <h1>History Barang</h1>
+            <h1>Daftar Pemeliharaanku</h1>
             <Divider />
             <Space style={{ display: "flex", justifyContent: "space-between" }}>
                 <Search
-                    placeholder="Cari history barang ..."
+                    placeholder="Cari info pengajuan ..."
                     allowClear
                     onSearch={onSearch}
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
-                <Button
-                    onClick={handleAdd}
-                    type="primary"
-                    style={{ marginBottom: 16 }}
-                    icon={<PlusOutlined />}
-                >
-                    Add a row
-                </Button>
             </Space>
 
             <Table
                 rowClassName={() => "editable-row"}
-                bordered
                 scroll={{ x: 1500 }}
+                bordered
                 dataSource={dataSource.filter((item) =>
                     Object.values(item)
                         .join("")
@@ -549,8 +617,8 @@ BarangPage.layout = (
 ) => (
     <AuthenticatedLayout
         user={page.props.auth.user}
-        header={<h2 className="">Kelola History Barang</h2>}
-        selectedKey="admin.kelola.history_barang.index"
+        header={<h2 className="">Pengajuan Saya</h2>}
+        selectedKey="pengajuan"
         children={page}
     ></AuthenticatedLayout>
 );

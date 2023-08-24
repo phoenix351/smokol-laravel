@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->integer('barang_id');
             $table->integer('users_id');
-            $table->string('keluhan', 255);
-            $table->string('kondisi_final', 255);
+            $table->text('keluhan')->nullable();
+            $table->string('kondisi_final', 255)->nullable();
             $table->string('catatan_admin', 255)->nullable();
             $table->string('bukti_rusak_berat', 255)->nullable();
-            $table->integer('biaya');
+            $table->integer('biaya')->nullable();
             $table->timestamps();
         });
     }

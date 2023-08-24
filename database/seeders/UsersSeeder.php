@@ -101,6 +101,8 @@ class UsersSeeder extends Seeder
             ["id" => '292',    "email" => 'zaenuri@bps.go.id',    "nama_lengkap" => 'Zaenuri Putro Utomo',    "nip" => '198101262011011005',    "bidang" => 'Fungsi Integrasi Pengolahan dan Diseminasi Statistik',    "username" => 'zaenuri',    "foto_url" => 'default.jpg', 'password' => Hash::make('password')],
             ["id" => '293',    "email" => 'herman.tinungki@bps.go.id',    "nama_lengkap" => 'Herman Tinungki SE',    "nip" => '196703311986031002',    "bidang" => 'Bagian Umum',    "username" => 'herman',    "foto_url" => 'default.jpg', 'password' => Hash::make('password')],
             ["id" => '294',    "email" => 'nurul.unonongo@bps.go.id',    "nama_lengkap" => 'Nurul Hayati Unonongo SST',    "nip" => '199311112017012002',    "bidang" => 'Bagian Umum',    "username" => 'nurul.unonongo',    "foto_url" => 'default.jpg', 'password' => Hash::make('password')],
+            ["id" => '295',    "email" => 'friska.patricia@bps.go.id',    "nama_lengkap" => 'Friska Patricia Raintung, SE',    "nip" => '198912292022032007',    "bidang" => 'Bagian Umum',    "username" => 'friska.patricia',    "foto_url" => 'default.jpg', 'password' => Hash::make('password')],
+            ["id" => '296',    "email" => 'nova.nurviana@bps.go.id',    "nama_lengkap" => 'Nova Nurviana SST, M.T.',    "nip" => '198911222013112001',    "bidang" => 'Statistik Sosial',    "username" => 'nova.nurviana',    "foto_url" => 'default.jpg', 'password' => Hash::make('password')],
         ];
         User::insert($users);
     }

@@ -19,7 +19,9 @@ class HistoryBarangUserController extends Controller
     public function index()
     {
         $user = auth()->user();
-        return Inertia::render('Barang', ['daftar_barang' => DB::table('view_barang_details')->where('id_pengguna', $user->id)->get()]);
+        return Inertia::render('Barang', ['history_barang' => DB::table('barang_view')->where('pengguna_id', $user->id)->get()]);
+
+        // return Inertia::render('Barang', ['daftar_barang' => DB::table('view_barang_details')->where('id_pengguna', $user->id)->get()]);
     }
 
     /**

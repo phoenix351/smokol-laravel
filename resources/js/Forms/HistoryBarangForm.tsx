@@ -70,9 +70,9 @@ const HistoryBarangForm: React.FC<{
 
                 // setJenisItems(response.data);
             } catch (error) {
-                console.log({ error });
+                console.error({ error });
             }
-            console.log({ jenisItems });
+            // console.log({ jenisItems });
         };
         fetchData();
     }, []);
@@ -259,7 +259,7 @@ const HistoryBarangForm: React.FC<{
             <Form.Item
                 {...formItemLayout}
                 label="Tahun Perolehan"
-                name="tahun_peroleh"
+                name="tanggal_peroleh"
                 rules={[
                     {
                         required: true,
@@ -267,7 +267,7 @@ const HistoryBarangForm: React.FC<{
                     },
                 ]}
             >
-                <DatePicker picker="year" />
+                <DatePicker picker="date" />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}

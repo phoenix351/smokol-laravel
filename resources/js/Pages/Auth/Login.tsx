@@ -17,15 +17,25 @@ const LoginForm: React.FC = () => {
     const handleSubmit = async (values: any) => {
         // console.log("Login form submitted:", values);
         // setLoading(true);
-        messageApi.open({
-            key,
-            type: "loading",
-            content: "Logging in...",
-        });
+
         try {
             router.visit(route("login", { preserveState: true }), {
                 method: "post",
                 data: values,
+                onStart: () => {
+                    messageApi.open({
+                        key,
+                        type: "loading",
+                        content: "Sedang login...",
+                    });
+                },
+                onSuccess: () => {
+                    messageApi.open({
+                        key,
+                        type: "success",
+                        content: "Login berhasil",
+                    });
+                },
             });
         } catch (error) {
             messageApi.open({

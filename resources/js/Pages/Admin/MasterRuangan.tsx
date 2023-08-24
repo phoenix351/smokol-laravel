@@ -262,6 +262,12 @@ const MasterRuangan = ({
 
     const defaultColumns: ColumnsType<MasterRuangan> = [
         {
+            title: "id",
+            dataIndex: "key",
+
+            // sorter: namaSorter as CompareFn<object>,
+        },
+        {
             title: "nama",
             dataIndex: "nama",
 

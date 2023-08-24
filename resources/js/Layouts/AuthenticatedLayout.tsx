@@ -40,6 +40,7 @@ export default function Authenticated({
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <AuthSider
+                user={user}
                 collapsed={collapsed}
                 selectedKey={selectedKey}
                 handleMenuClick={handleMenuClick}
@@ -55,7 +56,8 @@ export default function Authenticated({
                         margin: "24px 16px",
                         padding: 24,
                         minHeight: 280,
-                        background: colorBgContainer,
+                        // background: colorBgContainer,
+                        background: "transparent",
                     }}
                 >
                     {children}

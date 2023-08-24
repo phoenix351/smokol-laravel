@@ -9,6 +9,7 @@ interface ModalProps {
     handleCancel: () => void;
     okText?: string;
     cancelText?: string;
+    width?: number | string;
 }
 const MyModal = ({
     title,
@@ -18,6 +19,7 @@ const MyModal = ({
     handleCancel,
     okText,
     cancelText,
+    width,
     children,
 }: PropsWithChildren<ModalProps>) => {
     return (
@@ -30,6 +32,7 @@ const MyModal = ({
             cancelText={cancelText}
             okText={okText}
             mask={true}
+            width={width}
         >
             {children}
         </Modal>

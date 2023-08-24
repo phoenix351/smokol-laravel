@@ -5,15 +5,21 @@ use App\Http\Controllers\MasterJabatanController;
 use App\Http\Controllers\MasterRuanganController;
 use App\Http\Controllers\MasterSistemOperasiController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BastController;
 use App\Http\Controllers\HistoryBarangUserController;
 use App\Http\Controllers\ProfileController;
-use App\Models\Barang;
+use App\Http\Controllers\MaintenanceController;
+
 use App\Models\MasterBarang;
 use App\Models\MasterJabatan;
 use App\Models\MasterRuangan;
 use App\Models\MasterSistemOperasi;
+
+
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -62,6 +68,9 @@ Route::middleware('auth')->group(function () {
         $namaList = MasterRuangan::select(["nama"])->groupBy(['nama'])->get();
         return response()->json([$namaList]);
     })->name('admin.master.ruangan.nama');
+
+    route::get('/api/bast', [BastController::class, 'get_bast_by_barangId'])->name('bast');
+    route::post('/api/bast/upload', [BastController::class, 'upload'])->name('bast.upload');
 
     //route master kelola barang
     route::get('/admin/barang', [BarangController::class, 'index'])->name('admin.kelola.history_barang.index');
@@ -112,32 +121,61 @@ Route::middleware('auth')->group(function () {
     })->name('admin.master.jabatan.tingkat');
 
 
+    route::get('/dashboard', function () {
+        Log::info('Showing the user profile for user');
+
+        $kondisi = DB::table('barang')
+            ->select('kondisi', DB::raw('count(*) as jumlah'))
+            ->groupBy('kondisi')
+            ->orderBy('kondisi', "asc")
+            ->get();
+
+        $kondisi_total = $kondisi->sum('jumlah');
+
+        $ruangan_summary = DB::table('barang')
+            ->select('ruangan_id', 'master_ruangan.nama as label', DB::raw('count(*) as value'))
+            ->join('master_ruangan', 'barang.ruangan_id', '=', 'master_ruangan.id')
+            ->groupBy('ruangan_id', 'master_ruangan.nama')
+            ->orderBy('value')
+            ->get();
+        $jenis_summary = DB::table('master_barang')
+            ->select('jenis as label', DB::raw('count(*) as value'))
+            ->groupBy('label')
+            ->orderBy('value')
+            ->get();
+
+        // $kondisi_total = 100;
+        return Inertia::render('Dashboard', ['kondisi' => $kondisi, 'kondisi_total' => $kondisi_total, 'ruangan_summary' => $ruangan_summary, 'jenis_summary' => $jenis_summary]);
+    })->name('dashboard');
+
+
     route::get('/', function () {
-        return Inertia::render('Dashboard');
+        return to_route('dashboard');
     })->name('root');
 
-    route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+
     route::get('/statistics', function () {
         return Inertia::render('Statistics');
     })->name('statistics');
 
-    route::get('/pengajuan', function () {
-        return Inertia::render('Pengajuan');
-    })->name('pengajuan');
-    // route::get('/admin/kelola-barang', function () {
-    //     return Inertia::render('Admin/KelolaBarang');
-    // })->name('admin.kelola.barang');
-    route::get('/admin/kelola-pengajuan', function () {
-        return Inertia::render('Admin/KelolaPengajuan');
-    })->name('admin.kelola.pengajuan');
+
 
     //route barang untuk user
     route::get('/barang', [HistoryBarangUserController::class, 'index'])->name('barang');
     Route::patch('/barang', [HistoryBarangUserController::class, 'update'])->name('barang.update');
     Route::post('/barang', [HistoryBarangUserController::class, 'store'])->name('barang.store');
     Route::delete('/barang', [HistoryBarangUserController::class, 'destroy'])->name('barang.destroy');
+
+    Route::get('/files', [BastController::class, 'show_file'])->name('file.show');
+
+    //route untuk pengajuan
+    route::get('/pengajuan', [MaintenanceController::class, 'index'])->name('pengajuan');
+
+    Route::post('/maintenance/store', [MaintenanceController::class, 'store'])->name('maintenance.store');
+    Route::post('/maintenance/update', [MaintenanceController::class, 'update'])->name('maintenance.update');
+    Route::post('/maintenance/check', [MaintenanceController::class, 'check'])->name('maintenance.check');
+
+    route::get('/admin/kelola-pengajuan', [MaintenanceController::class, 'admin'])->name('admin.kelola.pengajuan');
 });
 
 require __DIR__ . '/auth.php';

@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Maintenance extends Model
 {
     use HasFactory;
+    protected $table = 'maintenances';
+    protected $fillable = ['sequence_id', 'status', 'created_at', 'updated_at'];
 }
