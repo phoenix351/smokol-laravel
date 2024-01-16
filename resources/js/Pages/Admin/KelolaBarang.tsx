@@ -104,6 +104,7 @@ const BarangPage = ({
             users_nama_lengkap,
             barang_id,
             pengguna_id,
+            ruangan_id,
         }): Barang => ({
             id,
             key: id,
@@ -117,6 +118,7 @@ const BarangPage = ({
             users_nama_lengkap,
             barang_id,
             pengguna_id,
+            ruangan_id,
         })
     );
     const [dataSource, setDataSource] = useState<Barang[]>(data_master);
@@ -141,6 +143,7 @@ const BarangPage = ({
                     users_nama_lengkap,
                     barang_id,
                     pengguna_id,
+                    ruangan_id,
                 }) => ({
                     key: id,
                     barang_jenis,
@@ -153,6 +156,7 @@ const BarangPage = ({
                     users_nama_lengkap,
                     barang_id,
                     pengguna_id,
+                    ruangan_id,
                 })
             ) as Barang[];
 
@@ -422,14 +426,14 @@ const BarangPage = ({
                         ),
                         key: "0",
                         onClick: () => {
-                            setOpenModalUbah(true);
                             const recordEdited = {
-                                users_id: record.pengguna_id,
+                                pengguna_id: record.pengguna_id,
                                 jenis: record.barang_jenis,
                                 merk: record.barang_merk,
                                 tipe: record.barang_tipe,
                                 nomor_seri: record.barang_nomor_seri,
                                 id: record.key,
+                                ruangan_id: record.ruangan_id,
                             };
                             itemAddForm.setFieldsValue(recordEdited);
                             itemAddForm.setFieldValue(
@@ -441,6 +445,7 @@ const BarangPage = ({
                                     "YYYY-MM-DD"
                                 )
                             );
+                            setOpenModalUbah(true);
                         },
                     },
                     {

@@ -133,7 +133,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
                 content={userPopoverContent}
                 placement="bottomRight"
                 arrow={false}
-                overlayStyle={{ width: "200px" }}
+                overlayStyle={{ width: "400px" }}
                 overlayInnerStyle={{ padding: "0" }}
             >
                 <Avatar

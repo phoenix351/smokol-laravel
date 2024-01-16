@@ -17,7 +17,7 @@ class StoreMasterBarangRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array<string, \d\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -27,6 +27,7 @@ class StoreMasterBarangRequest extends FormRequest
             'merk' => 'required',
             'tahun_peroleh' => 'required',
             'nomor_seri' => 'required',
+            'nomor_urut_pendaftaran' => 'required',
         ];
     }
 }

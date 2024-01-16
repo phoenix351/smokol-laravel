@@ -95,7 +95,7 @@ class MasterBarangController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMasterBarangRequest $request, MasterBarang $masterBarang)
+    public function update(UpdateMasterBarangRequest $request)
     {
 
 
@@ -108,7 +108,8 @@ class MasterBarangController extends Controller
             $updateRecord->update($validatedData);
 
             $response = [
-                'message' => 'Berhasil melakukan update data'
+                'message' => 'Berhasil melakukan update data',
+                'data' => $updateRecord
             ];
 
             $master_barang = MasterBarang::all();
@@ -135,6 +136,12 @@ class MasterBarangController extends Controller
                 'errors' => $e->getMessage(),
             ];
             $master_barang = [];
+        } catch (\Illuminate\Database\Eloquent\MassAssignmentException $e) {
+            // Tangkap exception jika terjadi kesalahan mass assignment
+            $response = [
+                'message' => 'Gagal melakukan update data: ' . $e->getMessage(),
+                'error' => $e->getMessage(),
+            ];
         }
 
         return Inertia::render('Admin/MasterBarang', [

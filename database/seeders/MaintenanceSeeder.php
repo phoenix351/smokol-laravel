@@ -17,237 +17,237 @@ class MaintenanceSeeder extends Seeder
             0 =>
             array(
                 'sequence_id' => 1,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             1 =>
             array(
                 'sequence_id' => 2,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             2 =>
             array(
                 'sequence_id' => 3,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             3 =>
             array(
                 'sequence_id' => 4,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             4 =>
             array(
                 'sequence_id' => 5,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             5 =>
             array(
                 'sequence_id' => 6,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             6 =>
             array(
                 'sequence_id' => 7,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             7 =>
             array(
                 'sequence_id' => 8,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             8 =>
             array(
                 'sequence_id' => 9,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             9 =>
             array(
                 'sequence_id' => 10,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             10 =>
             array(
                 'sequence_id' => 11,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             11 =>
             array(
                 'sequence_id' => 12,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             12 =>
             array(
                 'sequence_id' => 13,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             13 =>
             array(
                 'sequence_id' => 14,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             14 =>
             array(
                 'sequence_id' => 15,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             15 =>
             array(
                 'sequence_id' => 16,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             16 =>
             array(
                 'sequence_id' => 17,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             17 =>
             array(
                 'sequence_id' => 18,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             18 =>
             array(
                 'sequence_id' => 19,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             19 =>
             array(
                 'sequence_id' => 20,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             20 =>
             array(
                 'sequence_id' => 21,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             21 =>
             array(
                 'sequence_id' => 22,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             22 =>
             array(
                 'sequence_id' => 23,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             23 =>
             array(
                 'sequence_id' => 24,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             24 =>
             array(
                 'sequence_id' => 25,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             25 =>
             array(
                 'sequence_id' => 26,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             26 =>
             array(
                 'sequence_id' => 27,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             27 =>
             array(
                 'sequence_id' => 28,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             28 =>
             array(
                 'sequence_id' => 29,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             29 =>
             array(
                 'sequence_id' => 30,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             30 =>
             array(
                 'sequence_id' => 31,
-                'status' => 'Selesai',
+                'kode_status' => '6',
             ),
             31 =>
             array(
                 'sequence_id' => 32,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             32 =>
             array(
                 'sequence_id' => 33,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             33 =>
             array(
                 'sequence_id' => 34,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             34 =>
             array(
                 'sequence_id' => 35,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             35 =>
             array(
                 'sequence_id' => 36,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             36 =>
             array(
                 'sequence_id' => 37,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             37 =>
             array(
                 'sequence_id' => 38,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             38 =>
             array(
                 'sequence_id' => 39,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             39 =>
             array(
                 'sequence_id' => 40,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             40 =>
             array(
                 'sequence_id' => 41,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             41 =>
             array(
                 'sequence_id' => 42,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             42 =>
             array(
                 'sequence_id' => 43,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             43 =>
             array(
                 'sequence_id' => 44,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             44 =>
             array(
                 'sequence_id' => 45,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             45 =>
             array(
                 'sequence_id' => 46,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
             46 =>
             array(
                 'sequence_id' => 47,
-                'status' => 'Pending',
+                'kode_status' => '0',
             ),
         );
         Maintenance::insert($maintenances);

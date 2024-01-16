@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 
-class HistoryBarangUserController extends Controller
+class BarangUserController extends Controller
 {
     /**
      * Display a listing of the resource.

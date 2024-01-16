@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateBarangRequest extends FormRequest
+class UpdateBarangUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,7 @@ class UpdateBarangRequest extends FormRequest
         return [
             "id" => "required",
             "ruangan_id" => "required",
-            "pengguna_id" => "required",
+            "users_id" => "required",
         ];
     }
 }

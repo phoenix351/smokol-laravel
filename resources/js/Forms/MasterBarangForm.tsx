@@ -282,6 +282,19 @@ const MasterBarangForm: React.FC<{
             >
                 <Input />
             </Form.Item>
+            <Form.Item
+                {...formItemLayout}
+                label="Nomor Urut Pendaftaran (NUP)"
+                name="nomor_urut_pendaftaran"
+                rules={[
+                    {
+                        required: true,
+                        message: "Isian NUP harus diisi",
+                    },
+                ]}
+            >
+                <Input type="number" />
+            </Form.Item>
         </Form>
     );
 };

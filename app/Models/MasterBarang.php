@@ -9,5 +9,5 @@ class MasterBarang extends Model
 {
     use HasFactory;
     protected $table = "master_barang";
-    protected $fillable = ["id", "jenis", "merk", "tipe", "tahun_peroleh", "nomor_seri"];
+    protected $fillable = ["id", "jenis", "merk", "tipe", "tahun_peroleh", "nomor_seri", "nomor_urut_pendaftaran"];
 }

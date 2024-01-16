@@ -47,7 +47,7 @@ const AuthSider: React.FC<AuthSiderProps> = ({
             label: "Daftar Pengajuan",
         },
     ];
-    if (user.role === "admin") {
+    if (user.role === "Tim BMN" || user.role === "Tim IPDS") {
         menuItems = [
             {
                 key: "dashboard",

@@ -5,6 +5,7 @@ use App\Http\Controllers\MasterJabatanController;
 use App\Http\Controllers\MasterRuanganController;
 use App\Http\Controllers\MasterSistemOperasiController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\BarangUserController;
 use App\Http\Controllers\BastController;
 use App\Http\Controllers\HistoryBarangUserController;
 use App\Http\Controllers\ProfileController;
@@ -108,6 +109,10 @@ Route::middleware('auth')->group(function () {
         $tipeList = MasterBarang::select(["tipe"])->groupBy(['tipe'])->get();
         return response()->json([$tipeList]);
     })->name('tipe.get');
+    route::get('/api/lokasi', function () {
+        $ruanganList = MasterRuangan::select('nama', 'id')->get();
+        return response()->json([$ruanganList]);
+    })->name('lokasi.get');
 
     // route api for jabatan
     route::get('/api/master/jabatan/nama', function () {
@@ -164,7 +169,7 @@ Route::middleware('auth')->group(function () {
 
 
     //route barang untuk user
-    route::get('/barang', [BarangController::class, 'index'])->name('barang');
+    route::get('/barang', [BarangUserController::class, 'index'])->name('barang');
     Route::patch('/barang', [BarangController::class, 'update'])->name('barang.update');
     Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
     Route::delete('/barang', [BarangController::class, 'destroy'])->name('barang.destroy');
@@ -173,12 +178,16 @@ Route::middleware('auth')->group(function () {
 
     //route untuk pengajuan
     route::get('/pengajuan', [MaintenanceController::class, 'index'])->name('pengajuan');
+    route::get('/pengajuan/riwayat/{sequence_id}', [MaintenanceController::class, 'riwayat'])->name('pengajuan.riwayat');
+
 
     Route::post('/maintenance/store', [MaintenanceController::class, 'store'])->name('maintenance.store');
     Route::post('/maintenance/update', [MaintenanceController::class, 'update'])->name('maintenance.update');
     Route::post('/maintenance/check', [MaintenanceController::class, 'check'])->name('maintenance.check');
 
     route::get('/admin/kelola-pengajuan', [MaintenanceController::class, 'admin'])->name('admin.kelola.pengajuan');
+    route::get('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_fetch'])->name('admin.pengajuan.fetch');
+    route::post('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_approve'])->name('admin.pengajuan.approve');
 });
 
 require __DIR__ . '/auth.php';

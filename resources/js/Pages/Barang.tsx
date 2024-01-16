@@ -65,6 +65,8 @@ const BarangPage = ({
     const [itemAddForm] = Form.useForm();
     const [currentBarangId, setCurrentBarangId] = useState(0); //
 
+    const [currentRecord, setCurrentRecord] = useState({});
+
     // modal
     const [openModal, setOpenModal] = useState(false);
     const [openModalUbah, setOpenModalUbah] = useState(false);
@@ -566,6 +568,7 @@ const BarangPage = ({
                                 "tipe",
                                 record.barang_tipe
                             );
+                            setCurrentRecord(record);
                             setOpenPengajuan(true);
                         },
                     },
@@ -646,6 +649,7 @@ const BarangPage = ({
             >
                 <Divider />
                 <PemeliharaanForm
+                    record={currentRecord}
                     form={pengajuanForm}
                     onFinish={pengajuanFinish}
                 />

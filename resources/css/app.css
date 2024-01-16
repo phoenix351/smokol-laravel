@@ -63,4 +63,5 @@ section .air.air4 {
         background-position-x: -1000px;
     }
 }
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,900;1,900&display=swap");

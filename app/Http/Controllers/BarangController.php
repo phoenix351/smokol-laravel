@@ -92,7 +92,7 @@ class BarangController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBarangRequest $request, Barang $Barang)
+    public function update(UpdateBarangRequest $request)
     {
 
         try {
@@ -102,9 +102,11 @@ class BarangController extends Controller
             $updateRecord = Barang::findOrFail($request->id);
 
             $updateRecord->update($validatedData);
+            $updateRecord->save();
 
             $response = [
-                'message' => 'Berhasil melakukan update data'
+                'message' => 'Berhasil melakukan update data',
+                'data' => $updateRecord
             ];
 
             $history_barang = Barang::all();

@@ -22,11 +22,13 @@ class UpdateMasterBarangRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id' => 'required',
             'jenis' => 'required',
             'tipe' => 'required',
             'merk' => 'required',
             'tahun_peroleh' => 'required',
             'nomor_seri' => 'required',
+            'nomor_urut_pendaftaran' => 'required',
         ];
     }
 }

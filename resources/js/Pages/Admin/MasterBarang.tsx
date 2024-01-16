@@ -71,6 +71,7 @@ interface MasterBarang {
     merk: string;
     tahun_peroleh?: number | string | any;
     nomor_seri: string;
+    nomor_urut_pendaftaran: string;
 }
 
 const { Search } = Input;
@@ -118,6 +119,7 @@ const MasterBarang = ({
             tipe,
             tahun_peroleh,
             nomor_seri,
+            nomor_urut_pendaftaran,
         }): MasterBarang => ({
             key: id,
             jenis,
@@ -125,6 +127,7 @@ const MasterBarang = ({
             tipe,
             tahun_peroleh,
             nomor_seri,
+            nomor_urut_pendaftaran,
         })
     );
     const [dataSource, setDataSource] = useState<MasterBarang[]>(data_master);
@@ -137,13 +140,22 @@ const MasterBarang = ({
     useEffect(() => {
         setTimeout(() => {
             let data_master = master_barang.map(
-                ({ id, jenis, merk, tipe, tahun_peroleh, nomor_seri }) => ({
+                ({
+                    id,
+                    jenis,
+                    merk,
+                    tipe,
+                    tahun_peroleh,
+                    nomor_seri,
+                    nomor_urut_pendaftaran,
+                }) => ({
                     key: id,
                     jenis,
                     merk,
                     tipe,
                     tahun_peroleh,
                     nomor_seri,
+                    nomor_urut_pendaftaran,
                 })
             );
 
@@ -292,6 +304,9 @@ const MasterBarang = ({
     const tipeSorter: Sorter<MasterBarang> = createSorter("tipe");
     const merkSorter: Sorter<MasterBarang> = createSorter("merk");
     const nomorSeriSorter: Sorter<MasterBarang> = createSorter("nomor_seri");
+    const nupSorter: Sorter<MasterBarang> = createSorter(
+        "nomor_urut_pendaftaran"
+    );
     const tahunPerolehSorter: Sorter<MasterBarang> =
         createSorter("tahun_peroleh");
     interface Column {
@@ -333,6 +348,11 @@ const MasterBarang = ({
             sorter: tahunPerolehSorter as CompareFn<object>,
         },
         {
+            title: "Nomor Urut Pendaftaran (NUP)",
+            dataIndex: "nomor_urut_pendaftaran",
+            sorter: nupSorter as CompareFn<object>,
+        },
+        {
             title: "nomor_seri",
             dataIndex: "nomor_seri",
             sorter: nomorSeriSorter as CompareFn<object>,
@@ -356,6 +376,8 @@ const MasterBarang = ({
                                 merk: record.merk,
                                 tipe: record.tipe,
                                 nomor_seri: record.nomor_seri,
+                                nomor_urut_pendaftaran:
+                                    record.nomor_urut_pendaftaran,
                                 id: record.key,
                             };
                             itemAddForm.setFieldsValue(recordEdited);

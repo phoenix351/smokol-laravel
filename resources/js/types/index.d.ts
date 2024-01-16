@@ -59,6 +59,7 @@ export interface Barang {
     bast_path?: string | null;
     is_approved?: boolean;
     pengguna_id: number;
+    ruangan_id: number;
 }
 
 export interface BastType {
@@ -84,7 +85,25 @@ export interface Maintenance {
     biaya: number | null;
     created_at: string | null;
     updated_at: string | null;
-    status: string;
+    kode_status: string;
+    // status: string | null;
+    jenis: string;
+    merk: string;
+    tipe: string;
+    nomor_seri: string;
+}
+
+export interface MaintenanceHistory {
+    id: number;
+    maintenance_id: number;
+    key: number;
+    barang_id: number;
+    users_id: number;
+    sequence_id: number;
+    kode_status: string;
+    deskripsi: string;
+    created_at: string | null;
+    nama_lengkap: string;
     jenis: string;
     merk: string;
     tipe: string;

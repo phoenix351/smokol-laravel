@@ -19,6 +19,10 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
+        const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMetaTag
+            ? csrfMetaTag.getAttribute("content")
+            : "";
 
         root.render(
             <ConfigProvider
