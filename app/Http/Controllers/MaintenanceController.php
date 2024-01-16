@@ -169,6 +169,7 @@ class MaintenanceController extends Controller
         $maintenance = DB::table('maintenances')
             ->join('maintenance_sequences', 'maintenances.sequence_id', '=', 'maintenance_sequences.id')
             ->where('maintenance_sequences.barang_id', $barang_id)
+            ->where('maintenances.kode_status','6')
             ->get();
 
         return response()->json($maintenance);
@@ -203,6 +204,22 @@ class MaintenanceController extends Controller
         // Query based on 'type'
         $maintenance_list = MaintenanceSequence::select(
             // Your select statements here
+            'maintenance_sequences.id as sequence_id',
+                'maintenance_sequences.keluhan',
+                'maintenance_sequences.biaya',
+
+                'master_barang.merk',
+                'master_barang.tipe',
+                'master_barang.jenis',
+                'master_barang.nomor_seri',
+                'master_barang.nomor_urut_pendaftaran',
+
+                'status_pemeliharaan.deskripsi',
+                'status_pemeliharaan.kode_status',
+
+                'users.id as users_id',
+                'users.nama_lengkap',
+                'users.bidang',
         )
             ->join('maintenances', function ($join) {
                 $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
@@ -223,7 +240,11 @@ class MaintenanceController extends Controller
                 // Otherwise, add the type condition to the query
                 return $query->where('maintenances.kode_status', $type);
             })
-            ->when($is_user,function())
+            
+            ->when($is_user=='1', function ($query) use ($user) {
+                // If query is not empty, add the search conditions to the query
+                return $query->where('users.id','like',$user->id);
+                })
             ->when($query_search, function ($query) use ($query_search) {
                 // If query is not empty, add the search conditions to the query
                 return $query->where(function ($query) use ($query_search) {
@@ -242,218 +263,7 @@ class MaintenanceController extends Controller
         return response()->json([
             'data' => $maintenance_list,
         ]);
-        if ($type == '99') {
-            // query all
-            $maintenance_list = MaintenanceSequence::select(
-                'maintenance_sequences.id as sequence_id',
-                'maintenance_sequences.keluhan',
-                'maintenance_sequences.biaya',
-
-                'master_barang.merk',
-                'master_barang.tipe',
-                'master_barang.jenis',
-                'master_barang.nomor_seri',
-                'master_barang.nomor_urut_pendaftaran',
-
-                'status_pemeliharaan.deskripsi',
-                'status_pemeliharaan.kode_status',
-
-                'users.id as users_id',
-                'users.nama_lengkap',
-                'users.bidang',
-            )
-                ->join('maintenances', function ($join) {
-                    $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
-                        ->whereRaw('maintenances.id = (
-                                SELECT id FROM maintenances as sub_maintenances
-                                WHERE sub_maintenances.sequence_id = maintenances.sequence_id
-                                ORDER BY sub_maintenances.id DESC
-                                LIMIT 1
-                            )');
-                })
-                ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', 'maintenances.kode_status')
-                ->join('master_barang', 'master_barang.id', 'maintenance_sequences.barang_id')
-                ->join('users', 'users.id', 'maintenance_sequences.users_id')
-                ->get();
-            $maintenance_list->transform(function ($item, $key) use ($user) {
-                $item['role'] = $user->role;
-                return $item;
-            });
-            return response()->json([
-                'data' => $maintenance_list,
-            ]);
-        } else if ($type == '1') {
-            $maintenance_list = MaintenanceSequence::select(
-                'maintenance_sequences.id as sequence_id',
-                'maintenance_sequences.keluhan',
-                'maintenance_sequences.biaya',
-
-                'master_barang.merk',
-                'master_barang.tipe',
-                'master_barang.jenis',
-                'master_barang.nomor_seri',
-                'master_barang.nomor_urut_pendaftaran',
-
-                'status_pemeliharaan.deskripsi',
-                'status_pemeliharaan.kode_status',
-
-                'users.id as users_id',
-                'users.nama_lengkap',
-                'users.bidang',
-            )
-                ->join('maintenances', function ($join) {
-                    $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
-                        ->whereRaw('maintenances.id = (
-                                SELECT id FROM maintenances as sub_maintenances
-                                WHERE sub_maintenances.sequence_id = maintenances.sequence_id
-                                ORDER BY sub_maintenances.id DESC
-                                LIMIT 1
-                            )');
-                })
-                ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', 'maintenances.kode_status')
-                ->join('master_barang', 'master_barang.id', 'maintenance_sequences.barang_id')
-                ->join('users', 'users.id', 'maintenance_sequences.users_id')
-                ->where('status_pemeliharaan.kode_status', '1')
-                ->orWhere('status_pemeliharaan.kode_status', '2')
-                ->get();
-            $maintenance_list->transform(function ($item, $key) use ($user) {
-                $item['role'] = $user->role;
-                return $item;
-            });
-            return response()->json([
-                'data' => $maintenance_list,
-            ]);
-        } else {
-            $maintenance_list = MaintenanceSequence::select(
-                'maintenance_sequences.id as sequence_id',
-                'maintenance_sequences.keluhan',
-                'maintenance_sequences.biaya',
-
-                'master_barang.merk',
-                'master_barang.tipe',
-                'master_barang.jenis',
-                'master_barang.nomor_seri',
-                'master_barang.nomor_urut_pendaftaran',
-
-                'status_pemeliharaan.deskripsi',
-                'status_pemeliharaan.kode_status',
-
-                'users.id as users_id',
-                'users.nama_lengkap',
-                'users.bidang',
-            )
-                ->join('maintenances', function ($join) {
-                    $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
-                        ->whereRaw('maintenances.id = (
-                                SELECT id FROM maintenances as sub_maintenances
-                                WHERE sub_maintenances.sequence_id = maintenances.sequence_id
-                                ORDER BY sub_maintenances.id DESC
-                                LIMIT 1
-                            )');
-                })
-                ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', 'maintenances.kode_status')
-                ->join('master_barang', 'master_barang.id', 'maintenance_sequences.barang_id')
-                ->join('users', 'users.id', 'maintenance_sequences.users_id')
-                ->where('status_pemeliharaan.kode_status', 'like', $type)
-                ->get();
-            $maintenance_list->transform(function ($item, $key) use ($user) {
-                $item['role'] = $user->role;
-                return $item;
-            });
-            return response()->json([
-                'data' => $maintenance_list,
-                'status' => 'harusnya ini'
-            ]);
-        }
-
-        // } elseif ($query_search) {
-        //     // Query based on 'id'
-        // $maintenance_list = MaintenanceSequence::select(
-        //     'maintenance_sequences.id as sequence_id',
-        //     'maintenance_sequences.keluhan',
-        //     'maintenance_sequences.biaya',
-
-        //     'master_barang.merk',
-        //     'master_barang.tipe',
-        //     'master_barang.jenis',
-        //     'master_barang.nomor_seri',
-        //     'master_barang.nomor_urut_pendaftaran',
-
-        //     'status_pemeliharaan.deskripsi',
-        //     'status_pemeliharaan.kode_status',
-
-        //     'users.id as users_id',
-        //     'users.nama_lengkap',
-        //     'users.bidang',
-        // )
-        //     ->join('maintenances', function ($join) {
-        //         $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
-        //             ->whereRaw('maintenances.id = (
-        //                 SELECT id FROM maintenances as sub_maintenances
-        //                 WHERE sub_maintenances.sequence_id = maintenances.sequence_id
-        //                 ORDER BY sub_maintenances.id DESC
-        //                 LIMIT 1
-        //             )');
-        //     })
-        //     ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', 'maintenances.kode_status')
-        //     ->join('master_barang', 'master_barang.id', 'maintenance_sequences.barang_id')
-        //     ->join('users', 'users.id', 'maintenance_sequences.users_id')
-        //     ->where('users.nama_lengkap', 'like', '%' . $query_search . '%')
-        //     ->orWhere('master_barang.nomor_urut_pendaftaran', 'like', '%' . $query_search . '%')
-        //     ->orWhere('master_barang.merk', 'like', '%' . $query_search . '%')
-        //     ->orWhere('master_barang.tipe', 'like', '%' . $query_search . '%')
-        //     ->orWhere('master_barang.jenis', 'like', '%' . $query_search . '%')
-        //     // ->where('concat(master_barang.merk,master_barang.tipe, master_barang.jenis) ', 'like', '%' . $query_search . '%')
-        //     ->get();
-        //     $maintenance_list->transform(function ($item, $key) use ($user) {
-        //         $item['role'] = $user->role;
-        //         return $item;
-        //     });
-        //     return response()->json([
-        //         'data' => $maintenance_list,
-        //         'query' => $query_search
-        //     ]);
-        // } else if (is_null($query_search)) {
-        //     $maintenance_list = MaintenanceSequence::select(
-        //         'maintenance_sequences.id as sequence_id',
-        //         'maintenance_sequences.keluhan',
-        //         'maintenance_sequences.biaya',
-
-        //         'master_barang.merk',
-        //         'master_barang.tipe',
-        //         'master_barang.jenis',
-        //         'master_barang.nomor_seri',
-        //         'master_barang.nomor_urut_pendaftaran',
-
-        //         'status_pemeliharaan.deskripsi',
-        //         'status_pemeliharaan.kode_status',
-
-        //         'users.id as users_id',
-        //         'users.nama_lengkap',
-        //         'users.bidang',
-        //     )
-        //         ->join('maintenances', function ($join) {
-        //             $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
-        //                 ->whereRaw('maintenances.id = (
-        //                     SELECT id FROM maintenances as sub_maintenances
-        //                     WHERE sub_maintenances.sequence_id = maintenances.sequence_id
-        //                     ORDER BY sub_maintenances.id DESC
-        //                     LIMIT 1
-        //                 )');
-        //         })
-        //         ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', 'maintenances.kode_status')
-        //         ->join('master_barang', 'master_barang.id', 'maintenance_sequences.barang_id')
-        //         ->join('users', 'users.id', 'maintenance_sequences.users_id')
-        //         ->get();
-        //     $maintenance_list->transform(function ($item, $key) use ($user) {
-        //         $item['role'] = $user->role;
-        //         return $item;
-        //     });
-        //     return response()->json([
-        //         'data' => $maintenance_list,
-        //         'query' => 'asd'
-        //     ]);
-        // }
+       
 
     }
     public function pengajuan_approve(Request $request)

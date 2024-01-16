@@ -548,7 +548,7 @@ const BarangPage = ({
                                     barang_id: record.barang_id,
                                 }
                             );
-                            if (data.length > 0) {
+                            if (data.length < 1) {
                                 setOpenWarningModal(true);
                                 return false;
                             }

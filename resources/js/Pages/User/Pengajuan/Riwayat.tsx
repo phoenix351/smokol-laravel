@@ -362,7 +362,7 @@ const BarangPage = ({
             <Space
                 direction="horizontal"
                 style={{ backgroundColor: "whitesmoke" }}
-                onClick={() => router.visit(route("admin.kelola.pengajuan"))}
+                onClick={() => window.history.back()}
             >
                 <Button type="primary" icon={<LeftOutlined />}>
                     Kembali

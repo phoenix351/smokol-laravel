@@ -40,7 +40,7 @@ const KelolaPengajuanPage = () => {
                 // Make a fetch request to your API endpoint
                 setSearchLoading(true);
                 const response = await fetch(
-                    route("admin.pengajuan.fetch", { type: "99" })
+                    route("admin.pengajuan.fetch", { type: "99",isUser:'1' })
                 );
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
@@ -99,7 +99,7 @@ const KelolaPengajuanPage = () => {
             // Make a fetch request to your API endpoint
             setSearchLoading(true);
             const response = await fetch(
-                route("admin.pengajuan.fetch", { type: type })
+                route("admin.pengajuan.fetch", { type: type, isUser:'1' })
             );
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -123,6 +123,7 @@ const KelolaPengajuanPage = () => {
                 route("admin.pengajuan.fetch", {
                     querySearch: querySearch ? querySearch : "",
                     type: type,
+                    isUser:'1'
                 })
             );
             if (!response.ok) {
@@ -154,7 +155,7 @@ const KelolaPengajuanPage = () => {
         fetchDataByType(e.key);
     };
     const renderContent = () => {
-        return <PengajuanCard items={items} csrfToken={csrfToken} />;
+        return <PengajuanCard items={items} csrfToken={csrfToken}  />;
     };
 
     const Loading = () => (
