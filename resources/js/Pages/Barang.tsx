@@ -348,6 +348,7 @@ const BarangPage = ({
             content: "Sedang mengajukan...",
             type: "loading",
         });
+        console.log({values})
         try {
             router.post(route("maintenance.store"), values, {
                 onSuccess: (responsePage) => {

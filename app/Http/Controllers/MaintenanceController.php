@@ -90,42 +90,50 @@ class MaintenanceController extends Controller
         try {
             $validatedData = $request->validate($request->rules());
             // Log::info($validatedData['keluhan']);
+
+            // upload file 
+            // Store the uploaded file in the storage/app/public directory
+            if ($request->hasFile('problem_img_path')) {
+                // Store the uploaded problem_img_path in the storage/app/public directory
+                $filePaths = [];
+
+                foreach ($request->file('problem_img_path')['fileList'] as $file) {
+                    // Store each file in the storage/app/public directory
+                    $filePath = $file->store('public/images/problems');
+                    $filePaths[] = $filePath;
+                }
+                            // Update a variable in $validatedData with the value of $filePath
+                $validatedData['problem_img_path'] = $filePaths[0];
+            }
+         
+            // insert
+            $newSequences = MaintenanceSequence::create($validatedData);
+            $newMaintenance = Maintenance::create(['sequence_id' => $newSequences->id, 'kode_status' => '0']);
+            
             $response = [
                 'message' => 'Data berhasil ditambahkan',
                 'data' => $validatedData, 'errors' => '',
             ];
-            // cek apakah sudah ada sequence yang masih aktif
-
-            // insert
-            $newSequences = MaintenanceSequence::create($validatedData);
-            $newMaintenance = Maintenance::create(['sequence_id' => $newSequences->id, 'kode_status' => '0']);
 
             $history_barang = Maintenance::all();
-        } catch (QueryException $e) {
-            $response = [
-                'message' => 'Koneksi gagal',
-                'data_sent' => $validatedData,
-                'errors' => $e->getMessage(),
-            ];
-            $history_barang = [];
         } catch (ValidationException $e) {
-            $response = [
-                'message' => 'Validation error',
-                'errors' => $e->errors(),
-            ];
-            $history_barang = [];
-        } catch (\Exception $e) {
-            $response = [
-                'message' => 'An error occurred',
-                'errors' => $e->getMessage(),
-            ];
-            $history_barang = [];
-        }
+        $response = [
+            'message' => 'Validation error',
+            'errors' => $e->errors(),
+        ];
+        $history_barang = [];
+    } catch (\Exception $e) {
+        $response = [
+            'message' => 'An error occurred',
+            'errors' => $e->getMessage(),
+        ];
+        $history_barang = [];
+    }
 
-        return Inertia::render('Barang', [
-            'response' => $response,
-            'history_barang' => $history_barang
-        ]);
+    return Inertia::render('Barang', [
+        'response' => $response,
+        'history_barang' => $history_barang
+    ]);
     }
 
     /**

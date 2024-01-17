@@ -17,12 +17,23 @@ const PemeliharaanForm: React.FC<{
 
 
     const handleChange = ({ fileList }:any) => {
-        setFileList(fileList);
-        if (fileList.length > 0) {
-            handlePreview(fileList[fileList.length - 1]); // Preview the last added file
-          } else {
-            setPreviewImage(null); // Clear preview if no files are selected
-          }
+        const filteredFileList = fileList.filter((file:any) => {
+            const isImage = file.type.startsWith('image/');
+            if(!isImage) {
+                message.warning(`mohon maaf, ${file.name} bukan merupakan file gambar, hanya menerima gambar.`);
+            }
+            return isImage;
+          });
+        const newFileList = filteredFileList.slice(-1);
+
+        setFileList(filteredFileList);
+
+        // Preview the first image in the filtered list
+        if (filteredFileList.length > 0) {
+          handlePreview(filteredFileList[0]);
+        } else {
+          setPreviewImage(null);
+        }
       };
       const handlePreview = async (file:any) => {
         if (file.url) {
@@ -95,15 +106,19 @@ const PemeliharaanForm: React.FC<{
                     <Input.TextArea />
                 </Form.Item>
                 <Form.Item {...formItemLayout}
-                    label="file"
-                    name="file">
+                    label="tangkapan permasalahan (opsional)"
+                    name="problem_img_path">
                     <Upload
                     onChange={handleChange}
                     fileList={fileList}
                     beforeUpload={()=>false}
                     onPreview={handlePreview}
-                    listType="picture-card">
-          <Button icon={<UploadOutlined />}>Select File</Button>
+                    multiple={false} // Ensure only one file can be uploaded
+
+                    // disabled={fileList.length > 0}
+
+                    >
+    {fileList.length === 0 && <Button icon={<UploadOutlined />}>Select File</Button>}
 
                     </Upload>
                 </Form.Item>
