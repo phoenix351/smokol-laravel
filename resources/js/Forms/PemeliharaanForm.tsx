@@ -12,40 +12,49 @@ const PemeliharaanForm: React.FC<{
         wrapperCol: { span: 24 },
     };
     const [messageApi, contextHolder] = message.useMessage();
-    const [fileList,setFileList] = useState([]);
-    const [previewImage, setPreviewImage] = useState<string | ArrayBuffer|null>(null);
+    const [file, setFile] = useState(null);    
+    const [previewImage, setPreviewImage] = useState<
+        string | ArrayBuffer | null
+    >(null);
 
-
-    const handleChange = ({ fileList }:any) => {
-        const filteredFileList = fileList.filter((file:any) => {
-            const isImage = file.type.startsWith('image/');
-            if(!isImage) {
-                message.warning(`mohon maaf, ${file.name} bukan merupakan file gambar, hanya menerima gambar.`);
-            }
-            return isImage;
-          });
-        const newFileList = filteredFileList.slice(-1);
-
-        setFileList(filteredFileList);
-
-        // Preview the first image in the filtered list
-        if (filteredFileList.length > 0) {
-          handlePreview(filteredFileList[0]);
-        } else {
-          setPreviewImage(null);
+    const handleChange = (info: any) => {
+        // console.log({info})
+        const { fileList } = info;
+        
+        const file = fileList.length>0 ? fileList[0]:false;
+        if (!file) {
+            setFile(null)
+            setPreviewImage(null)
+            return false}
+        
+        // console.log({file})
+        if ( file.originFileObj) {
+           setFile(file);
+           handlePreview(file);
         }
-      };
-      const handlePreview = async (file:any) => {
+        // const isImage = file.type.startsWith("image/");
+        // if (!isImage) {
+        //     message.warning(
+        //         `mohon maaf, ${file.name} bukan merupakan file gambar, hanya menerima gambar.`
+        //     );
+        //     setPreviewImage(null);
+        // } else {
+        //     setFile(file);
+        //     handlePreview(file);
+        // }
+    };
+    const handlePreview = async (file: any) => {
+        console.log({ file });
         if (file.url) {
             setPreviewImage(file.url);
-          } else {
+        } else {
             const reader = new FileReader();
             reader.onloadend = () => {
-              setPreviewImage(reader.result);
+                setPreviewImage(reader.result);
             };
             reader.readAsDataURL(file.originFileObj);
-          }
-      };
+        }
+    };
     return (
         <>
             <Form
@@ -105,30 +114,29 @@ const PemeliharaanForm: React.FC<{
                 >
                     <Input.TextArea />
                 </Form.Item>
-                <Form.Item {...formItemLayout}
+                <Form.Item
+                    {...formItemLayout}
                     label="tangkapan permasalahan (opsional)"
-                    name="problem_img_path">
+                    name="problem_img_path"
+                >
                     <Upload
-                    onChange={handleChange}
-                    fileList={fileList}
-                    beforeUpload={()=>false}
-                    onPreview={handlePreview}
-                    multiple={false} // Ensure only one file can be uploaded
+                        onChange={handleChange}
+                        beforeUpload={() => false}
+                        onPreview={handlePreview}
+                        multiple={false}
 
-                    // disabled={fileList.length > 0}
-
+                        // disabled={fileList.length > 0}
                     >
-    {fileList.length === 0 && <Button icon={<UploadOutlined />}>Select File</Button>}
-
+                       {file!==null? '':<Button icon={<UploadOutlined />}>Select File</Button>}
                     </Upload>
                 </Form.Item>
                 {previewImage && (
-          <img
-            alt="Preview"
-            style={{ width: '100%', marginTop: '10px' }}
-            src={previewImage as string}
-          />
-        )}
+                    <img
+                        alt="Preview"
+                        style={{ width: "100%", marginTop: "10px" }}
+                        src={previewImage as string}
+                    />
+                )}
             </Form>
         </>
     );

@@ -349,8 +349,16 @@ const BarangPage = ({
             type: "loading",
         });
         console.log({values})
+        const copyValues = {...values};
         try {
-            router.post(route("maintenance.store"), values, {
+            
+            copyValues['problem_img_path'] = values.problem_img_path.fileList[0].originFileObj;
+        } catch (error) {
+            copyValues['problem_img_path'] = '';
+            
+        }
+        try {
+            router.post(route("maintenance.store"), copyValues, {
                 onSuccess: (responsePage) => {
                     const response: any = responsePage.props.response;
                     console.log({ response });
@@ -549,6 +557,7 @@ const BarangPage = ({
                                     barang_id: record.barang_id,
                                 }
                             );
+                            console.log({dataLeng :data.length})
                             if (data.length < 1) {
                                 setOpenWarningModal(true);
                                 return false;

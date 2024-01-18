@@ -95,15 +95,22 @@ class MaintenanceController extends Controller
             // Store the uploaded file in the storage/app/public directory
             if ($request->hasFile('problem_img_path')) {
                 // Store the uploaded problem_img_path in the storage/app/public directory
-                $filePaths = [];
+                // $filePaths = [];
 
-                foreach ($request->file('problem_img_path')['fileList'] as $file) {
-                    // Store each file in the storage/app/public directory
-                    $filePath = $file->store('public/images/problems');
-                    $filePaths[] = $filePath;
-                }
+                $path = $request->file('problem_img_path')->store('public/images/problems');
+                // $imageUrl = Storage::url($path);
+                // return response()->json(['data'=>$path]);
+
+                // foreach ($request->file('problem_img_path')['fileList'] as $file) {
+                //     // Store each file in the storage/app/public directory
+                //     $filePath = $file->store('public/images/problems');
+                //     $filePaths[] = $filePath;
+                // }
                             // Update a variable in $validatedData with the value of $filePath
-                $validatedData['problem_img_path'] = $filePaths[0];
+                $validatedData['problem_img_path'] = $path;
+            } else {
+                $validatedData['problem_img_path'] = null;
+                
             }
          
             // insert
@@ -174,11 +181,20 @@ class MaintenanceController extends Controller
     public function check(Request $request)
     {
         $barang_id = $request->post('barang_id');
-        $maintenance = DB::table('maintenances')
-            ->join('maintenance_sequences', 'maintenances.sequence_id', '=', 'maintenance_sequences.id')
-            ->where('maintenance_sequences.barang_id', $barang_id)
-            ->where('maintenances.kode_status','6')
-            ->get();
+        $last_sequence = MaintenanceSequence::where('barang_id',$barang_id)->orderBy('id','DESC')->first();
+        if($last_sequence) {
+            $last_sequence_id = $last_sequence->id;
+            $maintenance = Maintenance::where('sequence_id',$last_sequence_id)->where('kode_status','6')->get();
+        }
+        else {
+            $maintenance = ['boleh'];
+        }
+
+        // $maintenance = DB::table('maintenances')
+        //     ->join('maintenance_sequences', 'maintenances.sequence_id', '=', 'maintenance_sequences.id')
+        //     ->where('maintenance_sequences.barang_id', $barang_id)
+        //     ->where('maintenances.kode_status','6')
+        //     ->get();
 
         return response()->json($maintenance);
     }
@@ -193,8 +209,13 @@ class MaintenanceController extends Controller
                 'users.nama_lengkap'
             )->get();
         $barang_id = DB::table('maintenance_sequences')->where('id', $sequence_id)->value('barang_id');
+        $img_path = DB::table('maintenance_sequences')->where('id', $sequence_id)->value('problem_img_path');
 
         $detail_barang = DB::table('master_barang')->where('id', $barang_id)->select('jenis', 'merk', 'tipe', 'nomor_seri')->first();
+        if(strlen($img_path)>0) {
+            
+            $detail_barang->image_path = Storage::url($img_path);
+        }
         return Inertia::render('User/Pengajuan/Riwayat', ['history_list' => $maintenance_list, 'detail_barang' => $detail_barang]);
     }
     public function pengajuan_fetch(Request $request)
