@@ -20,7 +20,8 @@ import {
     Spin,
 } from "antd";
 
-import PengajuanCard from "@/Components/PengajuanCard";
+import UserPengajuanCard from "@/Components/UserPengajuanCard";
+
 
 const { Search } = Input;
 
@@ -155,7 +156,7 @@ const KelolaPengajuanPage = () => {
         fetchDataByType(e.key);
     };
     const renderContent = () => {
-        return <PengajuanCard items={items} csrfToken={csrfToken}  />;
+        return <UserPengajuanCard items={items} csrfToken={csrfToken}  />;
     };
 
     const Loading = () => (

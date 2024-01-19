@@ -21,6 +21,7 @@ import {
 } from "antd";
 
 import PengajuanCard from "@/Components/PengajuanCard";
+import MyModal from "@/Components/Modal";
 
 const { Search } = Input;
 
@@ -156,7 +157,7 @@ const KelolaPengajuanPage = () => {
     const renderContent = () => {
         return <PengajuanCard items={items} csrfToken={csrfToken} />;
     };
-
+    
     const Loading = () => (
         <Card
             style={{
@@ -171,6 +172,8 @@ const KelolaPengajuanPage = () => {
 
     return (
         <div>
+            
+
             <Head title="History Barang" />
 
             <h1 style={{ marginBottom: "10px" }}>Daftar Pengajuan Pegawai</h1>

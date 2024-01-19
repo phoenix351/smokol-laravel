@@ -188,6 +188,12 @@ Route::middleware('auth')->group(function () {
     route::get('/admin/kelola-pengajuan', [MaintenanceController::class, 'admin'])->name('admin.kelola.pengajuan');
     route::get('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_fetch'])->name('admin.pengajuan.fetch');
     route::post('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_approve'])->name('admin.pengajuan.approve');
+
+    Route::get('/editable', function () {
+        return Inertia::render('Editable');
+
+    });
+
 });
 
 require __DIR__ . '/auth.php';
