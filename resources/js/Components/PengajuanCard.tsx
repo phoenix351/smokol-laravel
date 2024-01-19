@@ -69,30 +69,31 @@ const handleApprove = async (
         // Add any other data you need for the approval
     };
 
-    try {
-        // Make the POST request to send the approval data
-        const response = await fetch(route("admin.pengajuan.approve"), {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": csrfToken ? csrfToken : "",
+    console.log("opening approval modal");
+    // try {
+    //     // Make the POST request to send the approval data
+    //     const response = await fetch(route("admin.pengajuan.approve"), {
+    //         method: "POST",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //             "X-CSRF-TOKEN": csrfToken ? csrfToken : "",
 
-                // Add any other headers you need
-            },
-            body: JSON.stringify(approvalData), // Convert the approval data to JSON format
-        });
+    //             // Add any other headers you need
+    //         },
+    //         body: JSON.stringify(approvalData), // Convert the approval data to JSON format
+    //     });
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
+    //     if (!response.ok) {
+    //         throw new Error("Network response was not ok");
+    //     }
 
-        const data = await response.json(); // Parse the response JSON
+    //     const data = await response.json(); // Parse the response JSON
 
-        // Handle the response data if needed
-    } catch (error) {
-        // Handle any errors that occurred during the fetch
-        console.error("Error:", error);
-    }
+    //     // Handle the response data if needed
+    // } catch (error) {
+    //     // Handle any errors that occurred during the fetch
+    //     console.error("Error:", error);
+    // }
 
     // return users_id + kode_status + sequence_id;
 };
@@ -128,7 +129,7 @@ const PengajuanCard: React.FC<{
                         actionItems = [<EllipsisOutlined key="ellipsis" />];
                     } else if (
                         item.kode_status == "0" &&
-                        item.role == "Tim BMN"
+                        item.role == "Tim IPDS"
                     ) {
                         actionItems = [
                             <div
@@ -157,7 +158,7 @@ const PengajuanCard: React.FC<{
                         ];
                     } else if (
                         item.kode_status == "1" &&
-                        item.role == "Tim IPDS"
+                        item.role == "Tim BMN"
                     ) {
                         actionItems = [
                             <div

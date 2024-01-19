@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class MaintenanceController extends Controller
 {
@@ -106,17 +107,16 @@ class MaintenanceController extends Controller
                 //     $filePath = $file->store('public/images/problems');
                 //     $filePaths[] = $filePath;
                 // }
-                            // Update a variable in $validatedData with the value of $filePath
+                // Update a variable in $validatedData with the value of $filePath
                 $validatedData['problem_img_path'] = $path;
             } else {
                 $validatedData['problem_img_path'] = null;
-                
             }
-         
+
             // insert
             $newSequences = MaintenanceSequence::create($validatedData);
             $newMaintenance = Maintenance::create(['sequence_id' => $newSequences->id, 'kode_status' => '0']);
-            
+
             $response = [
                 'message' => 'Data berhasil ditambahkan',
                 'data' => $validatedData, 'errors' => '',
@@ -124,23 +124,23 @@ class MaintenanceController extends Controller
 
             $history_barang = Maintenance::all();
         } catch (ValidationException $e) {
-        $response = [
-            'message' => 'Validation error',
-            'errors' => $e->errors(),
-        ];
-        $history_barang = [];
-    } catch (\Exception $e) {
-        $response = [
-            'message' => 'An error occurred',
-            'errors' => $e->getMessage(),
-        ];
-        $history_barang = [];
-    }
+            $response = [
+                'message' => 'Validation error',
+                'errors' => $e->errors(),
+            ];
+            $history_barang = [];
+        } catch (\Exception $e) {
+            $response = [
+                'message' => 'An error occurred',
+                'errors' => $e->getMessage(),
+            ];
+            $history_barang = [];
+        }
 
-    return Inertia::render('Barang', [
-        'response' => $response,
-        'history_barang' => $history_barang
-    ]);
+        return Inertia::render('Barang', [
+            'response' => $response,
+            'history_barang' => $history_barang
+        ]);
     }
 
     /**
@@ -181,12 +181,11 @@ class MaintenanceController extends Controller
     public function check(Request $request)
     {
         $barang_id = $request->post('barang_id');
-        $last_sequence = MaintenanceSequence::where('barang_id',$barang_id)->orderBy('id','DESC')->first();
-        if($last_sequence) {
+        $last_sequence = MaintenanceSequence::where('barang_id', $barang_id)->orderBy('id', 'DESC')->first();
+        if ($last_sequence) {
             $last_sequence_id = $last_sequence->id;
-            $maintenance = Maintenance::where('sequence_id',$last_sequence_id)->where('kode_status','6')->get();
-        }
-        else {
+            $maintenance = Maintenance::where('sequence_id', $last_sequence_id)->where('kode_status', '6')->get();
+        } else {
             $maintenance = ['boleh'];
         }
 
@@ -212,8 +211,8 @@ class MaintenanceController extends Controller
         $img_path = DB::table('maintenance_sequences')->where('id', $sequence_id)->value('problem_img_path');
 
         $detail_barang = DB::table('master_barang')->where('id', $barang_id)->select('jenis', 'merk', 'tipe', 'nomor_seri')->first();
-        if(strlen($img_path)>0) {
-            
+        if (strlen($img_path) > 0) {
+
             $detail_barang->image_path = Storage::url($img_path);
         }
         return Inertia::render('User/Pengajuan/Riwayat', ['history_list' => $maintenance_list, 'detail_barang' => $detail_barang]);
@@ -234,21 +233,21 @@ class MaintenanceController extends Controller
         $maintenance_list = MaintenanceSequence::select(
             // Your select statements here
             'maintenance_sequences.id as sequence_id',
-                'maintenance_sequences.keluhan',
-                'maintenance_sequences.biaya',
+            'maintenance_sequences.keluhan',
+            'maintenance_sequences.biaya',
 
-                'master_barang.merk',
-                'master_barang.tipe',
-                'master_barang.jenis',
-                'master_barang.nomor_seri',
-                'master_barang.nomor_urut_pendaftaran',
+            'master_barang.merk',
+            'master_barang.tipe',
+            'master_barang.jenis',
+            'master_barang.nomor_seri',
+            'master_barang.nomor_urut_pendaftaran',
 
-                'status_pemeliharaan.deskripsi',
-                'status_pemeliharaan.kode_status',
+            'status_pemeliharaan.deskripsi',
+            'status_pemeliharaan.kode_status',
 
-                'users.id as users_id',
-                'users.nama_lengkap',
-                'users.bidang',
+            'users.id as users_id',
+            'users.nama_lengkap',
+            'users.bidang',
         )
             ->join('maintenances', function ($join) {
                 $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
@@ -269,11 +268,11 @@ class MaintenanceController extends Controller
                 // Otherwise, add the type condition to the query
                 return $query->where('maintenances.kode_status', $type);
             })
-            
-            ->when($is_user=='1', function ($query) use ($user) {
+
+            ->when($is_user == '1', function ($query) use ($user) {
                 // If query is not empty, add the search conditions to the query
-                return $query->where('users.id','like',$user->id);
-                })
+                return $query->where('users.id', 'like', $user->id);
+            })
             ->when($query_search, function ($query) use ($query_search) {
                 // If query is not empty, add the search conditions to the query
                 return $query->where(function ($query) use ($query_search) {
@@ -292,8 +291,6 @@ class MaintenanceController extends Controller
         return response()->json([
             'data' => $maintenance_list,
         ]);
-       
-
     }
     public function pengajuan_approve(Request $request)
     {

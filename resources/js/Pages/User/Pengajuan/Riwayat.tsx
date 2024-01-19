@@ -21,6 +21,7 @@ import {
     Typography,
     Table,
     Button,
+    Image,
 } from "antd";
 import {
     EditOutlined,
@@ -377,10 +378,12 @@ const BarangPage = ({
                 </h3>
             </Space>
             <Divider />
-            <h1>{detail_barang.image_path}</h1>
-            <img src={detail_barang.image_path} alt="Example Image" />
-
-
+            {/* <h1>{detail_barang.image_path}</h1> */}
+            {detail_barang.image_path ? (
+                <Image src={detail_barang.image_path} alt="Example Image" />
+            ) : (
+                ""
+            )}
 
             <Table
                 rowClassName={() => "editable-row"}
