@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useState } from "react";
-import { Button, Modal } from "antd";
+import { Button, Divider, Modal } from "antd";
 
 interface ModalProps {
     title: string;
@@ -34,6 +34,7 @@ const MyModal = ({
             mask={true}
             width={width}
         >
+            <Divider />
             {children}
         </Modal>
     );

@@ -7,13 +7,12 @@ import {
     SettingOutlined,
 } from "@ant-design/icons";
 import { router } from "@inertiajs/react";
-import { Card, Divider, Empty, Space, Typography } from "antd";
+import { Card, Divider, Empty, Form, Space, Typography } from "antd";
 import { ReactNode, useState } from "react";
 import { JSX } from "react/jsx-runtime";
 import MyModal from "./Modal";
 import PemeliharaanForm from "@/Forms/PemeliharaanForm";
 import PemeriksaanForm from "@/Forms/PemeriksaanBarang";
-
 
 const { Meta } = Card;
 const { Text } = Typography;
@@ -49,6 +48,8 @@ interface ApproveProps {
     users_id: number;
     kode_status: string;
     sequence_id: number;
+    merk: string;
+    tipe: string;
 }
 const actionIconStyle = {
     marginRight: 13,
@@ -67,9 +68,12 @@ const PengajuanCard: React.FC<{
     const [openTechCheckForm, setOpenTechCheckForm] = useState(false);
     const [loadingTechCheckForm, setLoadingTechCheckForm] = useState(false);
 
+    // define the form
+    const [pemeriksaanForm] = Form.useForm();
+
     const handleApprove = async (
         event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-        { users_id, kode_status, sequence_id }: ApproveProps,
+        { users_id, kode_status, sequence_id, merk, tipe }: ApproveProps,
         csrfToken: string | null
     ) => {
         // Create the approval data object
@@ -80,7 +84,12 @@ const PengajuanCard: React.FC<{
             csrfToken,
             // Add any other data you need for the approval
         };
-
+        pemeriksaanForm.setFieldsValue({
+            users_id: users_id,
+            sequence_id: sequence_id,
+            merk: merk,
+            tipe: tipe,
+        });
 
         setOpenTechCheckForm(true);
         // try {
@@ -312,8 +321,10 @@ const PengajuanCard: React.FC<{
                 handleOk={() => setOpenTechCheckForm(false)}
                 openModal={openTechCheckForm}
             >
-            <PemeriksaanForm
-                    onFinish={(values) => console.log({ values })} form={undefined}            />
+                <PemeriksaanForm
+                    onFinish={(values) => console.log({ values })}
+                    form={pemeriksaanForm}
+                />
             </MyModal>
         </>
     );

@@ -12,7 +12,7 @@ const PemeriksaanForm: React.FC<{
         wrapperCol: { span: 24 },
     };
     const [messageApi, contextHolder] = message.useMessage();
-    const [file, setFile] = useState(null);    
+    const [file, setFile] = useState(null);
     const [previewImage, setPreviewImage] = useState<
         string | ArrayBuffer | null
     >(null);
@@ -20,17 +20,18 @@ const PemeriksaanForm: React.FC<{
     const handleChange = (info: any) => {
         // console.log({info})
         const { fileList } = info;
-        
-        const file = fileList.length>0 ? fileList[0]:false;
+
+        const file = fileList.length > 0 ? fileList[0] : false;
         if (!file) {
-            setFile(null)
-            setPreviewImage(null)
-            return false}
-        
+            setFile(null);
+            setPreviewImage(null);
+            return false;
+        }
+
         // console.log({file})
-        if ( file.originFileObj) {
-           setFile(file);
-           handlePreview(file);
+        if (file.originFileObj) {
+            setFile(file);
+            handlePreview(file);
         }
         // const isImage = file.type.startsWith("image/");
         // if (!isImage) {
@@ -55,6 +56,7 @@ const PemeriksaanForm: React.FC<{
             reader.readAsDataURL(file.originFileObj);
         }
     };
+    const [showSolution, setShowSolution] = useState(false);
     return (
         <>
             <Form
@@ -86,7 +88,7 @@ const PemeriksaanForm: React.FC<{
                     {...formItemLayout}
                     label="users_id"
                     name="users_id"
-                    style={{ display: "none" }}
+                    // style={{ display: "none" }}
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -116,28 +118,55 @@ const PemeriksaanForm: React.FC<{
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="Solusi yang Dilakukan"
-                    name="solution"
-                    // style={{ display: "none" }}
-                >
-                    <Input.TextArea />
-                </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
                     label="Tindak Lanjut"
                     name="next_step"
                     // style={{ display: "none" }}
                 >
-                    <Select options={[
-                        { value: 'sample', label: <span>sample</span> },
-                        { value: 'sample', label: <span>sample</span> },
-                        { value: 'sample', label: <span>sample</span> },
-                        { value: 'sample', label: <span>sample</span> },
-                        { value: 'sample', label: <span>sample</span> },
-                        { value: 'sample', label: <span>sample</span> },
-                    ]} />
+                    <Select
+                        onChange={() => {
+                            let nextValue = form.getFieldValue("next_step");
+                            if (nextValue === "0") {
+                                setShowSolution(true);
+                            } else {
+                                setShowSolution(false);
+                            }
+                        }}
+                        options={[
+                            {
+                                value: "0",
+                                label: (
+                                    <span>Diiperbaiki langsung Oleh IPDS</span>
+                                ),
+                            },
+                            {
+                                value: "1",
+                                label: (
+                                    <span>
+                                        Tidak memungkinkan untuk Diperbaiki
+                                    </span>
+                                ),
+                            },
+                            {
+                                value: "2",
+                                label: (
+                                    <span>
+                                        Diteruskan untuk Dilakukan Pemeliharaan
+                                    </span>
+                                ),
+                            },
+                        ]}
+                    />
                 </Form.Item>
-           
+
+                {showSolution && (
+                    <Form.Item
+                        label="Solusi yang Diterapkan"
+                        name="solution"
+                        id="solution"
+                    >
+                        <Input.TextArea />
+                    </Form.Item>
+                )}
             </Form>
         </>
     );
