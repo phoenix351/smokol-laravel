@@ -109,3 +109,21 @@ export interface MaintenanceHistory {
     tipe: string;
     nomor_seri: string;
 }
+export interface PengajuanItem {
+    spek_path: any;
+    problem_img_path: string | null;
+    sequence_id: number;
+    bidang: string;
+    deskripsi: string;
+    kode_status: string;
+    jenis: string;
+    merk: string;
+    tipe: string;
+    users_id: number;
+    nama_lengkap: string;
+    nomor_seri: string;
+    nomor_urut_pendaftaran: string;
+    keluhan: string;
+    biaya: number;
+    role: string;
+}

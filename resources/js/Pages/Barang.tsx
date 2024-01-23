@@ -138,6 +138,7 @@ const BarangPage = ({
             barang_nomor_seri,
             kondisi,
             ruangan_nama,
+            ruangan_id,
             users_nama_lengkap,
             bast_path,
             is_approved,
@@ -153,6 +154,7 @@ const BarangPage = ({
             barang_nomor_seri,
             kondisi,
             ruangan_nama,
+            ruangan_id,
             users_nama_lengkap,
             bast_path,
             is_approved,
@@ -348,14 +350,13 @@ const BarangPage = ({
             content: "Sedang mengajukan...",
             type: "loading",
         });
-        console.log({values})
-        const copyValues = {...values};
+        console.log({ values });
+        const copyValues = { ...values };
         try {
-            
-            copyValues['problem_img_path'] = values.problem_img_path.fileList[0].originFileObj;
+            copyValues["problem_img_path"] =
+                values.problem_img_path.fileList[0].originFileObj;
         } catch (error) {
-            copyValues['problem_img_path'] = '';
-            
+            copyValues["problem_img_path"] = "";
         }
         try {
             router.post(route("maintenance.store"), copyValues, {
@@ -557,7 +558,7 @@ const BarangPage = ({
                                     barang_id: record.barang_id,
                                 }
                             );
-                            console.log({dataLeng :data.length})
+                            console.log({ dataLeng: data.length });
                             if (data.length < 1) {
                                 setOpenWarningModal(true);
                                 return false;

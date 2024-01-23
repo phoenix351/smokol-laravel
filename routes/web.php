@@ -184,6 +184,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/maintenance/store', [MaintenanceController::class, 'store'])->name('maintenance.store');
     Route::post('/maintenance/update', [MaintenanceController::class, 'update'])->name('maintenance.update');
     Route::post('/maintenance/check', [MaintenanceController::class, 'check'])->name('maintenance.check');
+    Route::post('/maintenance/inspect/ipds', [MaintenanceController::class, 'PemeriksaanIPDS'])->name('maintenance.inspect.ipds.store');
+    Route::post('/maintenance/inspect/bmn', [MaintenanceController::class, 'PemeriksaanBMN'])->name('maintenance.inspect.bmn.store');
+    Route::post('/maintenance/inspect/pbj-ppk', [MaintenanceController::class, 'PemeriksaanPBJ_PPK'])->name('maintenance.inspect.pbj-ppk.store');
 
     route::get('/admin/kelola-pengajuan', [MaintenanceController::class, 'admin'])->name('admin.kelola.pengajuan');
     route::get('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_fetch'])->name('admin.pengajuan.fetch');
@@ -191,9 +194,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/editable', function () {
         return Inertia::render('Editable');
-
     });
-
 });
 
 require __DIR__ . '/auth.php';

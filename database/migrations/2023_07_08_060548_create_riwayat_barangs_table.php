@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('riwayat_barang', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('barang_id');
-            $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade');
+            $table->foreign('barang_id')->references('id')->on('master_barang')->onDelete('cascade');
             $table->timestamp('waktu_perubahan');
             $table->unsignedBigInteger('pengguna_id');
             $table->foreign('pengguna_id')->references('id')->on('users')->onDelete('cascade');

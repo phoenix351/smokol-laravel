@@ -4,15 +4,19 @@ import {
     EditOutlined,
     EllipsisOutlined,
     EyeOutlined,
+    FilePdfOutlined,
     SettingOutlined,
 } from "@ant-design/icons";
 import { router } from "@inertiajs/react";
-import { Card, Divider, Empty, Form, Space, Typography } from "antd";
+import { Button, Card, Divider, Empty, Form, Space, Typography } from "antd";
 import { ReactNode, useState } from "react";
 import { JSX } from "react/jsx-runtime";
 import MyModal from "./Modal";
 import PemeliharaanForm from "@/Forms/PemeliharaanForm";
 import PemeriksaanForm from "@/Forms/PemeriksaanBarang";
+import PemeriksaanBMN from "@/Forms/PemeriksaanBMN";
+import { PengajuanItem } from "@/types";
+import PemeriksaanPBJPPK from "@/Forms/PemeriksaanPBJPPK";
 
 const { Meta } = Card;
 const { Text } = Typography;
@@ -28,22 +32,22 @@ const rules = [
         message: "Please upload a file",
     },
 ];
-interface PengajuanItem {
-    sequence_id: number;
-    bidang: string;
-    deskripsi: string;
-    kode_status: string;
-    jenis: string;
-    merk: string;
-    tipe: string;
-    users_id: number;
-    nama_lengkap: string;
-    nomor_seri: string;
-    nomor_urut_pendaftaran: string;
-    keluhan: string;
-    biaya: number;
-    role: string;
-}
+// interface PengajuanItem {
+//     sequence_id: number;
+//     bidang: string;
+//     deskripsi: string;
+//     kode_status: string;
+//     jenis: string;
+//     merk: string;
+//     tipe: string;
+//     users_id: number;
+//     nama_lengkap: string;
+//     nomor_seri: string;
+//     nomor_urut_pendaftaran: string;
+//     keluhan: string;
+//     biaya: number;
+//     role: string;
+// }
 interface ApproveProps {
     users_id: number;
     kode_status: string;
@@ -66,10 +70,16 @@ const PengajuanCard: React.FC<{
     csrfToken: string | null;
 }> = ({ items, csrfToken }) => {
     const [openTechCheckForm, setOpenTechCheckForm] = useState(false);
+    const [openBMNCheckForm, setOpenBMNCheckForm] = useState(false);
+    const [openPbjPpkCheckForm, setOpenPbjPpkCheckForm] = useState(false);
     const [loadingTechCheckForm, setLoadingTechCheckForm] = useState(false);
+    const [loadingBMNCheckForm, setLoadingBMNCheckForm] = useState(false);
+    const [loadingPbjPpkCheckForm, setLoadingPbjPpkCheckForm] = useState(false);
 
     // define the form
     const [pemeriksaanForm] = Form.useForm();
+    const [pemeriksaanBMN] = Form.useForm();
+    const [pemeriksaanPbjPpk] = Form.useForm();
 
     const handleApprove = async (
         event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
@@ -92,32 +102,50 @@ const PengajuanCard: React.FC<{
         });
 
         setOpenTechCheckForm(true);
-        // try {
-        //     // Make the POST request to send the approval data
-        //     const response = await fetch(route("admin.pengajuan.approve"), {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //             "X-CSRF-TOKEN": csrfToken ? csrfToken : "",
+    };
+    const handleApproveBMN = async (
+        event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+        { users_id, kode_status, sequence_id, merk, tipe }: ApproveProps,
+        csrfToken: string | null
+    ) => {
+        // Create the approval data object
+        const approvalData = {
+            users_id,
+            kode_status,
+            sequence_id,
+            csrfToken,
+            // Add any other data you need for the approval
+        };
+        pemeriksaanBMN.setFieldsValue({
+            users_id: users_id,
+            sequence_id: sequence_id,
+            merk: merk,
+            tipe: tipe,
+        });
 
-        //             // Add any other headers you need
-        //         },
-        //         body: JSON.stringify(approvalData), // Convert the approval data to JSON format
-        //     });
+        setOpenBMNCheckForm(true);
+    };
+    const handleApprovePbjPpk = async (
+        event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+        { users_id, kode_status, sequence_id, merk, tipe }: ApproveProps,
+        csrfToken: string | null
+    ) => {
+        // Create the approval data object
+        const approvalData = {
+            users_id,
+            kode_status,
+            sequence_id,
+            csrfToken,
+            // Add any other data you need for the approval
+        };
+        pemeriksaanPbjPpk.setFieldsValue({
+            users_id: users_id,
+            sequence_id: sequence_id,
+            merk: merk,
+            tipe: tipe,
+        });
 
-        //     if (!response.ok) {
-        //         throw new Error("Network response was not ok");
-        //     }
-
-        //     const data = await response.json(); // Parse the response JSON
-
-        //     // Handle the response data if needed
-        // } catch (error) {
-        //     // Handle any errors that occurred during the fetch
-        //     console.error("Error:", error);
-        // }
-
-        // return users_id + kode_status + sequence_id;
+        setOpenPbjPpkCheckForm(true);
     };
 
     const handleReject = (
@@ -136,6 +164,7 @@ const PengajuanCard: React.FC<{
 
         // return users_id + kode_status + sequence_id;
     };
+    console.log({ items });
     return (
         <>
             <Space direction="vertical" style={{ width: "100%" }}>
@@ -146,8 +175,20 @@ const PengajuanCard: React.FC<{
                             | ReactNode[]
                             | undefined = [];
 
-                        if (item.kode_status == "6") {
-                            actionItems = [<EllipsisOutlined key="ellipsis" />];
+                        if (item.kode_status == "6" || item.role == "basic") {
+                            actionItems = [
+                                <div
+                                    style={{
+                                        color: "green",
+                                    }}
+                                    onClick={(event) =>
+                                        handleView(event, item, csrfToken)
+                                    }
+                                >
+                                    <EyeOutlined style={actionIconStyle} />{" "}
+                                    Lihat Pengajuan
+                                </div>,
+                            ];
                         } else if (
                             item.kode_status == "0" &&
                             item.role == "Tim IPDS"
@@ -188,7 +229,41 @@ const PengajuanCard: React.FC<{
                                         color: "green",
                                     }}
                                     onClick={(event) =>
-                                        handleApprove(event, item, csrfToken)
+                                        handleApproveBMN(event, item, csrfToken)
+                                    }
+                                >
+                                    <CheckOutlined style={actionIconStyle} />{" "}
+                                    Approve
+                                </div>,
+                                <div
+                                    style={{
+                                        color: "red",
+                                    }}
+                                    onClick={(event) =>
+                                        handleReject(event, item, csrfToken)
+                                    }
+                                >
+                                    <CloseOutlined style={actionIconStyle} />{" "}
+                                    Reject
+                                </div>,
+
+                                <EllipsisOutlined key="ellipsis" />,
+                            ];
+                        } else if (
+                            item.kode_status == "2" &&
+                            item.role == "pbj"
+                        ) {
+                            actionItems = [
+                                <div
+                                    style={{
+                                        color: "green",
+                                    }}
+                                    onClick={(event) =>
+                                        handleApprovePbjPpk(
+                                            event,
+                                            item,
+                                            csrfToken
+                                        )
                                     }
                                 >
                                     <CheckOutlined style={actionIconStyle} />{" "}
@@ -282,6 +357,24 @@ const PengajuanCard: React.FC<{
                                         justifyContent: "end",
                                     }}
                                 >
+                                    <Space>
+                                        {item.spek_path ? (
+                                            <Button
+                                                type="primary"
+                                                icon={<FilePdfOutlined />}
+                                                onClick={() =>
+                                                    window.open(
+                                                        item.spek_path,
+                                                        "_blank"
+                                                    )
+                                                }
+                                            >
+                                                Lihat Spek
+                                            </Button>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </Space>
                                     {item.kode_status == "6" ? (
                                         <Text
                                             style={{
@@ -318,13 +411,43 @@ const PengajuanCard: React.FC<{
                 confirmLoadingModal={loadingTechCheckForm}
                 title="Formulir Pemeriksaan Barang oleh IPDS"
                 handleCancel={() => setOpenTechCheckForm(false)}
-                handleOk={() => setOpenTechCheckForm(false)}
+                handleOk={() => {
+                    // setOpenTechCheckForm(false);
+                    pemeriksaanForm.submit();
+                }}
                 openModal={openTechCheckForm}
+                okText="Kirim Form"
             >
-                <PemeriksaanForm
-                    onFinish={(values) => console.log({ values })}
-                    form={pemeriksaanForm}
-                />
+                <PemeriksaanForm form={pemeriksaanForm} />
+            </MyModal>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingBMNCheckForm}
+                title="Formulir Pemeriksaan Barang oleh Tim BMN"
+                handleCancel={() => setOpenBMNCheckForm(false)}
+                handleOk={() => {
+                    // setOpenTechCheckForm(false);
+                    pemeriksaanBMN.submit();
+                }}
+                openModal={openBMNCheckForm}
+                okText="Kirim Form"
+            >
+                <PemeriksaanBMN form={pemeriksaanBMN} />
+            </MyModal>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingPbjPpkCheckForm}
+                title="Formulir Pemeriksaan Barang oleh Tim PBJ / PPK"
+                handleCancel={() => setOpenPbjPpkCheckForm(false)}
+                handleOk={() => {
+                    // setOpenTechCheckForm(false);
+                    pemeriksaanPbjPpk.submit();
+                }}
+                openModal={openPbjPpkCheckForm}
+                okText="Kirim Form"
+                maskClosable={false}
+            >
+                <PemeriksaanPBJPPK form={pemeriksaanPbjPpk} />
             </MyModal>
         </>
     );

@@ -31,6 +31,7 @@ import {
     StopOutlined,
     CheckCircleOutlined,
     LeftOutlined,
+    FilePdfOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
@@ -301,15 +302,6 @@ const BarangPage = ({
     }
 
     const defaultColumns: ColumnsType<MaintenanceHistory> = [
-        // {
-        //     title: "sequence_id",
-        //     dataIndex: "id",
-
-        // },
-        // {
-        //     title: "maintenance_id",
-        //     dataIndex: "maintenance_id",
-        // },
         {
             title: "tanggal",
             dataIndex: "created_at",
@@ -370,12 +362,32 @@ const BarangPage = ({
                 </Button>
             </Space>
             <Divider />
-            <Space direction="vertical">
-                <h1>Riwayat Pengajuan</h1>
-                <h3>
-                    {detail_barang.jenis} : {detail_barang.merk}{" "}
-                    {detail_barang.tipe}
-                </h3>
+            <Space
+                direction="horizontal"
+                style={{ width: "100%", justifyContent: "space-between" }}
+            >
+                <Space direction="vertical">
+                    <h1>Riwayat Pengajuan</h1>
+                    <h3>
+                        {detail_barang.jenis} : {detail_barang.merk}{" "}
+                        {detail_barang.tipe}
+                    </h3>
+                </Space>
+                <Space>
+                    {detail_barang.spek_path ? (
+                        <Button
+                            type="primary"
+                            icon={<FilePdfOutlined />}
+                            onClick={() =>
+                                window.open(detail_barang.spek_path, "_blank")
+                            }
+                        >
+                            Lihat Spek
+                        </Button>
+                    ) : (
+                        ""
+                    )}
+                </Space>
             </Space>
             <Divider />
             {/* <h1>{detail_barang.image_path}</h1> */}

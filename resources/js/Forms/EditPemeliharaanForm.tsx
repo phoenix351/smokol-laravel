@@ -1,35 +1,76 @@
-import { Button, Divider, Form, Input, Select, Upload, message } from "antd";
+import { Button, Divider, Form, Input, Upload, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { router } from "@inertiajs/react";
 
-const PemeriksaanForm: React.FC<{
+const EditPemeliharaanForm: React.FC<{
     form: any;
+
+    defaultPreview: string | null;
     // record: any;
-}> = ({ form }) => {
+}> = ({ form, defaultPreview }) => {
     const formItemLayout = {
         wrapperCol: { span: 24 },
     };
     const [messageApi, contextHolder] = message.useMessage();
+    const [file, setFile] = useState(null);
+    const [previewImage, setPreviewImage] = useState<
+        string | ArrayBuffer | null
+    >(defaultPreview);
 
+    const handleChange = (info: any) => {
+        // console.log({info})
+        const { fileList } = info;
+
+        const file = fileList.length > 0 ? fileList[0] : false;
+        if (!file) {
+            setFile(null);
+            setPreviewImage(null);
+            return false;
+        }
+
+        // console.log({file})
+        if (file.originFileObj) {
+            setFile(file);
+            handlePreview(file);
+        }
+    };
+    const handlePreview = async (file: any) => {
+        console.log({ file });
+        if (file.url) {
+            setPreviewImage(file.url);
+        } else {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImage(reader.result);
+            };
+            reader.readAsDataURL(file.originFileObj);
+        }
+    };
     const onFinish = (values: any) => {
+        values.problem_img_path = values.problem_img_path
+            ? values.problem_img_path.file
+            : "";
+
         messageApi.open({
             // key: saveKey,
             content: "Sedang menambahkan data...",
             type: "loading",
         });
+
         try {
-            router.post(route("maintenance.inspect.ipds.store"), values, {
+            router.post(route("maintenance.update"), values, {
                 onSuccess: (responsePage) => {
-                    const response: any = responsePage.props.response;
+                    const response: any = responsePage.props;
                     console.log({ response });
                     if (response.errors?.length > 1) {
-                        return messageApi.open({
+                        messageApi.open({
                             // key: saveKey,
                             content: response.errors,
                             type: "error",
                         });
+                        return false;
                     }
                     messageApi.open({
                         // key: saveKey,
@@ -37,7 +78,7 @@ const PemeriksaanForm: React.FC<{
                         type: "success",
                     });
 
-                    return 1;
+                    return true;
                 },
             });
         } catch (error: any) {
@@ -46,10 +87,9 @@ const PemeriksaanForm: React.FC<{
                 content: error.message,
                 type: "error",
             });
-            return 0;
+            return false;
         }
     };
-    const [showSolution, setShowSolution] = useState(false);
     return (
         <>
             <Form
@@ -60,7 +100,6 @@ const PemeriksaanForm: React.FC<{
                 layout="vertical"
             >
                 {contextHolder}
-
                 <Form.Item
                     {...formItemLayout}
                     label="sequence_id"
@@ -103,77 +142,45 @@ const PemeriksaanForm: React.FC<{
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="Permasalahan yang Ditemukan"
-                    name="problems"
-                    rules={[
-                        {
-                            required: true,
-                            message: "Silahkan isi Uraian Permasalahan ",
-                        },
-                    ]} // style={{ display: "none" }}
+                    label="keluhan"
+                    name="keluhan"
+                    // style={{ display: "none" }}
                 >
                     <Input.TextArea />
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="Tindak Lanjut"
-                    name="next_step"
-                    rules={[
-                        {
-                            required: true,
-                            message: "Silahkan isi Tindak Lanjut",
-                        },
-                    ]}
-                    // style={{ display: "none" }}
+                    label="Ubah tangkapan permasalahan (opsional)"
+                    name="problem_img_path"
                 >
-                    <Select
-                        onChange={() => {
-                            let nextValue = form.getFieldValue("next_step");
-                            if (nextValue === "0") {
-                                setShowSolution(true);
-                            } else {
-                                setShowSolution(false);
-                            }
-                        }}
-                        options={[
-                            {
-                                value: "0",
-                                label: (
-                                    <span>Diiperbaiki langsung Oleh IPDS</span>
-                                ),
-                            },
-                            // {
-                            //     value: "1",
-                            //     label: (
-                            //         <span>
-                            //             Tidak memungkinkan untuk Diperbaiki
-                            //         </span>
-                            //     ),
-                            // },
-                            {
-                                value: "2",
-                                label: (
-                                    <span>
-                                        Diteruskan untuk Dilakukan Pemeliharaan
-                                    </span>
-                                ),
-                            },
-                        ]}
-                    />
-                </Form.Item>
+                    <Upload
+                        onChange={handleChange}
+                        beforeUpload={() => false}
+                        onPreview={handlePreview}
+                        multiple={false}
 
-                {showSolution && (
-                    <Form.Item
-                        label="Solusi yang Diterapkan"
-                        name="solution"
-                        id="solution"
+                        // disabled={fileList.length > 0}
                     >
-                        <Input.TextArea />
-                    </Form.Item>
+                        {file !== null ? (
+                            ""
+                        ) : (
+                            <Button icon={<UploadOutlined />}>
+                                Select File
+                            </Button>
+                        )}
+                    </Upload>
+                </Form.Item>
+                preview
+                {previewImage && (
+                    <img
+                        alt="Preview"
+                        style={{ width: "100%", marginTop: "10px" }}
+                        src={previewImage as string}
+                    />
                 )}
             </Form>
         </>
     );
 };
 
-export default PemeriksaanForm;
+export default EditPemeliharaanForm;

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateMaintenanceRequest extends FormRequest
+class StorePemeriksaanBMNRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,11 @@ class UpdateMaintenanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // 'barang_id' => 'required',
-            'keluhan' => 'nullable',
-            'problem_img_path' => 'nullable',
-            'sequence_id' => 'nullable',
+            'sequence_id' => 'required',
+            'users_id' => 'required',
+            'spek_path' => 'required',
+
+
         ];
     }
 }

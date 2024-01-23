@@ -12,7 +12,7 @@ const PemeliharaanForm: React.FC<{
         wrapperCol: { span: 24 },
     };
     const [messageApi, contextHolder] = message.useMessage();
-    const [file, setFile] = useState(null);    
+    const [file, setFile] = useState(null);
     const [previewImage, setPreviewImage] = useState<
         string | ArrayBuffer | null
     >(null);
@@ -20,28 +20,19 @@ const PemeliharaanForm: React.FC<{
     const handleChange = (info: any) => {
         // console.log({info})
         const { fileList } = info;
-        
-        const file = fileList.length>0 ? fileList[0]:false;
+
+        const file = fileList.length > 0 ? fileList[0] : false;
         if (!file) {
-            setFile(null)
-            setPreviewImage(null)
-            return false}
-        
-        // console.log({file})
-        if ( file.originFileObj) {
-           setFile(file);
-           handlePreview(file);
+            setFile(null);
+            setPreviewImage(null);
+            return false;
         }
-        // const isImage = file.type.startsWith("image/");
-        // if (!isImage) {
-        //     message.warning(
-        //         `mohon maaf, ${file.name} bukan merupakan file gambar, hanya menerima gambar.`
-        //     );
-        //     setPreviewImage(null);
-        // } else {
-        //     setFile(file);
-        //     handlePreview(file);
-        // }
+
+        // console.log({file})
+        if (file.originFileObj) {
+            setFile(file);
+            handlePreview(file);
+        }
     };
     const handlePreview = async (file: any) => {
         console.log({ file });
@@ -127,7 +118,13 @@ const PemeliharaanForm: React.FC<{
 
                         // disabled={fileList.length > 0}
                     >
-                       {file!==null? '':<Button icon={<UploadOutlined />}>Select File</Button>}
+                        {file !== null ? (
+                            ""
+                        ) : (
+                            <Button icon={<UploadOutlined />}>
+                                Select File
+                            </Button>
+                        )}
                     </Upload>
                 </Form.Item>
                 {previewImage && (

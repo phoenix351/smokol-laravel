@@ -18,10 +18,13 @@ import {
     Menu,
     Card,
     Spin,
+    Form,
+    Divider,
 } from "antd";
 
 import UserPengajuanCard from "@/Components/UserPengajuanCard";
-
+import PemeliharaanForm from "@/Forms/PemeliharaanForm";
+import MyModal from "@/Components/Modal";
 
 const { Search } = Input;
 
@@ -41,7 +44,7 @@ const KelolaPengajuanPage = () => {
                 // Make a fetch request to your API endpoint
                 setSearchLoading(true);
                 const response = await fetch(
-                    route("admin.pengajuan.fetch", { type: "99",isUser:'1' })
+                    route("admin.pengajuan.fetch", { type: "99", isUser: "1" })
                 );
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
@@ -100,7 +103,7 @@ const KelolaPengajuanPage = () => {
             // Make a fetch request to your API endpoint
             setSearchLoading(true);
             const response = await fetch(
-                route("admin.pengajuan.fetch", { type: type, isUser:'1' })
+                route("admin.pengajuan.fetch", { type: type, isUser: "1" })
             );
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -124,7 +127,7 @@ const KelolaPengajuanPage = () => {
                 route("admin.pengajuan.fetch", {
                     querySearch: querySearch ? querySearch : "",
                     type: type,
-                    isUser:'1'
+                    isUser: "1",
                 })
             );
             if (!response.ok) {
@@ -156,7 +159,7 @@ const KelolaPengajuanPage = () => {
         fetchDataByType(e.key);
     };
     const renderContent = () => {
-        return <UserPengajuanCard items={items} csrfToken={csrfToken}  />;
+        return <UserPengajuanCard items={items} csrfToken={csrfToken} />;
     };
 
     const Loading = () => (
@@ -170,6 +173,10 @@ const KelolaPengajuanPage = () => {
             <Spin />
         </Card>
     );
+
+    function pengajuanFinish(values: any): void {
+        throw new Error("Function not implemented.");
+    }
 
     return (
         <div>
@@ -195,7 +202,7 @@ const KelolaPengajuanPage = () => {
                 direction="vertical"
             >
                 <Search
-                    placeholder="Cari berdasarakan nama pegawai atau nama barang, ataupun nomor urut pendaftaran"
+                    placeholder="Cari berdasarakan  nama barang / nomor urut pendaftaran"
                     allowClear
                     onSearch={onSearch}
                     loading={searchLoading}

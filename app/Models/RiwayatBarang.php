@@ -9,7 +9,7 @@ class RiwayatBarang extends Model
 {
     use HasFactory;
     protected $table = 'riwayat_barang';
-    protected $fillable = ['barang_id', 'waktu_perubahan', 'pengguna_id', 'atribut', 'nilai_lama', 'nilai_baru'];
+    protected $fillable = ['barang_id', 'waktu_perubahan', 'users_id', 'atribut', 'nilai_lama', 'nilai_baru'];
 
     public function barang()
     {

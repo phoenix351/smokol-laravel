@@ -5,15 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Maintenance;
 use App\Models\MaintenanceSequence;
 use App\Http\Requests\StoreMaintenanceRequest;
+use App\Http\Requests\StorePemeriksaanBMNRequest;
+use App\Http\Requests\StorePemeriksaanPBJPPKRequest;
+use App\Http\Requests\StorePemeriksaanRequest;
 use App\Http\Requests\UpdateMaintenanceRequest;
+use App\Models\Barang;
+use App\Models\RiwayatBarang;
 use Exception;
 use Inertia\Inertia;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Validation\ValidationException;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 
 class MaintenanceController extends Controller
 {
@@ -58,7 +65,7 @@ class MaintenanceController extends Controller
 
         $user = auth()->user();
 
-        if ($user->role != 'Tim IPDS' && $user->role != 'Tim BMN') {
+        if ($user->role == 'basic') {
             return 0;
         }
 
@@ -162,13 +169,48 @@ class MaintenanceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMaintenanceRequest $request, Maintenance $maintenance)
+    public function update(UpdateMaintenanceRequest $request)
     {
-
+        // return response()->json($request->all());
+        $user = auth()->user();
         $validatedRequest = $request->validate($request->rules());
-        // return response()->json($validatedRequest);
 
-        $updatedSequence = MaintenanceSequence::where('id', $validatedRequest['sequence_id'])->update(['keluhan' => $validatedRequest['keluhan']]);
+        $updateContent = [
+            'keluhan' => $validatedRequest['keluhan'],
+            // 'keluhan'=>$validatedRequest['keluhan'],
+        ];
+        if (strlen($validatedRequest['problem_img_path']) > 0) {
+            // store image 
+            $img_path = $request->file('problem_img_path')->store('public/images/problems');
+            $updateContent['problem_img_path'] = $img_path;
+        }
+
+        $updatedSequence = MaintenanceSequence::where('id', $validatedRequest['sequence_id'])->update($updateContent);
+        $maintenance_list = MaintenanceSequence::select(
+            'maintenance_sequences.*',
+            'maintenances.id as maintenance_id',
+            'maintenances.kode_status',
+            'status_pemeliharaan.deskripsi as status',
+            'master_barang.jenis',
+            'master_barang.merk',
+            'master_barang.tipe',
+            'master_barang.nomor_seri'
+        )
+            ->join('maintenances', function ($join) {
+                $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
+                    ->whereRaw('maintenances.id = (
+                    SELECT id FROM maintenances as sub_maintenances
+                    WHERE sub_maintenances.sequence_id = maintenances.sequence_id
+                    ORDER BY sub_maintenances.id DESC
+                    LIMIT 1
+                )');
+            })
+            ->join('master_barang', 'maintenance_sequences.barang_id', '=', 'master_barang.id')
+            ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', '=', 'maintenances.kode_status')
+            ->where('maintenance_sequences.users_id', $user->id)
+            ->get();
+        // $maintenance_list = DB::table('maintenances')->where('users_id', $user->id);
+        return Inertia::render('Maintenance', ['maintenance_list' => $maintenance_list]);
     }
 
     /**
@@ -207,14 +249,20 @@ class MaintenanceController extends Controller
                 'maintenances.*',
                 'users.nama_lengkap'
             )->get();
-        $barang_id = DB::table('maintenance_sequences')->where('id', $sequence_id)->value('barang_id');
-        $img_path = DB::table('maintenance_sequences')->where('id', $sequence_id)->value('problem_img_path');
+        $sequence = DB::table('maintenance_sequences')->where('id', $sequence_id)->select('barang_id', 'problem_img_path', 'spek_path')->first();
 
-        $detail_barang = DB::table('master_barang')->where('id', $barang_id)->select('jenis', 'merk', 'tipe', 'nomor_seri')->first();
-        if (strlen($img_path) > 0) {
 
-            $detail_barang->image_path = Storage::url($img_path);
+        $detail_barang = DB::table('master_barang')->where('id', $sequence->barang_id)->select('jenis', 'merk', 'tipe', 'nomor_seri')->first();
+        if (strlen($sequence->problem_img_path) > 0) {
+
+            $detail_barang->image_path = Storage::url($sequence->problem_img_path);
         }
+        if (strlen($sequence->spek_path) > 0) {
+
+            $detail_barang->spek_path = Storage::url($sequence->spek_path);
+        }
+
+
         return Inertia::render('User/Pengajuan/Riwayat', ['history_list' => $maintenance_list, 'detail_barang' => $detail_barang]);
     }
     public function pengajuan_fetch(Request $request)
@@ -235,6 +283,8 @@ class MaintenanceController extends Controller
             'maintenance_sequences.id as sequence_id',
             'maintenance_sequences.keluhan',
             'maintenance_sequences.biaya',
+            'maintenance_sequences.problem_img_path',
+            'maintenance_sequences.spek_path',
 
             'master_barang.merk',
             'master_barang.tipe',
@@ -266,6 +316,9 @@ class MaintenanceController extends Controller
                 return $query;
             }, function ($query) use ($type) {
                 // Otherwise, add the type condition to the query
+                if ($type === '0') {
+                    return $query->whereIn('maintenances.kode_status', ['0', '1', "2"]);
+                }
                 return $query->where('maintenances.kode_status', $type);
             })
 
@@ -286,6 +339,9 @@ class MaintenanceController extends Controller
             ->get();
         $maintenance_list->transform(function ($item, $key) use ($user) {
             $item['role'] = $user->role;
+            $item['problem_img_path'] = Storage::url($item['problem_img_path']);
+            $item['spek_path'] = Storage::url($item['spek_path']);
+
             return $item;
         });
         return response()->json([
@@ -312,6 +368,109 @@ class MaintenanceController extends Controller
             ]);
         } catch (\Exception $e) {
             throw $e;
+        }
+    }
+    public function PemeriksaanIPDS(StorePemeriksaanRequest $request)
+    {
+        $user = auth()->user(); // user dari admin
+
+
+        $validatedData = $request->validate($request->rules()); // data yg dikirim
+        $sequence = MaintenanceSequence::where('id', '=', $validatedData['sequence_id'])->first();
+        $barang_status = Barang::where('barang_id', 'like', $sequence['barang_id'])->first();
+
+        $maintenance = [
+            'sequence_id' => $validatedData['sequence_id'],
+            'users_id' => $user->id,
+        ];
+        $updatedSequence = [
+            'problems' => $validatedData['problems'],
+            'next_step' => $validatedData['next_step'],
+        ];
+
+        if ($validatedData['next_step'] == '2') {
+            // ubah status barang menjadi rusak ringan
+            $riwayat_barang = [
+                'barang_id' => $sequence['barang_id'],
+                'waktu_perubahan' => Carbon::now(),
+                'users_id' => $sequence['users_id'], // user id of master barang
+                'atribut' => "Status Barang",
+                'nilai_lama' => $barang_status->kondisi,
+                'nilai_baru' => "Rusak Ringan",
+            ];
+            $updateStatus = [
+                'kondisi' => "Rusak Ringan"
+            ];
+            $statusUpdated = Barang::where('barang_id', $sequence['barang_id'])->update($updateStatus);
+            $riwayatStored = RiwayatBarang::create($riwayat_barang);
+            // tambah status baru menjadi kode 1
+            $maintenance['kode_status'] = '1';
+        } else if ($validatedData['next_step'] == '0') {
+            // tambah status barang menjadi kode 5 
+
+            $maintenance['kode_status'] = '5';
+            $updatedSequence['solution'] = $validatedData['solution'];
+        }
+        $maintenanceStored = Maintenance::create($maintenance);
+
+
+
+        return response()->json(['data' => $validatedData]);
+    }
+    public function PemeriksaanBMN(StorePemeriksaanBMNRequest $request)
+    {
+        try {
+            //code...
+            $user = auth()->user(); // user dari admin
+
+
+            $validatedData = $request->validate($request->rules()); // data yg dikirim
+            // upload the file
+            if ($request->hasFile('spek_path')) {
+                $path = $request->file('spek_path')->store('public/docs/spek');
+                MaintenanceSequence::where('id', $validatedData['sequence_id'])->update([
+                    'spek_path' => $path
+                ]);
+                Maintenance::create([
+                    'sequence_id' => $validatedData['sequence_id'],
+                    'kode_status' => '2',
+                    'users_id' => $user->id,
+                ]);
+            } else {
+                return false;
+            }
+
+
+
+            return response()->json(['message' => "Berhasil mengirimkan formulir pemeriksaan BMN",]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function PemeriksaanPBJ_PPK(StorePemeriksaanPBJPPKRequest $request)
+    {
+        try {
+            //code...
+            $user = auth()->user(); // user dari admin
+            $validatedData = $request->validate($request->rules());
+
+
+            // if reject status code =  6 
+            // add alasan
+            $maintenance_update = [
+                'alasan' =>  $validatedData['alasan_ditolak']
+            ];
+
+            MaintenanceSequence::where('sequence_id', $validatedData['sequence_id'])->update($maintenance_update);
+            Maintenance::create([
+                'sequence_id' => $validatedData['sequence_id'],
+                'users_id' => $user->id,
+                'kode_status' => '6'
+            ]);
+
+            return response()->json(['message' => "Berhasil mengirimkan formulir pemeriksaan BMN",]);
+        } catch (\Throwable $th) {
+            throw $th;
         }
     }
 }

@@ -9,6 +9,7 @@ interface ModalProps {
     handleCancel: () => void;
     okText?: string;
     cancelText?: string;
+    maskClosable?: boolean;
     width?: number | string;
 }
 const MyModal = ({
@@ -20,6 +21,7 @@ const MyModal = ({
     okText,
     cancelText,
     width,
+    maskClosable,
     children,
 }: PropsWithChildren<ModalProps>) => {
     return (
@@ -32,6 +34,7 @@ const MyModal = ({
             cancelText={cancelText}
             okText={okText}
             mask={true}
+            maskClosable={maskClosable}
             width={width}
         >
             <Divider />

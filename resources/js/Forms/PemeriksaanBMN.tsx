@@ -4,7 +4,7 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { router } from "@inertiajs/react";
 
-const PemeriksaanForm: React.FC<{
+const PemeriksaanBMN: React.FC<{
     form: any;
     // record: any;
 }> = ({ form }) => {
@@ -12,15 +12,49 @@ const PemeriksaanForm: React.FC<{
         wrapperCol: { span: 24 },
     };
     const [messageApi, contextHolder] = message.useMessage();
+    const [file, setFile] = useState(null);
+    const [previewImage, setPreviewImage] = useState<
+        string | ArrayBuffer | null
+    >(null);
 
+    const handleChange = (info: any) => {
+        // console.log({info})
+        const { fileList } = info;
+
+        const file = fileList.length > 0 ? fileList[0] : false;
+        if (!file) {
+            setFile(null);
+            setPreviewImage(null);
+            return false;
+        }
+
+        // console.log({file})
+        if (file.originFileObj) {
+            setFile(file);
+            handlePreview(file);
+        }
+    };
+    const handlePreview = async (file: any) => {
+        console.log({ file });
+        if (file.url) {
+            setPreviewImage(file.url);
+        } else {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImage(reader.result);
+            };
+            reader.readAsDataURL(file.originFileObj);
+        }
+    };
     const onFinish = (values: any) => {
+        values.spek_path = values.spek_path.file;
         messageApi.open({
             // key: saveKey,
             content: "Sedang menambahkan data...",
             type: "loading",
         });
         try {
-            router.post(route("maintenance.inspect.ipds.store"), values, {
+            router.post(route("maintenance.inspect.bmn.store"), values, {
                 onSuccess: (responsePage) => {
                     const response: any = responsePage.props.response;
                     console.log({ response });
@@ -49,7 +83,6 @@ const PemeriksaanForm: React.FC<{
             return 0;
         }
     };
-    const [showSolution, setShowSolution] = useState(false);
     return (
         <>
             <Form
@@ -103,77 +136,29 @@ const PemeriksaanForm: React.FC<{
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="Permasalahan yang Ditemukan"
-                    name="problems"
-                    rules={[
-                        {
-                            required: true,
-                            message: "Silahkan isi Uraian Permasalahan ",
-                        },
-                    ]} // style={{ display: "none" }}
+                    label="Upload File Spek"
+                    name="spek_path"
                 >
-                    <Input.TextArea />
-                </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="Tindak Lanjut"
-                    name="next_step"
-                    rules={[
-                        {
-                            required: true,
-                            message: "Silahkan isi Tindak Lanjut",
-                        },
-                    ]}
-                    // style={{ display: "none" }}
-                >
-                    <Select
-                        onChange={() => {
-                            let nextValue = form.getFieldValue("next_step");
-                            if (nextValue === "0") {
-                                setShowSolution(true);
-                            } else {
-                                setShowSolution(false);
-                            }
-                        }}
-                        options={[
-                            {
-                                value: "0",
-                                label: (
-                                    <span>Diiperbaiki langsung Oleh IPDS</span>
-                                ),
-                            },
-                            // {
-                            //     value: "1",
-                            //     label: (
-                            //         <span>
-                            //             Tidak memungkinkan untuk Diperbaiki
-                            //         </span>
-                            //     ),
-                            // },
-                            {
-                                value: "2",
-                                label: (
-                                    <span>
-                                        Diteruskan untuk Dilakukan Pemeliharaan
-                                    </span>
-                                ),
-                            },
-                        ]}
-                    />
-                </Form.Item>
+                    <Upload
+                        onChange={handleChange}
+                        beforeUpload={() => false}
+                        multiple={false}
+                        accept=".pdf"
 
-                {showSolution && (
-                    <Form.Item
-                        label="Solusi yang Diterapkan"
-                        name="solution"
-                        id="solution"
+                        // disabled={fileList.length > 0}
                     >
-                        <Input.TextArea />
-                    </Form.Item>
-                )}
+                        {file !== null ? (
+                            ""
+                        ) : (
+                            <Button icon={<UploadOutlined />}>
+                                Select File
+                            </Button>
+                        )}
+                    </Upload>
+                </Form.Item>
             </Form>
         </>
     );
 };
 
-export default PemeriksaanForm;
+export default PemeriksaanBMN;

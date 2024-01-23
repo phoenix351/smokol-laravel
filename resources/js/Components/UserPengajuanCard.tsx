@@ -1,17 +1,18 @@
+import PemeliharaanForm from "@/Forms/PemeliharaanForm";
 import {
     CheckOutlined,
     CloseOutlined,
     EditOutlined,
-    EllipsisOutlined,
     EyeOutlined,
-    SettingOutlined,
 } from "@ant-design/icons";
 import { router } from "@inertiajs/react";
-import { Card, Divider, Empty, Space, Typography } from "antd";
-import { ReactNode } from "react";
+import { Card, Divider, Empty, Form, Space, Typography } from "antd";
+import { MouseEvent, ReactNode, useState } from "react";
 import { JSX } from "react/jsx-runtime";
+import MyModal from "./Modal";
+import EditPemeliharaanForm from "@/Forms/EditPemeliharaanForm";
 
-const { Meta } = Card;
+// const { Meta } = Card;
 const { Text } = Typography;
 
 const layout = {
@@ -19,13 +20,8 @@ const layout = {
     wrapperCol: { span: 24 },
 };
 
-const rules = [
-    {
-        required: true,
-        message: "Please upload a file",
-    },
-];
 interface PengajuanItem {
+    problem_img_path: string | null;
     sequence_id: number;
     bidang: string;
     deskripsi: string;
@@ -55,48 +51,6 @@ const actionStyle = {
     justifyContent: "center",
 };
 
-const handleApprove = async (
-    event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-    { users_id, kode_status, sequence_id }: ApproveProps,
-    csrfToken: string | null
-) => {
-    // Create the approval data object
-    const approvalData = {
-        users_id,
-        kode_status,
-        sequence_id,
-        csrfToken,
-        // Add any other data you need for the approval
-    };
-
-    console.log("opening approval modal");
-    // try {
-    //     // Make the POST request to send the approval data
-    //     const response = await fetch(route("admin.pengajuan.approve"), {
-    //         method: "POST",
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //             "X-CSRF-TOKEN": csrfToken ? csrfToken : "",
-
-    //             // Add any other headers you need
-    //         },
-    //         body: JSON.stringify(approvalData), // Convert the approval data to JSON format
-    //     });
-
-    //     if (!response.ok) {
-    //         throw new Error("Network response was not ok");
-    //     }
-
-    //     const data = await response.json(); // Parse the response JSON
-
-    //     // Handle the response data if needed
-    // } catch (error) {
-    //     // Handle any errors that occurred during the fetch
-    //     console.error("Error:", error);
-    // }
-
-    // return users_id + kode_status + sequence_id;
-};
 const handleReject = (
     event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
     { users_id, kode_status, sequence_id }: ApproveProps,
@@ -105,7 +59,7 @@ const handleReject = (
     // return users_id + kode_status + sequence_id;
 };
 const handleView = (
-    event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     { users_id, kode_status, sequence_id }: ApproveProps,
     csrfToken: string | null
 ) => {
@@ -118,6 +72,38 @@ const UserPengajuanCard: React.FC<{
     items: PengajuanItem[];
     csrfToken: string | null;
 }> = ({ items, csrfToken }) => {
+    const [urlImage, setUrlImage] = useState<string | null>("");
+
+    const [openPengajuan, setOpenPengajuan] = useState(false);
+    const [confirmLoadingPengajuan, setConfirmLoadingPengajuan] =
+        useState(false);
+
+    const [pengajuanForm] = Form.useForm();
+    const handleOkPengajuan = async () => {
+        // handle opening
+        pengajuanForm.submit();
+        // setOpenPengajuan(false);
+
+        setOpenPengajuan(false);
+    };
+
+    const handleChange = (
+        event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
+        item: PengajuanItem,
+        csrfToken: string | null
+    ) => {
+        pengajuanForm.setFieldsValue({
+            users_id: item.users_id,
+            sequence_id: item.sequence_id,
+            merk: item.merk,
+            tipe: item.tipe,
+            keluhan: item.keluhan,
+        });
+        setUrlImage(item.problem_img_path);
+        setOpenPengajuan(true);
+        console.log({ item });
+    };
+
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
             {items.length > 0 ? (
@@ -143,11 +129,11 @@ const UserPengajuanCard: React.FC<{
                                     color: "",
                                 }}
                                 onClick={(event) =>
-                                    handleView(event, item, csrfToken)
+                                    handleChange(event, item, csrfToken)
                                 }
                             >
                                 <EditOutlined style={actionIconStyle} /> Ubah
-                                Status
+                                Pengajuan{" "}
                             </div>,
                         ];
                     } else {
@@ -162,8 +148,7 @@ const UserPengajuanCard: React.FC<{
                             >
                                 <EyeOutlined style={actionIconStyle} /> Lihat
                                 Pengajuan
-                            </div>
-                           
+                            </div>,
                         ];
                     }
                     return (
@@ -172,10 +157,6 @@ const UserPengajuanCard: React.FC<{
                             style={{ width: "100%" }}
                             actions={actionItems}
                         >
-                            {/* <Meta
-                        title=
-                        description=
-                    /> */}
                             <Space
                                 direction="horizontal"
                                 style={{
@@ -200,37 +181,39 @@ const UserPengajuanCard: React.FC<{
                                 >{`${item.merk} ${item.tipe} (${item.jenis})`}</Text>
                                 <Text>{`Keluhan : ${item.keluhan}`}</Text>
                             </Space>
-                            <Divider
-                                style={{
-                                    marginTop: "12px",
-                                    marginBottom: "12px",
-                                }}
-                            />
-                            <Space
-                                style={{
-                                    width: "100%",
-                                    justifyContent: "end",
-                                }}
-                            >
-                                {item.kode_status == "6" ? (
-                                    <Text
+                            {item.kode_status == "6" ? (
+                                <>
+                                    <Divider
                                         style={{
-                                            fontSize: "15px",
-                                            fontWeight: "500",
+                                            marginTop: "12px",
+                                            marginBottom: "12px",
+                                        }}
+                                    />
+                                    <Space
+                                        style={{
                                             width: "100%",
-                                            color: "#4E54C8",
+                                            justifyContent: "end",
                                         }}
                                     >
-                                        Total Biaya Perbaikan :{" "}
-                                        {new Intl.NumberFormat("id-ID", {
-                                            style: "currency",
-                                            currency: "IDR",
-                                        }).format(item.biaya)}
-                                    </Text>
-                                ) : (
-                                    ""
-                                )}
-                            </Space>
+                                        <Text
+                                            style={{
+                                                fontSize: "15px",
+                                                fontWeight: "500",
+                                                width: "100%",
+                                                color: "#4E54C8",
+                                            }}
+                                        >
+                                            Total Biaya Perbaikan :{" "}
+                                            {new Intl.NumberFormat("id-ID", {
+                                                style: "currency",
+                                                currency: "IDR",
+                                            }).format(item.biaya)}
+                                        </Text>
+                                    </Space>
+                                </>
+                            ) : (
+                                ""
+                            )}
                         </Card>
                     );
                 })
@@ -242,6 +225,22 @@ const UserPengajuanCard: React.FC<{
                     />
                 </Card>
             )}
+            <MyModal
+                title="Form Pengajuan Barang"
+                openModal={openPengajuan}
+                handleOk={handleOkPengajuan}
+                confirmLoadingModal={confirmLoadingPengajuan}
+                handleCancel={() => setOpenPengajuan(false)}
+                okText="Kirim Pengajuan"
+                cancelText="Batal"
+                maskClosable={false}
+                width={600}
+            >
+                <EditPemeliharaanForm
+                    form={pengajuanForm}
+                    defaultPreview={urlImage}
+                />
+            </MyModal>
         </Space>
     );
 };
