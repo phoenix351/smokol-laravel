@@ -10,7 +10,8 @@ use App\Http\Controllers\BastController;
 use App\Http\Controllers\HistoryBarangUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MaintenanceController;
-
+use App\Http\Controllers\MasterPerusahaanController;
+use App\Http\Controllers\MasterPjPerusahaanController;
 use App\Models\MasterBarang;
 use App\Models\MasterJabatan;
 use App\Models\MasterRuangan;
@@ -91,6 +92,9 @@ Route::middleware('auth')->group(function () {
         return response()->json([$arsitektur_list]);
     })->name('admin.master.sistem_operasi.arsitektur');
 
+    // master perusahaan
+    Route::get('api/master/perusahaan', [MasterPerusahaanController::class, 'fetch'])->name('master.perusahaan.fetch');
+    Route::get('api/master/perusahaan/pj', [MasterPjPerusahaanController::class, 'fetch'])->name('master.perusahaan.pj.fetch');
 
     // route api for master barang just for admin
     route::get('/api/users', function () {

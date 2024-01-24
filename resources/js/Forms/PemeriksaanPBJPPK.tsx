@@ -56,43 +56,108 @@ const PemeriksaanPBJPPK: React.FC<{
             reader.readAsDataURL(file.originFileObj);
         }
     };
-    const onFinish = (values: any) => {
-        values.spek_path = values.spek_path.file;
+    const onFinish = async (values: any) => {
+        // values.spek_path = values.spek_path.file;
         messageApi.open({
-            // key: saveKey,
+            key: "saveKey",
             content: "Sedang menambahkan data...",
             type: "loading",
         });
         try {
-            router.post(route("maintenance.inspect.bmn.store"), values, {
-                onSuccess: (responsePage) => {
-                    const response: any = responsePage.props.response;
-                    console.log({ response });
-                    if (response.errors?.length > 1) {
-                        return messageApi.open({
-                            // key: saveKey,
-                            content: response.errors,
-                            type: "error",
-                        });
-                    }
-                    messageApi.open({
-                        // key: saveKey,
-                        content: "Berhasil menambahkan data",
-                        type: "success",
-                    });
+            const response = await axios.post(
+                route("maintenance.inspect.pbj-ppk.store"),
+                values,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            console.log("POST request successful:", response.data);
 
-                    return 1;
-                },
+            messageApi.open({
+                key: "saveKey",
+                content: "Berhasil menambahkan data",
+                type: "success",
             });
         } catch (error: any) {
             messageApi.open({
-                // key: saveKey,
+                key: "saveKey",
                 content: error.message,
                 type: "error",
             });
-            return 0;
         }
     };
+    const [daftarPerusahaan, setDaftarPerusahaan] = useState([]);
+    const [daftarPj, setDaftarPj] = useState([]);
+
+    const fetchData = async (getUrl: string) => {
+        try {
+            const response = await axios.get(getUrl);
+
+            return response.data.data;
+        } catch (error) {
+            console.log("Error fetching data", error);
+            throw error;
+        }
+    };
+
+    useEffect(() => {
+        const route_ = route("master.perusahaan.fetch");
+        fetchData(route_).then((data) => {
+            const daftar_perusahaan = data.map(
+                (item: { nama: any; id: any }) => ({
+                    label: item.nama,
+                    value: item.id,
+                })
+            );
+            setDaftarPerusahaan(daftar_perusahaan);
+        });
+    }, []);
+
+    const handlePerusahaanChange = (value: any) => {
+        const perusahaan_id = value;
+        const route_ = route("master.perusahaan.fetch", {
+            perusahaan_id: perusahaan_id,
+        });
+        fetchData(route_).then((data) => {
+            const fieldsValue = {
+                // nama_pj: data.nama_pj,
+                // jabatan_pj: data.jabatan_pj,
+                alamat: data.alamat,
+                nomor_rekening: data.nomor_rekening,
+                npwp: data.npwp,
+            };
+            form.setFieldsValue(fieldsValue);
+            const route_ = route("master.perusahaan.pj.fetch", {
+                perusahaan_id: perusahaan_id,
+            });
+            fetchData(route_).then((data) => {
+                const daftar_pj = data.map((item: { nama: any; id: any }) => ({
+                    label: item.nama,
+                    value: item.id,
+                }));
+                setDaftarPj(daftar_pj);
+            });
+        });
+    };
+    const handlePjChange = (value: any) => {
+        const penanggung_jawab_id = value;
+        const route_ = route("master.perusahaan.pj.fetch", {
+            perusahaan_id: 0,
+            penanggung_jawab_id: penanggung_jawab_id,
+        });
+        fetchData(route_).then((data) => {
+            const fieldsValue = {
+                jabatan_pj: data.jabatan,
+                email: data.email,
+                nomor_wa: data.nomor_wa,
+                // npwp: data.npwp,
+            };
+            form.setFieldsValue(fieldsValue);
+        });
+    };
+
     return (
         <>
             <Form
@@ -148,6 +213,12 @@ const PemeriksaanPBJPPK: React.FC<{
                     {...formItemLayout}
                     label="Estimasi Penyelesaian"
                     name="estimasi_penyelesaian"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Estimasi Penyelesaian harus diisi",
+                        },
+                    ]}
                 >
                     <DatePicker
                         style={{ width: "100%" }}
@@ -166,27 +237,32 @@ const PemeriksaanPBJPPK: React.FC<{
 
                 <Form.Item
                     {...formItemLayout}
-                    label="nama_perusahaan"
-                    name="nama_perusahaan"
+                    label="Perusahaan"
+                    name="perusahaan_id"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Perusahaan harus dipilih",
+                        },
+                    ]}
+
                     // style={{ display: "none" }}
                 >
-                    <Input style={{ color: "#000" }} />
+                    {/* <Input readOnly={true} style={{ color: "#000" }} /> */}
+                    <Select
+                        onChange={(value) => handlePerusahaanChange(value)}
+                        options={daftarPerusahaan}
+                        allowClear={true}
+                    />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="nama_penanggung_jawab"
-                    name="nama_penanggung_jawab"
-                    // style={{ display: "none" }}
-                >
-                    <Input style={{ color: "#000" }} />
-                </Form.Item>
+
                 <Form.Item
                     {...formItemLayout}
                     label="alamat"
                     name="alamat"
                     // style={{ display: "none" }}
                 >
-                    <Input style={{ color: "#000" }} />
+                    <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
@@ -194,7 +270,7 @@ const PemeriksaanPBJPPK: React.FC<{
                     name="npwp"
                     // style={{ display: "none" }}
                 >
-                    <Input style={{ color: "#000" }} />
+                    <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
@@ -202,15 +278,45 @@ const PemeriksaanPBJPPK: React.FC<{
                     name="nomor_rekening"
                     // style={{ display: "none" }}
                 >
-                    <Input style={{ color: "#000" }} />
+                    <Input readOnly={true} style={{ color: "#000" }} />
+                </Form.Item>
+                <b>Identitas Penanggung Jawab</b>
+                <Form.Item
+                    {...formItemLayout}
+                    label="Nama Penanggung Jawab"
+                    name="penanggun_jawab_id"
+                    // style={{ display: "none" }}
+                >
+                    <Select
+                        onChange={(value) => handlePjChange(value)}
+                        options={daftarPj}
+                        allowClear={true}
+                    />
+                    {/* <Input readOnly={true} style={{ color: "#000" }} /> */}
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="jabatan"
-                    name="jabatan"
+                    label="Jabatan Penanggun Jawab"
+                    name="jabatan_pj"
                     // style={{ display: "none" }}
                 >
-                    <Input style={{ color: "#000" }} />
+                    <Input readOnly={true} style={{ color: "#000" }} />
+                </Form.Item>
+                <Form.Item
+                    {...formItemLayout}
+                    label="Email Penanggung Jawab"
+                    name="email"
+                    // style={{ display: "none" }}
+                >
+                    <Input readOnly={true} style={{ color: "#000" }} />
+                </Form.Item>
+                <Form.Item
+                    {...formItemLayout}
+                    label="Nomor HP Penanggun Jawab"
+                    name="nomor_wa"
+                    // style={{ display: "none" }}
+                >
+                    <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
             </Form>
         </>

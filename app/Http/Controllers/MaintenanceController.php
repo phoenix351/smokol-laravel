@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RejectRequest;
 use App\Models\Maintenance;
 use App\Models\MaintenanceSequence;
 use App\Http\Requests\StoreMaintenanceRequest;
@@ -454,23 +455,28 @@ class MaintenanceController extends Controller
             $user = auth()->user(); // user dari admin
             $validatedData = $request->validate($request->rules());
 
-
+            return response()->json($validatedData);
             // if reject status code =  6 
-            // add alasan
-            $maintenance_update = [
-                'alasan' =>  $validatedData['alasan_ditolak']
-            ];
 
-            MaintenanceSequence::where('sequence_id', $validatedData['sequence_id'])->update($maintenance_update);
-            Maintenance::create([
-                'sequence_id' => $validatedData['sequence_id'],
-                'users_id' => $user->id,
-                'kode_status' => '6'
-            ]);
-
-            return response()->json(['message' => "Berhasil mengirimkan formulir pemeriksaan BMN",]);
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+    public function reject(RejectRequest $request)
+    {
+        // add alasan
+        $user = auth()->user(); // user dari admin
+        $rejectData = $request->validate($request->rules());
+
+
+
+        MaintenanceSequence::where('sequence_id', $rejectData['sequence_id'])->update($rejectData);
+        Maintenance::create([
+            'sequence_id' => $rejectData['sequence_id'],
+            'users_id' => $user->id,
+            'kode_status' => '6'
+        ]);
+
+        return response()->json(['message' => "Berhasil mengirimkan formulir pemeriksaan PBJ / PPK",]);
     }
 }

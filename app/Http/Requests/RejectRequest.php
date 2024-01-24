@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePemeriksaanPBJPPKRequest extends FormRequest
+class RejectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,8 @@ class StorePemeriksaanPBJPPKRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'estimasi_penyelesaian' => 'required',
-            'perusahaan_id' => 'required',
-            'nama_pj' => 'nullable',
-            'jabatan_pj' => 'nullable',
+            'sequence_id' => 'required',
+            'alasan' => 'required|string',
         ];
     }
 }
