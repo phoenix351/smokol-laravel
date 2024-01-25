@@ -17,6 +17,7 @@ import PemeriksaanForm from "@/Forms/PemeriksaanBarang";
 import PemeriksaanBMN from "@/Forms/PemeriksaanBMN";
 import { PengajuanItem } from "@/types";
 import PemeriksaanPBJPPK from "@/Forms/PemeriksaanPBJPPK";
+import EditStatusForm from "@/Forms/EditStatusForm";
 
 const { Meta } = Card;
 const { Text } = Typography;
@@ -72,15 +73,42 @@ const PengajuanCard: React.FC<{
     const [openTechCheckForm, setOpenTechCheckForm] = useState(false);
     const [openBMNCheckForm, setOpenBMNCheckForm] = useState(false);
     const [openPbjPpkCheckForm, setOpenPbjPpkCheckForm] = useState(false);
+    const [openChangeStatusForm, setOpenChangeStatusForm] = useState(false);
+
     const [loadingTechCheckForm, setLoadingTechCheckForm] = useState(false);
     const [loadingBMNCheckForm, setLoadingBMNCheckForm] = useState(false);
     const [loadingPbjPpkCheckForm, setLoadingPbjPpkCheckForm] = useState(false);
+    const [loadingChangeStatusForm, setLoadingChangeStatusForm] =
+        useState(false);
 
     // define the form
     const [pemeriksaanForm] = Form.useForm();
     const [pemeriksaanBMN] = Form.useForm();
     const [pemeriksaanPbjPpk] = Form.useForm();
+    const [changeStatusForm] = Form.useForm();
 
+    const handleChange = async (
+        event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+        { users_id, kode_status, sequence_id, merk, tipe }: ApproveProps,
+        csrfToken: string | null
+    ) => {
+        // Create the approval data object
+        const approvalData = {
+            users_id,
+            kode_status,
+            sequence_id,
+            csrfToken,
+            // Add any other data you need for the approval
+        };
+        changeStatusForm.setFieldsValue({
+            users_id: users_id,
+            sequence_id: sequence_id,
+            merk: merk,
+            tipe: tipe,
+        });
+
+        setOpenChangeStatusForm(true);
+    };
     const handleApprove = async (
         event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
         { users_id, kode_status, sequence_id, merk, tipe }: ApproveProps,
@@ -301,7 +329,7 @@ const PengajuanCard: React.FC<{
                                         color: "",
                                     }}
                                     onClick={(event) =>
-                                        handleView(event, item, csrfToken)
+                                        handleChange(event, item, csrfToken)
                                     }
                                 >
                                     <EditOutlined style={actionIconStyle} />{" "}
@@ -345,37 +373,19 @@ const PengajuanCard: React.FC<{
                                     >{`${item.merk} ${item.tipe} (${item.jenis})`}</Text>
                                     <Text>{`Keluhan : ${item.keluhan}`}</Text>
                                 </Space>
-                                <Divider
-                                    style={{
-                                        marginTop: "12px",
-                                        marginBottom: "12px",
-                                    }}
-                                />
-                                <Space
-                                    style={{
-                                        width: "100%",
-                                        justifyContent: "end",
-                                    }}
-                                >
-                                    <Space>
-                                        {item.spek_path ? (
-                                            <Button
-                                                type="primary"
-                                                icon={<FilePdfOutlined />}
-                                                onClick={() =>
-                                                    window.open(
-                                                        item.spek_path,
-                                                        "_blank"
-                                                    )
-                                                }
-                                            >
-                                                Lihat Spek
-                                            </Button>
-                                        ) : (
-                                            ""
-                                        )}
-                                    </Space>
-                                    {item.kode_status == "6" ? (
+                                {item.kode_status > "4" ? (
+                                    <Space
+                                        style={{
+                                            width: "100%",
+                                            justifyContent: "end",
+                                        }}
+                                    >
+                                        <Divider
+                                            style={{
+                                                marginTop: "12px",
+                                                marginBottom: "12px",
+                                            }}
+                                        />
                                         <Text
                                             style={{
                                                 fontSize: "15px",
@@ -390,10 +400,10 @@ const PengajuanCard: React.FC<{
                                                 currency: "IDR",
                                             }).format(item.biaya)}
                                         </Text>
-                                    ) : (
-                                        ""
-                                    )}
-                                </Space>
+                                    </Space>
+                                ) : (
+                                    ""
+                                )}
                             </Card>
                         );
                     })
@@ -412,11 +422,11 @@ const PengajuanCard: React.FC<{
                 title="Formulir Pemeriksaan Barang oleh IPDS"
                 handleCancel={() => setOpenTechCheckForm(false)}
                 handleOk={() => {
-                    // setOpenTechCheckForm(false);
                     pemeriksaanForm.submit();
+                    setOpenTechCheckForm(false);
                 }}
                 openModal={openTechCheckForm}
-                okText="Kirim Form"
+                okText="Setujui"
             >
                 <PemeriksaanForm form={pemeriksaanForm} />
             </MyModal>
@@ -426,11 +436,11 @@ const PengajuanCard: React.FC<{
                 title="Formulir Pemeriksaan Barang oleh Tim BMN"
                 handleCancel={() => setOpenBMNCheckForm(false)}
                 handleOk={() => {
-                    // setOpenTechCheckForm(false);
                     pemeriksaanBMN.submit();
+                    setOpenBMNCheckForm(false);
                 }}
                 openModal={openBMNCheckForm}
-                okText="Kirim Form"
+                okText="Setujui"
             >
                 <PemeriksaanBMN form={pemeriksaanBMN} />
             </MyModal>
@@ -442,12 +452,29 @@ const PengajuanCard: React.FC<{
                 handleOk={() => {
                     // setOpenTechCheckForm(false);
                     pemeriksaanPbjPpk.submit();
+                    setOpenPbjPpkCheckForm(false);
                 }}
                 openModal={openPbjPpkCheckForm}
-                okText="Kirim Form"
+                okText="Setujui"
                 maskClosable={false}
             >
                 <PemeriksaanPBJPPK form={pemeriksaanPbjPpk} />
+            </MyModal>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingChangeStatusForm}
+                title="Formulir Perubahan Status Pengajuan"
+                handleCancel={() => setOpenChangeStatusForm(false)}
+                handleOk={() => {
+                    // setOpenTechCheckForm(false);
+                    changeStatusForm.submit();
+                    setOpenChangeStatusForm(false);
+                }}
+                openModal={openChangeStatusForm}
+                okText="Simpan Perubahan"
+                maskClosable={false}
+            >
+                <EditStatusForm form={changeStatusForm} />
             </MyModal>
         </>
     );

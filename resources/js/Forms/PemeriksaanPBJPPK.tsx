@@ -73,7 +73,6 @@ const PemeriksaanPBJPPK: React.FC<{
                     },
                 }
             );
-            console.log("POST request successful:", response.data);
 
             messageApi.open({
                 key: "saveKey",
@@ -172,7 +171,7 @@ const PemeriksaanPBJPPK: React.FC<{
                     {...formItemLayout}
                     label="sequence_id"
                     name="sequence_id"
-                    style={{ display: "none" }}
+                    // style={{ display: "none" }}
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -284,7 +283,7 @@ const PemeriksaanPBJPPK: React.FC<{
                 <Form.Item
                     {...formItemLayout}
                     label="Nama Penanggung Jawab"
-                    name="penanggun_jawab_id"
+                    name="penanggung_jawab_id"
                     // style={{ display: "none" }}
                 >
                     <Select

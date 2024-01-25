@@ -95,6 +95,7 @@ Route::middleware('auth')->group(function () {
     // master perusahaan
     Route::get('api/master/perusahaan', [MasterPerusahaanController::class, 'fetch'])->name('master.perusahaan.fetch');
     Route::get('api/master/perusahaan/pj', [MasterPjPerusahaanController::class, 'fetch'])->name('master.perusahaan.pj.fetch');
+    Route::get('api/maintenance/status', [MaintenanceController::class, 'fetch_status'])->name('maintenance.status.fetch');
 
     // route api for master barang just for admin
     route::get('/api/users', function () {
@@ -187,6 +188,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/maintenance/store', [MaintenanceController::class, 'store'])->name('maintenance.store');
     Route::post('/maintenance/update', [MaintenanceController::class, 'update'])->name('maintenance.update');
+    Route::post('/maintenance/status/update', [MaintenanceController::class, 'status_update'])->name('maintenance.status.update');
     Route::post('/maintenance/check', [MaintenanceController::class, 'check'])->name('maintenance.check');
     Route::post('/maintenance/inspect/ipds', [MaintenanceController::class, 'PemeriksaanIPDS'])->name('maintenance.inspect.ipds.store');
     Route::post('/maintenance/inspect/bmn', [MaintenanceController::class, 'PemeriksaanBMN'])->name('maintenance.inspect.bmn.store');

@@ -34,6 +34,44 @@ const PemeliharaanForm: React.FC<{
             handlePreview(file);
         }
     };
+    const handleFinish = async (values: any) => {
+        messageApi.open({
+            key: "saveKey",
+            content: "Sedang mengirimkan form...",
+            type: "loading",
+        });
+        const copyValues = { ...values };
+        try {
+            copyValues["problem_img_path"] =
+                values.problem_img_path.fileList[0].originFileObj;
+        } catch (error) {
+            copyValues["problem_img_path"] = "";
+        }
+        try {
+            const response = await axios.post(
+                route("maintenance.store"),
+                copyValues,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            console.log("POST request successful:", response.data);
+
+            messageApi.open({
+                key: "saveKey",
+                content: "Berhasil menambahkan data",
+                type: "success",
+            });
+        } catch (error: any) {
+            messageApi.open({
+                key: "saveKey",
+                content: error.message,
+                type: "error",
+            });
+        }
+    };
     const handlePreview = async (file: any) => {
         console.log({ file });
         if (file.url) {

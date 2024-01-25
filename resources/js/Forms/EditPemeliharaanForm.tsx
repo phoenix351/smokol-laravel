@@ -104,7 +104,7 @@ const EditPemeliharaanForm: React.FC<{
                     {...formItemLayout}
                     label="sequence_id"
                     name="sequence_id"
-                    // style={{ display: "none" }}
+                    style={{ display: "none" }}
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -120,7 +120,7 @@ const EditPemeliharaanForm: React.FC<{
                     {...formItemLayout}
                     label="users_id"
                     name="users_id"
-                    // style={{ display: "none" }}
+                    style={{ display: "none" }}
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>

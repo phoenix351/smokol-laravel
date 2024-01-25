@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('master_perusahaan', function (Blueprint $table) {
             $table->dropColumn(['nama_pj', 'jabatan_pj']);
-            $table->unsignedBigInteger('penanggung_jawab_id');
+            $table->unsignedBigInteger('penanggung_jawab_id')->nullable();
         });
     }
 

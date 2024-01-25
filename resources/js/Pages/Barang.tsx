@@ -350,7 +350,7 @@ const BarangPage = ({
             content: "Sedang mengajukan...",
             type: "loading",
         });
-        console.log({ values });
+        // console.log({ values });
         const copyValues = { ...values };
         try {
             copyValues["problem_img_path"] =
@@ -359,26 +359,23 @@ const BarangPage = ({
             copyValues["problem_img_path"] = "";
         }
         try {
-            router.post(route("maintenance.store"), copyValues, {
-                onSuccess: (responsePage) => {
-                    const response: any = responsePage.props.response;
-                    console.log({ response });
-                    if (response.errors?.length > 1) {
-                        return messageApi.open({
-                            key: saveKey,
-                            content: response.errors,
-                            type: "error",
-                        });
-                    }
-                    messageApi.open({
-                        key: saveKey,
-                        content: "Berhasil menambahkan data",
-                        type: "success",
-                    });
+            const response = axios.post(
+                route("maintenance.store"),
+                copyValues,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
 
-                    return 1;
-                },
+            console.log({ response });
+
+            messageApi.open({
+                key: saveKey,
+                content: "Berhasil menambahkan data",
+                type: "success",
             });
+
+            return 1;
         } catch (error: any) {
             messageApi.open({
                 key: saveKey,
@@ -658,7 +655,6 @@ const BarangPage = ({
                 cancelText="Batal"
                 width={600}
             >
-                <Divider />
                 <PemeliharaanForm
                     record={currentRecord}
                     form={pengajuanForm}

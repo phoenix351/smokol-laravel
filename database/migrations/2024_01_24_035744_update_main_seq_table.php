@@ -15,7 +15,7 @@ return new class extends Migration
 
         Schema::table('maintenance_sequences', function (Blueprint $table) {
             $table->date('estimasi_penyelesaian')->nullable();
-            $table->unsignedBigInteger('perusahaan_id');
+            $table->unsignedBigInteger('perusahaan_id')->nullable();
             // $table->foreign('perusahaan_id')->references('id')->on('maser_perusahaan');
         });
     }

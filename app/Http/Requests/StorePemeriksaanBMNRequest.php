@@ -24,7 +24,7 @@ class StorePemeriksaanBMNRequest extends FormRequest
         return [
             'sequence_id' => 'required',
             'users_id' => 'required',
-            'spek_path' => 'required',
+            // 'spek_path' => 'required',
 
 
         ];

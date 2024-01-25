@@ -11,76 +11,38 @@ const PemeriksaanBMN: React.FC<{
     const formItemLayout = {
         wrapperCol: { span: 24 },
     };
+    const saveKey = "message";
     const [messageApi, contextHolder] = message.useMessage();
-    const [file, setFile] = useState(null);
-    const [previewImage, setPreviewImage] = useState<
-        string | ArrayBuffer | null
-    >(null);
-
-    const handleChange = (info: any) => {
-        // console.log({info})
-        const { fileList } = info;
-
-        const file = fileList.length > 0 ? fileList[0] : false;
-        if (!file) {
-            setFile(null);
-            setPreviewImage(null);
-            return false;
-        }
-
-        // console.log({file})
-        if (file.originFileObj) {
-            setFile(file);
-            handlePreview(file);
-        }
-    };
-    const handlePreview = async (file: any) => {
-        console.log({ file });
-        if (file.url) {
-            setPreviewImage(file.url);
-        } else {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result);
-            };
-            reader.readAsDataURL(file.originFileObj);
-        }
-    };
-    const onFinish = (values: any) => {
-        values.spek_path = values.spek_path.file;
+    const onFinish = async (values: any) => {
         messageApi.open({
-            // key: saveKey,
+            key: saveKey,
             content: "Sedang menambahkan data...",
             type: "loading",
         });
         try {
-            router.post(route("maintenance.inspect.bmn.store"), values, {
-                onSuccess: (responsePage) => {
-                    const response: any = responsePage.props.response;
-                    console.log({ response });
-                    if (response.errors?.length > 1) {
-                        return messageApi.open({
-                            // key: saveKey,
-                            content: response.errors,
-                            type: "error",
-                        });
-                    }
-                    messageApi.open({
-                        // key: saveKey,
-                        content: "Berhasil menambahkan data",
-                        type: "success",
-                    });
+            const response = await axios.post(
+                route("maintenance.inspect.bmn.store"),
+                values,
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
 
-                    return 1;
-                },
+            console.log({ response });
+            messageApi.open({
+                key: saveKey,
+                content: "Berhasil menambahkan data",
+                type: "success",
             });
         } catch (error: any) {
             messageApi.open({
-                // key: saveKey,
+                key: saveKey,
                 content: error.message,
                 type: "error",
             });
             return 0;
+        } finally {
+            // messageApi.close();
         }
     };
     return (
@@ -133,28 +95,6 @@ const PemeriksaanBMN: React.FC<{
                     // style={{ display: "none" }}
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
-                </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="Upload File Spek"
-                    name="spek_path"
-                >
-                    <Upload
-                        onChange={handleChange}
-                        beforeUpload={() => false}
-                        multiple={false}
-                        accept=".pdf"
-
-                        // disabled={fileList.length > 0}
-                    >
-                        {file !== null ? (
-                            ""
-                        ) : (
-                            <Button icon={<UploadOutlined />}>
-                                Select File
-                            </Button>
-                        )}
-                    </Upload>
                 </Form.Item>
             </Form>
         </>
