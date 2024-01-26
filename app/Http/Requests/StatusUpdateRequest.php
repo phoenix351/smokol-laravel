@@ -25,7 +25,8 @@ class StatusUpdateRequest extends FormRequest
             'sequence_id' => 'required',
             // 'users_id' => 'required',
             'kode_status' => 'required',
-            'biaya' => 'nullable'
+            'biaya' => 'nullable',
+            'status' => 'nullable'
         ];
     }
 }

@@ -488,6 +488,10 @@ const BarangPage = ({
             title: "ruangan_nama",
             dataIndex: "ruangan_nama",
         },
+        {
+            title: "bast_path",
+            dataIndex: "bast_path",
+        },
 
         {
             title: "operation",

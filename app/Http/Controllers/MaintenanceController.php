@@ -271,6 +271,7 @@ class MaintenanceController extends Controller
             'maintenance_sequences.keluhan',
             'maintenance_sequences.biaya',
             'maintenance_sequences.problem_img_path',
+            'maintenance_sequences.kondisi_final',
 
 
             'master_barang.merk',
@@ -492,6 +493,11 @@ class MaintenanceController extends Controller
             // cek kesamaan dg kode skrg
             $currentSeq = Maintenance::where('sequence_id', $validatedData['sequence_id'])->orderBy('id', 'DESC')->first();
             $currentStatus = $currentSeq->kode_status;
+            $new_maintenance = [
+                'kode_status' => $validatedData['kode_status'],
+                'sequence_id' => $validatedData['sequence_id'],
+                'users_id' => $user->id
+            ];
 
             if ($validatedData['kode_status'] === $currentStatus) {
                 return response()->json(
@@ -506,9 +512,24 @@ class MaintenanceController extends Controller
                     ]
                 );
             }
-            $validatedData['users_id'] = $user->id;
+            if (!is_null($validatedData['status'])) {
+                MaintenanceSequence::where('id', $validatedData['sequence_id'])->update(
+                    [
+                        'kondisi_final' => $validatedData['status']
+                    ]
+                );
+                // jika baik maka kemballikan ke pengguna 
+                // jika rusak ringan maka bisa memilih
+                // jika rusak berat maka kembalikan ke umum
+
+            }
+            // $validatedData['users_id'] = $user->id;
             Maintenance::create(
-                $validatedData
+                $new_maintenance
+            );
+            return response()->json(
+                ['message' => 'Berhasil mengubah status pengajuan !'],
+                201
             );
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

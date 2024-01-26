@@ -357,6 +357,10 @@ const BarangPage = ({
             sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
+            title: "nomor_urut_pendaftaran",
+            dataIndex: "nomor_urut_pendaftaran",
+        },
+        {
             title: "kondisi",
             dataIndex: "kondisi",
             filters: [
@@ -490,7 +494,7 @@ const BarangPage = ({
 
     return (
         <div>
-            <Head title="History Barang" />
+            <Head title="Daftar Barang Pegawai" />
             <MyModal
                 title={"Tambah History Barang"}
                 openModal={openModal}
@@ -517,11 +521,11 @@ const BarangPage = ({
             </MyModal>
 
             {contextHolder}
-            <h1>History Barang</h1>
+            <h1>Daftar Barang Pegawai</h1>
             <Divider />
             <Space style={{ display: "flex", justifyContent: "space-between" }}>
                 <Search
-                    placeholder="Cari history barang ..."
+                    placeholder="Cari barang ..."
                     allowClear
                     onSearch={onSearch}
                     loading={searchLoading}

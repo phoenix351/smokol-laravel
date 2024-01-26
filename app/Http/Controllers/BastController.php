@@ -78,7 +78,7 @@ class BastController extends Controller
 
     public function upload(Request $request)
     {
-        $path = $request->file('file')['file']->store('files');
+        $path = $request->file('file')->store('files');
         $barang_id = $request->post('barang_id');
 
         BastModel::create([

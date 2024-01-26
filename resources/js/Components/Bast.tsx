@@ -30,6 +30,9 @@ const Bast: React.FC<{ data: BastType[]; barang_id: number }> = ({
     const key = "updatable";
 
     const onFinish = async (values: any) => {
+        console.log("submit....");
+
+        values["file"] = values["file"]["file"]["originFileObj"];
         router.post(route("bast.upload"), (data = values), {
             onStart: () => {
                 messageApi.open({
@@ -69,19 +72,29 @@ const Bast: React.FC<{ data: BastType[]; barang_id: number }> = ({
     }, []);
 
     const handleFileChange = (info: any) => {
-        setFileList(info.fileList);
+        console.log("====================================");
+        console.log({ len: info.fileList.length });
+        console.log("====================================");
+        if (info.fileList.length === 0) {
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>");
+            setFileList([]);
+            return;
+        }
+
         form.setFieldValue("barang_id", barang_id);
+        form.setFieldValue("file", info.fileList[0].originalFileObj);
         form.submit();
+        console.log("submti");
     };
     const defaultColumns: ColumnsType<BastType> = [
         // {
         //     title: "id",
         //     dataIndex: "id",
         // },
-        // {
-        //     title: "barang_id",
-        //     dataIndex: "barang_id",
-        // },
+        {
+            title: "barang_id",
+            dataIndex: "barang_id",
+        },
         {
             title: "uploaded_date",
             dataIndex: "uploaded_date",
@@ -98,7 +111,7 @@ const Bast: React.FC<{ data: BastType[]; barang_id: number }> = ({
         {
             title: "path",
             dataIndex: "path",
-            render: (value) => (
+            render: (value: any) => (
                 <a href={route("file.show", { filepath: value })}>
                     Lihat Dokumen
                 </a>
@@ -130,14 +143,7 @@ const Bast: React.FC<{ data: BastType[]; barang_id: number }> = ({
                         fileList={fileList}
                         onChange={handleFileChange}
                         multiple={false}
-                        beforeUpload={(file) => {
-                            const isPDF = file.type == "application/pdf";
-                            if (!isPDF) {
-                                message.error(`${file.name} is not a PDF file`);
-                            }
-
-                            return isPDF || Upload.LIST_IGNORE;
-                        }}
+                        beforeUpload={() => false}
                         style={{ alignItems: "center" }}
                     >
                         <p className="ant-upload-drag-icon">

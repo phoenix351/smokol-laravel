@@ -1,4 +1,13 @@
-import { Button, Divider, Form, Input, Select, Upload, message } from "antd";
+import {
+    Button,
+    Divider,
+    Form,
+    Input,
+    Radio,
+    Select,
+    Upload,
+    message,
+} from "antd";
 import { useEffect, useRef, useState } from "react";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -160,6 +169,27 @@ const EditStatusForm: React.FC<{
                         // style={{ display: "none" }}
                     >
                         <RupiahInput value={value} onChange={handleChange} />
+                    </Form.Item>
+                )}
+                {kodeStatus == "6" && (
+                    <Form.Item
+                        {...formItemLayout}
+                        label="Status Pasca Pemeliharaan"
+                        name="status"
+                        rules={[
+                            {
+                                required: true,
+                                message:
+                                    "Status Pasca Pemeliharaan harus diisi",
+                            },
+                        ]}
+                        // style={{ display: "none" }}
+                    >
+                        <Radio.Group buttonStyle="solid">
+                            <Radio.Button value="1">Baik</Radio.Button>
+                            <Radio.Button value="2">Rusak Ringan</Radio.Button>
+                            <Radio.Button value="3">Rusak Berat</Radio.Button>
+                        </Radio.Group>
                     </Form.Item>
                 )}
             </Form>

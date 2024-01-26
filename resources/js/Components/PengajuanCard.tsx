@@ -380,26 +380,46 @@ const PengajuanCard: React.FC<{
                                             justifyContent: "end",
                                         }}
                                     >
-                                        <Divider
-                                            style={{
-                                                marginTop: "12px",
-                                                marginBottom: "12px",
-                                            }}
-                                        />
-                                        <Text
-                                            style={{
-                                                fontSize: "15px",
-                                                fontWeight: "500",
-                                                width: "100%",
-                                                color: "#4E54C8",
-                                            }}
-                                        >
-                                            Total Biaya Perbaikan :{" "}
-                                            {new Intl.NumberFormat("id-ID", {
-                                                style: "currency",
-                                                currency: "IDR",
-                                            }).format(item.biaya)}
-                                        </Text>
+                                        <Space direction="vertical">
+                                            <Divider
+                                                style={{
+                                                    marginTop: "12px",
+                                                    marginBottom: "12px",
+                                                }}
+                                            />
+                                            <Text
+                                                style={{
+                                                    fontSize: "15px",
+                                                    fontWeight: "500",
+                                                    width: "100%",
+                                                    color: "#4E54C8",
+                                                }}
+                                            >
+                                                Total Biaya Perbaikan :{" "}
+                                                {new Intl.NumberFormat(
+                                                    "id-ID",
+                                                    {
+                                                        style: "currency",
+                                                        currency: "IDR",
+                                                    }
+                                                ).format(item.biaya)}
+                                            </Text>
+                                            {item.kondisi_final ? (
+                                                <Text
+                                                    style={{
+                                                        fontSize: "15px",
+                                                        fontWeight: "500",
+                                                        width: "100%",
+                                                        color: "#4E54C8",
+                                                    }}
+                                                >
+                                                    Kondisi Final :{" "}
+                                                    {item.kondisi_final}
+                                                </Text>
+                                            ) : (
+                                                ""
+                                            )}
+                                        </Space>
                                     </Space>
                                 ) : (
                                     ""
@@ -421,9 +441,12 @@ const PengajuanCard: React.FC<{
                 confirmLoadingModal={loadingTechCheckForm}
                 title="Formulir Pemeriksaan Barang oleh IPDS"
                 handleCancel={() => setOpenTechCheckForm(false)}
-                handleOk={() => {
-                    pemeriksaanForm.submit();
-                    setOpenTechCheckForm(false);
+                handleOk={async () => {
+                    try {
+                        const isValid = await pemeriksaanForm.validateFields();
+                        pemeriksaanForm.submit();
+                        setOpenTechCheckForm(false);
+                    } catch (error) {}
                 }}
                 openModal={openTechCheckForm}
                 okText="Setujui"
@@ -435,9 +458,12 @@ const PengajuanCard: React.FC<{
                 confirmLoadingModal={loadingBMNCheckForm}
                 title="Formulir Pemeriksaan Barang oleh Tim BMN"
                 handleCancel={() => setOpenBMNCheckForm(false)}
-                handleOk={() => {
-                    pemeriksaanBMN.submit();
-                    setOpenBMNCheckForm(false);
+                handleOk={async () => {
+                    try {
+                        const isValid = await pemeriksaanBMN.validateFields();
+                        pemeriksaanBMN.submit();
+                        setOpenBMNCheckForm(false);
+                    } catch (error) {}
                 }}
                 openModal={openBMNCheckForm}
                 okText="Setujui"
@@ -449,10 +475,13 @@ const PengajuanCard: React.FC<{
                 confirmLoadingModal={loadingPbjPpkCheckForm}
                 title="Formulir Pemeriksaan Barang oleh Tim PBJ / PPK"
                 handleCancel={() => setOpenPbjPpkCheckForm(false)}
-                handleOk={() => {
-                    // setOpenTechCheckForm(false);
-                    pemeriksaanPbjPpk.submit();
-                    setOpenPbjPpkCheckForm(false);
+                handleOk={async () => {
+                    try {
+                        const isValid =
+                            await pemeriksaanPbjPpk.validateFields();
+                        pemeriksaanPbjPpk.submit();
+                        setOpenPbjPpkCheckForm(false);
+                    } catch (error) {}
                 }}
                 openModal={openPbjPpkCheckForm}
                 okText="Setujui"
@@ -465,10 +494,15 @@ const PengajuanCard: React.FC<{
                 confirmLoadingModal={loadingChangeStatusForm}
                 title="Formulir Perubahan Status Pengajuan"
                 handleCancel={() => setOpenChangeStatusForm(false)}
-                handleOk={() => {
+                handleOk={async () => {
                     // setOpenTechCheckForm(false);
-                    changeStatusForm.submit();
-                    setOpenChangeStatusForm(false);
+                    try {
+                        const isValid = await changeStatusForm.validateFields();
+                        changeStatusForm.submit();
+                        setOpenChangeStatusForm(false);
+                    } catch (error) {
+                        // console.log(error);
+                    }
                 }}
                 openModal={openChangeStatusForm}
                 okText="Simpan Perubahan"

@@ -12,6 +12,8 @@ import { JSX } from "react/jsx-runtime";
 import MyModal from "./Modal";
 import EditPemeliharaanForm from "@/Forms/EditPemeliharaanForm";
 
+import { PengajuanItem } from "@/types";
+
 // const { Meta } = Card;
 const { Text } = Typography;
 
@@ -19,24 +21,6 @@ const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 24 },
 };
-
-interface PengajuanItem {
-    problem_img_path: string | null;
-    sequence_id: number;
-    bidang: string;
-    deskripsi: string;
-    kode_status: string;
-    jenis: string;
-    merk: string;
-    tipe: string;
-    users_id: number;
-    nama_lengkap: string;
-    nomor_seri: string;
-    nomor_urut_pendaftaran: string;
-    keluhan: string;
-    biaya: number;
-    role: string;
-}
 interface ApproveProps {
     users_id: number;
     kode_status: string;
@@ -181,20 +165,20 @@ const UserPengajuanCard: React.FC<{
                                 >{`${item.merk} ${item.tipe} (${item.jenis})`}</Text>
                                 <Text>{`Keluhan : ${item.keluhan}`}</Text>
                             </Space>
-                            {item.kode_status == "6" ? (
-                                <>
-                                    <Divider
-                                        style={{
-                                            marginTop: "12px",
-                                            marginBottom: "12px",
-                                        }}
-                                    />
-                                    <Space
-                                        style={{
-                                            width: "100%",
-                                            justifyContent: "end",
-                                        }}
-                                    >
+                            {item.kode_status > "4" ? (
+                                <Space
+                                    style={{
+                                        width: "100%",
+                                        justifyContent: "end",
+                                    }}
+                                >
+                                    <Space direction="vertical">
+                                        <Divider
+                                            style={{
+                                                marginTop: "12px",
+                                                marginBottom: "12px",
+                                            }}
+                                        />
                                         <Text
                                             style={{
                                                 fontSize: "15px",
@@ -209,8 +193,23 @@ const UserPengajuanCard: React.FC<{
                                                 currency: "IDR",
                                             }).format(item.biaya)}
                                         </Text>
+                                        {item.kondisi_final ? (
+                                            <Text
+                                                style={{
+                                                    fontSize: "15px",
+                                                    fontWeight: "500",
+                                                    width: "100%",
+                                                    color: "#4E54C8",
+                                                }}
+                                            >
+                                                Kondisi Final :{" "}
+                                                {item.kondisi_final}
+                                            </Text>
+                                        ) : (
+                                            ""
+                                        )}
                                     </Space>
-                                </>
+                                </Space>
                             ) : (
                                 ""
                             )}
