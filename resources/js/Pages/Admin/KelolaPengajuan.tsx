@@ -88,8 +88,12 @@ const KelolaPengajuanPage = () => {
             key: "5",
         },
         {
-            label: "Selesai",
+            label: "Selesai Diperiksa",
             key: "6",
+        },
+        {
+            label: "Selesai",
+            key: "9",
         },
     ];
     const [selectedVerticalMenu, setSelectedVerticalMenu] = useState("99");
@@ -157,7 +161,7 @@ const KelolaPengajuanPage = () => {
     const renderContent = () => {
         return <PengajuanCard items={items} csrfToken={csrfToken} />;
     };
-    
+
     const Loading = () => (
         <Card
             style={{
@@ -172,8 +176,6 @@ const KelolaPengajuanPage = () => {
 
     return (
         <div>
-            
-
             <Head title="History Barang" />
 
             <h1 style={{ marginBottom: "10px" }}>Daftar Pengajuan Pegawai</h1>

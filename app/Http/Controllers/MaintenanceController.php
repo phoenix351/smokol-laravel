@@ -96,6 +96,7 @@ class MaintenanceController extends Controller
      */
     public function store(StoreMaintenanceRequest $request)
     {
+        $user = auth()->user();
         try {
             $validatedData = $request->validate($request->rules());
             // Log::info($validatedData['keluhan']);
@@ -123,7 +124,7 @@ class MaintenanceController extends Controller
 
             // insert
             $newSequences = MaintenanceSequence::create($validatedData);
-            $newMaintenance = Maintenance::create(['sequence_id' => $newSequences->id, 'kode_status' => '0']);
+            $newMaintenance = Maintenance::create(['sequence_id' => $newSequences->id, 'kode_status' => '0', 'users_id' => $user->id]);
 
             return response()->json(['message' => "Berhasil mengirimkan formulir pengajuan",]);
         } catch (ValidationException $e) {
@@ -498,13 +499,14 @@ class MaintenanceController extends Controller
                 'sequence_id' => $validatedData['sequence_id'],
                 'users_id' => $user->id
             ];
-
+            // apabila kode sama
             if ($validatedData['kode_status'] === $currentStatus) {
                 return response()->json(
                     ['error' => "Kode Status tidak boleh sama dengan status sebelumnya !"],
                     400
                 );
             }
+            // apabila kode sudah diperbaiki penyedia
             if ($validatedData['kode_status'] === '5') {
                 MaintenanceSequence::where('id', $validatedData['sequence_id'])->update(
                     [
@@ -512,7 +514,8 @@ class MaintenanceController extends Controller
                     ]
                 );
             }
-            if (!is_null($validatedData['status'])) {
+            // default
+            if (isset($validatedData['status'])) {
                 MaintenanceSequence::where('id', $validatedData['sequence_id'])->update(
                     [
                         'kondisi_final' => $validatedData['status']
@@ -532,7 +535,7 @@ class MaintenanceController extends Controller
                 201
             );
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['asulah' => $e->getMessage()], 400);
         }
     }
 }

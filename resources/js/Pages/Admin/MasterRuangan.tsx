@@ -54,6 +54,8 @@ interface MasterRuangan {
     id?: number;
     key?: number;
     nama: string;
+    users_id: number;
+    users_nama: string;
 }
 
 const { Search } = Input;
@@ -92,19 +94,25 @@ const MasterRuangan = ({
     //end modal
 
     const data_master = master_ruangan.map(
-        ({ id, nama }): MasterRuangan => ({
+        ({ id, nama, users_id, users_nama }): MasterRuangan => ({
             key: id,
             nama,
+            users_id,
+            users_nama,
         })
     );
     const [dataSource, setDataSource] = useState<MasterRuangan[]>(data_master);
 
     useEffect(() => {
         setTimeout(() => {
-            let data_master = master_ruangan.map(({ id, nama }) => ({
-                key: id,
-                nama,
-            }));
+            let data_master = master_ruangan.map(
+                ({ id, nama, users_id, users_nama }) => ({
+                    key: id,
+                    nama,
+                    users_id,
+                    users_nama,
+                })
+            );
 
             console.log("changeeeee", { master_ruangan });
             setDataSource(data_master);
@@ -221,7 +229,6 @@ const MasterRuangan = ({
             router.patch(route("master_ruangan.update"), values, {
                 onSuccess: (responsePage) => {
                     const response: any = responsePage.props.response;
-                    console.log({ response });
                     if (response.errors?.length > 1) {
                         return messageApi.open({
                             key: saveKey,
@@ -273,6 +280,18 @@ const MasterRuangan = ({
 
             // sorter: namaSorter as CompareFn<object>,
         },
+        // {
+        //     title: "users_id",
+        //     dataIndex: "users_id",
+
+        //     // sorter: namaSorter as CompareFn<object>,
+        // },
+        {
+            title: "users_namaama",
+            dataIndex: "users_nama",
+
+            // sorter: namaSorter as CompareFn<object>,
+        },
 
         {
             title: "operation",
@@ -291,6 +310,10 @@ const MasterRuangan = ({
 
                             itemAddForm.setFieldsValue(record);
                             itemAddForm.setFieldValue("id", record.key);
+                            itemAddForm.setFieldValue(
+                                "users_id",
+                                record.users_id
+                            );
                         },
                     },
                     {

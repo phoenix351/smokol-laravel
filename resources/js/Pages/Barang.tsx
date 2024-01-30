@@ -33,6 +33,8 @@ import {
     WarningOutlined,
     StopOutlined,
     CheckCircleOutlined,
+    UploadOutlined,
+    FilePdfOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
@@ -489,8 +491,20 @@ const BarangPage = ({
             dataIndex: "ruangan_nama",
         },
         {
-            title: "bast_path",
+            title: "File BAST",
             dataIndex: "bast_path",
+            render: (value: string) =>
+                value === "path" ? (
+                    <Button>
+                        {" "}
+                        <UploadOutlined /> Upload Bast
+                    </Button>
+                ) : (
+                    <Button onClick={() => window.open(value, "_blank")}>
+                        {" "}
+                        <FilePdfOutlined /> Lihat Dokumen
+                    </Button>
+                ),
         },
 
         {

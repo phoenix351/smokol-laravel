@@ -9,5 +9,5 @@ class MasterRuangan extends Model
 {
     use HasFactory;
     protected $table = "master_ruangan";
-    protected $fillable = ["id", "nama"];
+    protected $fillable = ["id", "nama", "users_id"];
 }

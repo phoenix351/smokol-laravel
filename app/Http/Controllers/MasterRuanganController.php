@@ -19,7 +19,9 @@ class MasterRuanganController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/MasterRuangan', ['master_ruangan' => MasterRuangan::all()]);
+        $master_ruangan = MasterRuangan::join('users', 'users.id', 'master_ruangan.users_id')
+            ->select('master_ruangan.id', 'master_ruangan.nama', 'users.nama_lengkap as users_nama', 'users.id as users_id')->get();
+        return Inertia::render('Admin/MasterRuangan', ['master_ruangan' => $master_ruangan]);
     }
 
     /**
@@ -94,15 +96,24 @@ class MasterRuanganController extends Controller
     {
         try {
             $validatedData = $request->validate($request->rules());
+
             $updateRecord = MasterRuangan::findOrFail($request->id);
 
-            $updateRecord->update($validatedData);
+            $updateRecord->update(
+                [
+                    'nama' => $validatedData['nama'],
+                    'users_id' => $validatedData['users_id'],
+                    // 'id'=>$validatedData['id'],
+                ]
+            );
 
             $response = [
                 'message' => 'Berhasil melakukan update data'
             ];
 
-            $master_ruangan = MasterRuangan::all();
+
+            $master_ruangan = MasterRuangan::join('users', 'users.id', 'master_ruangan.users_id')
+                ->select('master_ruangan.id', 'master_ruangan.nama', 'users.nama_lengkap as users_nama', 'users.id as users_id')->get();
         } catch (QueryException $e) {
             $response = [
                 'message' => 'An error occurred',

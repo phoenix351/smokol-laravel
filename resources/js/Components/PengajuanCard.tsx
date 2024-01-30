@@ -203,7 +203,10 @@ const PengajuanCard: React.FC<{
                             | ReactNode[]
                             | undefined = [];
 
-                        if (item.kode_status == "6" || item.role == "basic") {
+                        if (
+                            item.kode_status == "9" ||
+                            item.kode_status == "99"
+                        ) {
                             actionItems = [
                                 <div
                                     style={{

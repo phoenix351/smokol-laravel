@@ -22,7 +22,9 @@ class UpdateMasterRuanganRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id' => 'required',
             'nama' => 'required',
+            'users_id' => 'required',
         ];
     }
 }

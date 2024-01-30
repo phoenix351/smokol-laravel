@@ -110,6 +110,7 @@ export interface MaintenanceHistory {
     nomor_seri: string;
 }
 export interface PengajuanItem {
+    kondisi_final: any;
     spek_path: any;
     problem_img_path: string | null;
     sequence_id: number;

@@ -83,8 +83,9 @@ const Bast: React.FC<{ data: BastType[]; barang_id: number }> = ({
 
         form.setFieldValue("barang_id", barang_id);
         form.setFieldValue("file", info.fileList[0].originalFileObj);
-        form.submit();
-        console.log("submti");
+        const isValid = form.Validate();
+
+        // console.log("submti");
     };
     const defaultColumns: ColumnsType<BastType> = [
         // {
