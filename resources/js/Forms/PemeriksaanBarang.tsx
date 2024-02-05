@@ -37,7 +37,7 @@ const PemeriksaanForm: React.FC<{
                         type: "success",
                     });
 
-                    return 1;
+                    router.get(route("admin.kelola.pengajuan"));
                 },
             });
         } catch (error: any) {

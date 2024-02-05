@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BastModel;
 use App\Http\Requests\StoreBastModelRequest;
 use App\Http\Requests\UpdateBastModelRequest;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
@@ -78,13 +79,21 @@ class BastController extends Controller
 
     public function upload(Request $request)
     {
-        $path = $request->file('file')->store('files');
-        $barang_id = $request->post('barang_id');
+        try {
+            //code...
+            $path = $request->file('file')->store('public/files/bast');
+            $barang_id = $request->post('barang_id');
 
-        BastModel::create([
-            'barang_id' => $barang_id,
-            'path' => $path,
-        ]);
+            Barang::where('id', $barang_id)->update(
+                ['bast_path' => $path]
+            );
+            return response()->json(
+                ['message' => 'Berhasil mengunnggah dokumen BAST'],
+                201
+            );
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
     public function show_file(Request $request)
     {

@@ -25,6 +25,10 @@ class UpdateMasterRuanganRequest extends FormRequest
             'id' => 'required',
             'nama' => 'required',
             'users_id' => 'required',
+            'kode_siman' => 'required',
+            'kode_baru' => 'required',
+            'gedung' => 'nullable',
+            'lantai' => 'nullable',
         ];
     }
 }

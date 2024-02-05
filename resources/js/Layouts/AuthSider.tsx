@@ -11,6 +11,10 @@ import {
     FileDoneOutlined,
     HomeOutlined,
     DesktopOutlined,
+    UserOutlined,
+    CarOutlined,
+    CarryOutFilled,
+    CarryOutOutlined,
 } from "@ant-design/icons";
 import { User } from "@/types";
 type AuthSiderProps = {
@@ -96,7 +100,7 @@ const AuthSider: React.FC<AuthSiderProps> = ({
             },
             {
                 key: "admin.master.jabatan",
-                icon: <UsergroupAddOutlined />,
+                icon: <CarryOutOutlined />,
                 label: "Master Jabatan",
                 onClick: () => handleMenuClick("admin.master.jabatan"),
             },
@@ -105,6 +109,12 @@ const AuthSider: React.FC<AuthSiderProps> = ({
                 icon: <DesktopOutlined />,
                 label: "Master Sistem Operasi",
                 onClick: () => handleMenuClick("admin.master.sistem_operasi"),
+            },
+            {
+                key: "admin.master.users",
+                icon: <UserOutlined />,
+                label: "Master Users",
+                onClick: () => handleMenuClick("admin.master.users"),
             },
         ];
     }

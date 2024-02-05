@@ -19,18 +19,14 @@ import {
 
 const Dashboard = ({
     kondisi,
-    kondisi_total,
     ruangan_summary,
     jenis_summary,
 }: PageProps & {
-    kondisi: KondisiSummary[];
-    kondisi_total: number;
+    kondisi: KondisiSummary;
     ruangan_summary: Summary[];
     jenis_summary: Summary[];
 }) => {
-    useEffect(() => {
-        console.log({ kondisi, kondisi_total, ruangan_summary });
-    }, [kondisi]);
+    useEffect(() => {}, [kondisi]);
 
     return (
         <>
@@ -41,7 +37,7 @@ const Dashboard = ({
                     <Card bordered={false}>
                         <Statistic
                             title="Total Barang TIK"
-                            value={kondisi_total}
+                            value={kondisi.jumlah}
                             valueStyle={{ color: "#000" }}
                             suffix="Unit"
                         />
@@ -51,7 +47,7 @@ const Dashboard = ({
                     <Card bordered={false}>
                         <Statistic
                             title="Barang TIK Kondisi Baik"
-                            value={kondisi[0].jumlah}
+                            value={kondisi.jumlah}
                             valueStyle={{ color: "green" }}
                             prefix={<CheckCircleOutlined />}
                             suffix="Unit"
@@ -62,7 +58,7 @@ const Dashboard = ({
                     <Card bordered={false}>
                         <Statistic
                             title="Barang TIK Kondisi Rusak Ringan"
-                            value={kondisi[2].jumlah}
+                            value={kondisi.rusakRingan}
                             valueStyle={{ color: "orange" }}
                             prefix={<WarningOutlined />}
                             suffix="Unit"
@@ -73,7 +69,7 @@ const Dashboard = ({
                     <Card bordered={false}>
                         <Statistic
                             title="Barang TIK Kondisi Rusak Berat"
-                            value={kondisi[1].jumlah}
+                            value={kondisi.rusakBerat}
                             valueStyle={{ color: "red" }}
                             prefix={<StopOutlined />}
                             suffix="Unit"

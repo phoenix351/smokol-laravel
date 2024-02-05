@@ -221,7 +221,7 @@ const PengajuanCard: React.FC<{
                                 </div>,
                             ];
                         } else if (
-                            item.kode_status == "0" &&
+                            item.kode_status == "1" &&
                             item.role == "Tim IPDS"
                         ) {
                             actionItems = [
@@ -251,7 +251,7 @@ const PengajuanCard: React.FC<{
                                 <EllipsisOutlined key="ellipsis" />,
                             ];
                         } else if (
-                            item.kode_status == "1" &&
+                            item.kode_status == "0" &&
                             item.role == "Tim BMN"
                         ) {
                             actionItems = [

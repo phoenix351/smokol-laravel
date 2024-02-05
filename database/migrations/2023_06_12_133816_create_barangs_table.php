@@ -20,20 +20,18 @@ return new class extends Migration
             $table->unsignedBigInteger('sistem_operasi_id');
             $table->foreign('sistem_operasi_id')->references('id')->on('master_sistem_operasi')->onDelete('cascade');
 
-            $table->unsignedBigInteger('pengguna_id');
-            $table->foreign('pengguna_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('users_id');
+            $table->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->unsignedBigInteger('ruangan_id');
             $table->foreign('ruangan_id')->references('id')->on('master_ruangan')->onDelete('cascade');
 
-            $table->date('tanggal_peroleh')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->date('tanggal_kembali')->nullable();
 
             $table->string('kondisi', 12);
-            $table->string('status_pemeliharaan', 20)->default('Operasional');
+            // $table->string('status_pemeliharaan', 20)->default('Operasional');
             $table->string('bast_path', 255)->nullable();
 
-            $table->boolean('is_approved')->default(false);
+            $table->boolean('is_approved')->nullable();
         });
     }
 

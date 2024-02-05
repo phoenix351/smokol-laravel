@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BarangUpdating;
 use App\Models\Barang;
+use App\Models\MasterBarang;
 use App\Http\Requests\StoreBarangRequest;
 use App\Http\Requests\UpdateBarangRequest;
 
@@ -21,7 +23,26 @@ class BarangController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/KelolaBarang', ['history_barang' => DB::table('barang_view')->get()]);
+        $data = MasterBarang::join('barang', 'barang.barang_id', 'master_barang.id')
+            ->leftJoin('users', 'users.id', 'barang.users_id')
+            ->leftJoin('master_ruangan', 'master_ruangan.id', 'barang.ruangan_id')
+            ->select(
+                'barang.id',
+                'barang.users_id',
+                'barang.ruangan_id',
+                'barang.kondisi',
+                'barang.sistem_operasi_id',
+                'master_barang.jenis',
+                'master_barang.merk',
+                'master_barang.tipe',
+                'master_barang.nomor_seri',
+                'master_barang.nomor_urut_pendaftaran',
+                'master_barang.tanggal_peroleh',
+                'users.nama_lengkap',
+                'master_ruangan.nama as ruangan_nama'
+            )
+            ->get();
+        return Inertia::render('Admin/KelolaBarang', ['history_barang' => $data]);
     }
 
     /**
@@ -99,46 +120,44 @@ class BarangController extends Controller
             $validatedData = $request->validate($request->rules());
             // $validatedData['tahun_peroleh'] = Carbon::parse($validatedData['tahun_peroleh'])->format('Y-m-d H:i:s');
 
-            $updateRecord = Barang::findOrFail($request->id);
+            $updateRecord = Barang::findOrFail($validatedData['id']);
 
             $updateRecord->update($validatedData);
             $updateRecord->save();
+
+            // BarangUpdating::dispatch($updateRecord);
 
             $response = [
                 'message' => 'Berhasil melakukan update data',
                 'data' => $updateRecord
             ];
-
-            $history_barang = Barang::all();
         } catch (QueryException $e) {
             $response = [
-                'message' => 'An error occurred',
-                'errors' => $e->getMessage(),
+                'message' => 'An asu occurred',
+                'error' => $e->getMessage(),
             ];
-            $history_barang = [];
+            return response()->json($response, 429);
         } catch (ModelNotFoundException $e) {
             $response = [
-                'errors' => 'Record not found',
+                'error' => 'Record not found',
             ];
-            $history_barang = [];
+            return response()->json($response, 404);
         } catch (ValidationException $e) {
             $response = [
                 'message' => 'Validation error',
-                'errors' => $e->errors(),
+                'error' => $e->errors(),
             ];
-            $history_barang = [];
+            return response()->json($response, 422);
         } catch (\Exception $e) {
             $response = [
-                'message' => 'An error occurred',
-                'errors' => $e->getMessage(),
+                'message' => 'Another error occurred',
+                'error' => json_encode($e),
             ];
-            $history_barang = [];
+            throw $e;
+            return response()->json($response, 500);
         }
 
-        return Inertia::render('Admin/Barang', [
-            'response' => $response,
-            'history_barang' => $history_barang
-        ]);
+        return response()->json($response, 201);
     }
 
     /**

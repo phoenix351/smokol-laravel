@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('riwayat_barang', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('barang_id');
-            $table->foreign('barang_id')->references('id')->on('master_barang')->onDelete('cascade');
-            $table->timestamp('waktu_perubahan');
-            $table->unsignedBigInteger('pengguna_id');
-            $table->foreign('pengguna_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('atribut');
-            $table->string('nilai_lama')->nullable();
-            $table->string('nilai_baru')->nullable();
-            $table->timestamps();
+            $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade');
+            $table->timestamp('modified_at');
+            $table->unsignedBigInteger('users_id');
+            $table->foreign('users_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->string('atribut');
+            $table->string('original_data')->nullable();
+            $table->string('modified_data')->nullable();
+            // $table->timestamps();
         });
     }
 

@@ -43,31 +43,37 @@ import {
     SortOrder,
 } from "antd/es/table/interface";
 import MyModal from "@/Components/Modal";
-import MasterRuanganForm from "@/Forms/MasterRuanganForm";
-import { findSourceMap } from "module";
+import UserForm from "@/Forms/UserForm";
 import axios from "axios";
 
 interface DataType {
     key: React.Key;
-    nama: string;
+    jenis: string;
+    merk: string;
+    tipe: string;
+    tanggal_peroleh: string;
+    nomor_seri: string;
 }
-interface MasterRuangan {
+interface User {
     id?: number;
     key?: number;
-    nama: string;
-    users_id: number;
-    users_nama: string;
-    kode_baru: string;
-    kode_siman: string;
-    gedung: string;
-    lantai: string | null;
+    nama_lengkap: string;
+    email: string;
+    nip?: string | undefined;
+    bidang?: string | undefined;
+    jabatan_id: number;
+    jabatan: string;
+    role: string;
+    username?: string | undefined;
+    foto_url?: string;
+    password_hash: string;
 }
 
 const { Search } = Input;
-const MasterRuangan = ({
-    master_ruangan,
-}: PageProps & { master_ruangan: MasterRuangan[] }) => {
-    // console.log({ master_ruangan });
+const User = ({ users }: PageProps & { users: User[] }) => {
+    // console.log({ master_barang });
+    const csrfTokenRef = useRef<string | null>(null);
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     const [searchText, setSearchText] = useState("");
     const [searchLoading, setSearchLoading] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
@@ -83,12 +89,12 @@ const MasterRuangan = ({
         useState(false);
     const handleOk = async () => {
         itemAddForm.submit();
-        setOpenModal(false);
+        // setOpenModal(false);
         setConfirmLoadingModal(false);
     };
     const handleOkUbah = async () => {
         try {
-            const isValid = itemEditForm.validateFields();
+            const validate = await itemEditForm.validateFields();
             itemEditForm.submit();
             setOpenModalUbah(false);
             setConfirmLoadingModalUbah(false);
@@ -102,43 +108,49 @@ const MasterRuangan = ({
     };
     //end modal
 
-    // const data_master = master_ruangan.map(
-    //     ({ id, nama, users_id, users_nama }): MasterRuangan => ({
-    //         key: id,
-    //         nama,
-    //         users_id,
-    //         users_nama,
-    //     })
-    // );
-    const [dataSource, setDataSource] = useState<MasterRuangan[]>([]);
+    const [dataSource, setDataSource] = useState<User[]>([]);
 
     useEffect(() => {
+        if (csrfTokenMeta) {
+            csrfTokenRef.current = csrfTokenMeta.getAttribute("content");
+        }
+    }, []);
+    useEffect(() => {
         setTimeout(() => {
-            let data_master = master_ruangan.map(
+            let data_master = users.map(
                 ({
                     id,
-                    nama,
-                    users_id,
-                    users_nama,
-                    kode_siman,
-                    lantai,
-                    gedung,
-                    kode_baru,
+
+                    nama_lengkap,
+                    email,
+                    nip,
+                    bidang,
+                    jabatan_id,
+                    jabatan,
+                    role,
+                    username,
+                    foto_url,
+                    password_hash,
                 }) => ({
                     key: id,
-                    nama,
-                    users_id,
-                    users_nama,
-                    kode_siman,
-                    lantai,
-                    gedung,
-                    kode_baru,
+                    id,
+                    nama_lengkap,
+                    email,
+                    nip,
+                    bidang,
+                    jabatan_id,
+                    jabatan,
+                    role,
+                    username,
+                    foto_url,
+                    password_hash,
                 })
             );
 
+            console.log("changeeeee", { users });
             setDataSource(data_master);
         }, 0);
-    }, [master_ruangan]);
+    }, [users]);
 
     const onSearch = async (value: string) => {
         setSearchLoading(true);
@@ -170,48 +182,70 @@ const MasterRuangan = ({
             return 0;
         };
     }
-    function handleDelete(key: React.Key | string): void {
-        if (key === 0) return;
-        router.delete(route("master_ruangan.destroy", { id: key }), {
-            // method: "delete",
-            preserveState: true,
-            preserveScroll: true,
-            onStart: () =>
-                messageApi.open({
-                    key: saveKey,
-                    content: "Menghapus dari master",
-                    type: "loading",
-                }),
-            onSuccess: (responsePage) => {
-                console.log({ responsePage });
-                const response: any = responsePage.props.response;
-                if (response.errors?.length > 1) {
-                    return messageApi.open({
-                        key: saveKey,
-                        content: response.errors,
-                        type: "error",
-                    });
-                }
-                messageApi.open({
-                    key: saveKey,
-                    content: "Berhasil menghapus data",
-                    type: "success",
-                });
-                return 1;
-            },
-            onFinish: () => {},
-
-            onError: (event) => console.log(`Error! ${event}`),
+    async function handleDelete(key: React.Key | string) {
+        messageApi.open({
+            key: saveKey,
+            content: "Sedang menghapus pengguna...",
+            type: "loading",
         });
+
+        // return 0;
+        try {
+            const url = route("admin.users.delete", { id: key });
+            const response = await axios.delete(url);
+            messageApi.open({
+                key: saveKey,
+                content: "Berhasil menghapus pengguna ",
+                type: "success",
+            });
+            router.get(
+                route("admin.master.users"),
+                {},
+                { preserveState: true, preserveScroll: true }
+            );
+        } catch (error: any) {
+            messageApi.open({
+                key: saveKey,
+                content: error.message,
+                type: "error",
+            });
+        }
     }
     const onFinishAdd: (values: any) => any = async (values: any) => {
         messageApi.open({
             key: saveKey,
-            content: "Sedang menambahkan data...",
+            content: "Sedang menambahkan pengguna...",
+            type: "loading",
+        });
+
+        // return 0;
+        try {
+            const url = route("admin.users.store");
+            const response = await axios.post(url, values, {
+                headers: { "Content-Type": "application/json" },
+            });
+            messageApi.open({
+                key: saveKey,
+                content: "Berhasil menambahkan pengguna ",
+                type: "success",
+            });
+            // router.get(route("admin.master.users"));
+        } catch (error: any) {
+            messageApi.open({
+                key: saveKey,
+                content: error.message,
+                type: "error",
+            });
+        }
+    };
+    const onFinishEdit: (values: any) => any = async (values: any) => {
+        messageApi.open({
+            key: saveKey,
+            content: "Sedang menyimpan perubahan...",
             type: "loading",
         });
         try {
-            // router.post(route("master_ruangan.store"), values, {
+            // router.patch(route("users.update"), values, {
             //     onSuccess: (responsePage) => {
             //         const response: any = responsePage.props.response;
             //         console.log({ response });
@@ -226,66 +260,17 @@ const MasterRuangan = ({
             //         return 1;
             //     },
             // });
-            const url = route("master_ruangan.store");
-            const { data } = await axios.post(url, values, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            messageApi.open({
-                key: saveKey,
-                content: "Berhasil menambahkan data",
-                type: "success",
-            });
-        } catch (error: any) {
-            messageApi.open({
-                key: saveKey,
-                content: error.message,
-                type: "error",
-            });
-            return 0;
-        }
-    };
-    const onFinishEdit: (values: any) => any = async (values: any) => {
-        messageApi.open({
-            key: saveKey,
-            content: "Sedang menambahkan data...",
-            type: "loading",
-        });
-        try {
-            // router.patch(route("master_ruangan.update"), values, {
-            //     onSuccess: (responsePage) => {
-            //         const response: any = responsePage.props.response;
-            //         if (response.errors?.length > 1) {
-            //             return messageApi.open({
-            //                 key: saveKey,
-            //                 content: response.errors,
-            //                 type: "error",
-            //             });
-            //         }
-            //         messageApi.open({
-            //             key: saveKey,
-            //             content: "Berhasil menyimpan perubahan data",
-            //             type: "success",
-            //         });
-
-            //         return 1;
-            //     },
-            // });
-            const url = route("master_ruangan.update");
-            const { data } = await axios.patch(url, values, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            const url = route("admin.users.update");
+            const response = await axios.patch(url, values, {
+                headers: { "Content-Type": "application/json" },
             });
             messageApi.open({
                 key: saveKey,
                 content: "Berhasil menyimpan perubahan",
                 type: "success",
             });
-
             router.get(
-                route("admin.master.ruangan"),
+                route("admin.master.users"),
                 {},
                 { preserveState: true, preserveScroll: true }
             );
@@ -298,58 +283,24 @@ const MasterRuangan = ({
             return 0;
         }
     };
-    const namaSorter: Sorter<MasterRuangan> = createSorter("nama");
 
-    interface Column {
-        key?: React.Key;
-        title: string;
-        dataIndex: string;
-        sorter?: CompareFn<object>;
-        editable?: boolean;
-        filters?: ColumnFilterItem[];
-        onCell?: (record: DataType) => object;
-        render?: (value: any, record: MasterRuangan) => React.ReactNode;
-    }
+    const defaultColumns: ColumnsType<User> = [
+        {
+            title: "ID",
+            dataIndex: "id",
+        },
+        {
+            title: "nama_lengkap",
+            dataIndex: "nama_lengkap",
+        },
+        { title: "email", dataIndex: "email" },
+        { title: "bidang", dataIndex: "bidang" },
+        { title: "jabatan", dataIndex: "jabatan" },
+        { title: "role", dataIndex: "role" },
+        { title: "username", dataIndex: "username" },
+        { title: "foto", dataIndex: "foto" },
+        { title: "password_hash", dataIndex: "password_hash" },
 
-    const defaultColumns: ColumnsType<MasterRuangan> = [
-        {
-            title: "id",
-            dataIndex: "key",
-
-            // sorter: namaSorter as CompareFn<object>,
-        },
-        {
-            title: "nama",
-            dataIndex: "nama",
-        },
-        {
-            title: "kode_siman",
-            dataIndex: "kode_siman",
-        },
-        {
-            title: "kode_baru",
-            dataIndex: "kode_baru",
-        },
-        {
-            title: "gedung",
-            dataIndex: "gedung",
-        },
-        {
-            title: "lantai",
-            dataIndex: "lantai",
-        },
-        // {
-        //     title: "users_id",
-        //     dataIndex: "users_id",
-
-        //     // sorter: namaSorter as CompareFn<object>,
-        // },
-        {
-            title: "Nama penanggungjawab ruangan",
-            dataIndex: "users_nama",
-
-            // sorter: namaSorter as CompareFn<object>,
-        },
         {
             title: "edit",
             render: (_, record) => (
@@ -357,19 +308,8 @@ const MasterRuangan = ({
                     onClick={() => {
                         setOpenModalUbah(true);
 
+                        // itemEditForm.setFieldsValue(record);
                         itemEditForm.setFieldsValue(record);
-                        itemEditForm.setFieldValue("id", record.key);
-                        itemEditForm.setFieldValue("users_id", record.users_id);
-                        itemEditForm.setFieldValue(
-                            "kode_siman",
-                            record.kode_siman
-                        );
-                        itemEditForm.setFieldValue(
-                            "kode_baru",
-                            record.kode_baru
-                        );
-                        itemEditForm.setFieldValue("gedung", record.gedung);
-                        itemEditForm.setFieldValue("lantai", record.lantai);
                     }}
                 >
                     <EditOutlined />
@@ -397,10 +337,10 @@ const MasterRuangan = ({
     ];
 
     return (
-        <div>
-            <Head title="Master Ruangan" />
+        <Space direction="vertical" style={{ width: "100%" }}>
+            <Head title="Daftar Pengguna" />
             <MyModal
-                title={"Tambah Master Ruangan"}
+                title={"Tambah Pengguna"}
                 openModal={openModal}
                 handleOk={handleOk}
                 confirmLoadingModal={confirmLoadingModal}
@@ -408,11 +348,14 @@ const MasterRuangan = ({
                 okText="Tambahkan"
                 cancelText="Batal"
             >
-                <Divider />
-                <MasterRuanganForm form={itemAddForm} onFinish={onFinishAdd} />
+                <UserForm
+                    form={itemAddForm}
+                    onFinish={onFinishAdd}
+                    type="add"
+                />
             </MyModal>
             <MyModal
-                title={"Ubah Master Ruangan"}
+                title={"Ubah Pengguna"}
                 openModal={openModalUbah}
                 handleOk={handleOkUbah}
                 confirmLoadingModal={confirmLoadingModalUbah}
@@ -420,19 +363,19 @@ const MasterRuangan = ({
                 okText="Simpan"
                 cancelText="Batal"
             >
-                <Divider />
-                <MasterRuanganForm
+                <UserForm
                     form={itemEditForm}
                     onFinish={onFinishEdit}
+                    type="edit"
                 />
             </MyModal>
 
             {contextHolder}
-            <h1>Master Ruangan</h1>
+            <h1>Daftar Pengguna</h1>
             <Divider />
             <Space style={{ display: "flex", justifyContent: "space-between" }}>
                 <Search
-                    placeholder="Cari ruangan ..."
+                    placeholder="Cari pengguna ..."
                     allowClear
                     onSearch={onSearch}
                     loading={searchLoading}
@@ -444,11 +387,16 @@ const MasterRuangan = ({
                     style={{ marginBottom: 16 }}
                     icon={<PlusOutlined />}
                 >
-                    Tambah Ruangan
+                    Daftarkan pengguna
                 </Button>
             </Space>
-
             <Table
+                style={{
+                    // width: "100%",
+                    // overflowX: "auto",
+                    backgroundColor: "#fff",
+                }}
+                scroll={{ x: 1500 }}
                 rowClassName={() => "editable-row"}
                 bordered
                 dataSource={dataSource.filter((item) =>
@@ -459,18 +407,18 @@ const MasterRuangan = ({
                 )}
                 columns={defaultColumns}
             />
-        </div>
+        </Space>
     );
 };
 
-MasterRuangan.layout = (
+User.layout = (
     page: ReactElement<any, JSXElementConstructor<any>> | ReactPortal
 ) => (
     <AuthenticatedLayout
         user={page.props.auth.user}
-        header={<h2 className="">Master Ruangan</h2>}
-        selectedKey="admin.master.Ruangan"
+        header={<h2 className="">Daftar Pengguna</h2>}
+        selectedKey="admin.master.users"
         children={page}
     ></AuthenticatedLayout>
 );
-export default MasterRuangan;
+export default User;

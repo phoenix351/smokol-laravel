@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MasterPerusahaanController;
 use App\Http\Controllers\MasterPjPerusahaanController;
+use App\Http\Controllers\UserController;
 use App\Models\MasterBarang;
 use App\Models\MasterJabatan;
 use App\Models\MasterRuangan;
@@ -118,8 +119,16 @@ Route::middleware('auth')->group(function () {
         $ruanganList = MasterRuangan::select('nama', 'id')->get();
         return response()->json([$ruanganList]);
     })->name('lokasi.get');
+    route::get('/api/os', function () {
+        $osList = MasterSistemOperasi::selectRaw('concat(nama, " ", arsitektur) as nama_os, id')->get();
+        return response()->json($osList);
+    })->name('os.get');
 
     // route api for jabatan
+    route::get('/api/master/jabatan', function () {
+        $jabatan_list = MasterJabatan::select('id', 'nama', 'tingkat')->get();
+        return response()->json($jabatan_list, 200);
+    })->name('api.master.jabatan');
     route::get('/api/master/jabatan/nama', function () {
         $namaList = MasterJabatan::select(["nama"])->groupBy(['nama'])->get();
         return response()->json([$namaList]);
@@ -128,22 +137,31 @@ Route::middleware('auth')->group(function () {
         $jenisList = MasterJabatan::select(["jenis"])->groupBy(['jenis'])->get();
         return response()->json([$jenisList]);
     })->name('admin.master.jabatan.jenis');
+
     route::get('/api/master/jabatan/tingkat', function () {
         $tingkatList = MasterJabatan::select(["tingkat"])->groupBy(['tingkat'])->get();
         return response()->json([$tingkatList]);
     })->name('admin.master.jabatan.tingkat');
+
+    route::get('/admin/master/users', [UserController::class, 'index'])->name('admin.master.users');
+
+    Route::patch('/admin/master/users', [UserController::class, 'update'])->name('admin.users.update');
+    Route::post('/admin/master/users', [UserController::class, 'store'])->name('admin.users.store');
+    Route::delete('/admin/master/users', [UserController::class, 'delete'])->name('admin.users.delete');
+
 
 
     route::get('/dashboard', function () {
         Log::info('Showing the user profile for user');
 
         $kondisi = DB::table('barang')
-            ->select('kondisi', DB::raw('count(*) as jumlah'))
-            ->groupBy('kondisi')
-            ->orderBy('kondisi', "asc")
-            ->get();
-
-        $kondisi_total = $kondisi->sum('jumlah');
+            ->select(
+                DB::raw('COUNT(CASE WHEN kondisi = "Baik" THEN 1 END) as baik'),
+                DB::raw('COUNT(CASE WHEN kondisi = "Rusak Ringan" THEN 1 END) as rusakRingan'),
+                DB::raw('COUNT(CASE WHEN kondisi = "Rusak Berat" THEN 1 END) as rusakBerat'),
+                DB::raw('COUNT(kondisi) as jumlah')
+            )
+            ->first();
 
         $ruangan_summary = DB::table('barang')
             ->select('ruangan_id', 'master_ruangan.nama as label', DB::raw('count(*) as value'))
@@ -158,7 +176,9 @@ Route::middleware('auth')->group(function () {
             ->get();
 
         // $kondisi_total = 100;
-        return Inertia::render('Dashboard', ['kondisi' => $kondisi, 'kondisi_total' => $kondisi_total, 'ruangan_summary' => $ruangan_summary, 'jenis_summary' => $jenis_summary]);
+        $response = ['kondisi' => $kondisi, 'ruangan_summary' => $ruangan_summary, 'jenis_summary' => $jenis_summary];
+        // return response()->json($response, 200);
+        return Inertia::render('Dashboard', $response);
     })->name('dashboard');
 
 

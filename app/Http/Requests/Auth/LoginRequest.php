@@ -57,7 +57,7 @@ class LoginRequest extends FormRequest
             // Handle the connection error here
             // You can customize the response or redirect to a specific page
             throw ValidationException::withMessages([
-                'email' => 'Tidak dapat terhubung, silahkan periksa koneksi anda',
+                'email' => $e->getMessage(),
             ]);
         }
     }

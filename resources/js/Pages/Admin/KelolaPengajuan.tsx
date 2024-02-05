@@ -18,10 +18,14 @@ import {
     Menu,
     Card,
     Spin,
+    Form,
+    Select,
+    Button,
 } from "antd";
 
 import PengajuanCard from "@/Components/PengajuanCard";
 import MyModal from "@/Components/Modal";
+import axios from "axios";
 
 const { Search } = Input;
 
@@ -59,6 +63,7 @@ const KelolaPengajuanPage = () => {
 
         // Call the fetch function when the component mounts
         fetchData();
+        daftarStatusFetch();
     }, []);
 
     const verticalMenuItems: MenuProps["items"] = [
@@ -154,9 +159,9 @@ const KelolaPengajuanPage = () => {
     // function handleVerticalMenuClick(event: any): MenuProps['onClick'] {
 
     // }
-    const handleVerticalMenuClick: MenuProps["onClick"] = (e: any) => {
-        setSelectedVerticalMenu(e.key);
-        fetchDataByType(e.key);
+    const onPengajuanFilter = (values: any) => {
+        // setFilter(value);
+        fetchDataByQuery(values.keyword, values.kode_status);
     };
     const renderContent = () => {
         return <PengajuanCard items={items} csrfToken={csrfToken} />;
@@ -173,26 +178,53 @@ const KelolaPengajuanPage = () => {
             <Spin />
         </Card>
     );
-
+    const [pengajuanFilterForm] = Form.useForm();
+    const [daftarStatus, setDaftarStatus] = useState([]);
+    const daftarStatusFetch = async () => {
+        const { data }: any | undefined = await axios.get(
+            route("maintenance.status.fetch")
+        );
+        const daftarStatusResponse = data.map((status: any) => ({
+            value: status.kode_status,
+            label: status.deskripsi,
+        }));
+        setDaftarStatus(daftarStatusResponse);
+    };
     return (
         <div>
             <Head title="History Barang" />
-
             <h1 style={{ marginBottom: "10px" }}>Daftar Pengajuan Pegawai</h1>
-
-            <Menu
-                selectedKeys={[selectedVerticalMenu]}
-                mode="horizontal"
-                items={verticalMenuItems}
-                style={{ display: "flex" }} // This makes the Menu take up all available space
-                onClick={handleVerticalMenuClick}
-            />
-
             {/* <Divider /> */}
-            <Space
+            <Form
+                form={pengajuanFilterForm}
+                onFinish={onPengajuanFilter}
+                style={{ width: "500px" }}
+            >
+                <Form.Item label={null} name="kode_status">
+                    <Select
+                        allowClear
+                        options={daftarStatus}
+                        placeholder="Filter berdasarkan status pengajuan"
+                    />
+                </Form.Item>
+                <Form.Item label={null} name="keyword">
+                    <Input
+                        allowClear
+                        placeholder="Cari berdasarakan nama pegawai atau nama barang, ataupun nomor urut pendaftaran"
+                    />
+                </Form.Item>
+                <Button
+                    type="primary"
+                    onClick={() => pengajuanFilterForm.submit()}
+                >
+                    Terapkan filter
+                </Button>
+            </Form>
+
+            {/* <Space
                 style={{
                     marginBottom: "20px",
-                    marginTop: "20px",
+                    marginTop: "5px",
                     width: "100%",
                 }}
                 direction="vertical"
@@ -204,7 +236,7 @@ const KelolaPengajuanPage = () => {
                     loading={searchLoading}
                     style={{ width: "100%" }}
                 />
-            </Space>
+            </Space> */}
             {searchLoading ? Loading() : renderContent()}
         </div>
     );

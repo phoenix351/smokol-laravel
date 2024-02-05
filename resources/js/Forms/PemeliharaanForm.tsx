@@ -107,7 +107,7 @@ const PemeliharaanForm: React.FC<{
                     {...formItemLayout}
                     label="barang_id"
                     name="barang_id"
-                    style={{ display: "none" }}
+                    // style={{ display: "none" }}
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -115,7 +115,7 @@ const PemeliharaanForm: React.FC<{
                     {...formItemLayout}
                     label="users_id"
                     name="users_id"
-                    style={{ display: "none" }}
+                    // style={{ display: "none" }}
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -139,6 +139,13 @@ const PemeliharaanForm: React.FC<{
                     {...formItemLayout}
                     label="keluhan"
                     name="keluhan"
+                    rules={[
+                        { required: true, message: "Mohon isi keluhan anda" },
+                        {
+                            min: 10,
+                            message: "Isian keluhan minimal 10 karakter",
+                        },
+                    ]}
                     // style={{ display: "none" }}
                 >
                     <Input.TextArea />
@@ -153,6 +160,7 @@ const PemeliharaanForm: React.FC<{
                         beforeUpload={() => false}
                         onPreview={handlePreview}
                         multiple={false}
+                        // fileList={[file]}
 
                         // disabled={fileList.length > 0}
                     >

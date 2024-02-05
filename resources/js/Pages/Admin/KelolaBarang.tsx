@@ -51,6 +51,7 @@ import HistoryBarangForm from "@/Forms/HistoryBarangForm";
 import { findSourceMap } from "module";
 import { Barang, DataType } from "@/types";
 import BarangForm from "@/Forms/BarangForm";
+import axios from "axios";
 
 // const ExportableTablex = ExportableTable(Table);
 
@@ -66,6 +67,7 @@ const BarangPage = ({
     const [messageApi, contextHolder] = message.useMessage();
     const saveKey = "updatable";
     const [itemAddForm] = Form.useForm();
+    const [itemEditForm] = Form.useForm();
 
     // modal
     const [openModal, setOpenModal] = useState(false);
@@ -79,9 +81,12 @@ const BarangPage = ({
         setConfirmLoadingModal(false);
     };
     const handleOkUbah = async () => {
-        itemAddForm.submit();
-        setOpenModalUbah(false);
-        setConfirmLoadingModalUbah(false);
+        try {
+            const validForm = await itemEditForm.validateFields();
+            itemEditForm.submit();
+            setOpenModalUbah(false);
+            setConfirmLoadingModalUbah(false);
+        } catch (error) {}
     };
     const handleCancel = () => {
         setOpenModal(false);
@@ -91,37 +96,7 @@ const BarangPage = ({
     };
     //end modal
 
-    const data_master = history_barang.map(
-        ({
-            id,
-            barang_jenis,
-            barang_merk,
-            barang_tipe,
-            tanggal_peroleh,
-            barang_nomor_seri,
-            kondisi,
-            ruangan_nama,
-            users_nama_lengkap,
-            barang_id,
-            pengguna_id,
-            ruangan_id,
-        }): Barang => ({
-            id,
-            key: id,
-            barang_jenis,
-            barang_merk,
-            barang_tipe,
-            tanggal_peroleh,
-            barang_nomor_seri,
-            kondisi,
-            ruangan_nama,
-            users_nama_lengkap,
-            barang_id,
-            pengguna_id,
-            ruangan_id,
-        })
-    );
-    const [dataSource, setDataSource] = useState<Barang[]>(data_master);
+    const [dataSource, setDataSource] = useState<Barang[]>([]);
 
     useEffect(() => {
         if (csrfTokenMeta) {
@@ -130,38 +105,47 @@ const BarangPage = ({
     }, []);
     useEffect(() => {
         setTimeout(() => {
-            let data_master = history_barang.map(
+            const data_master = history_barang.map(
                 ({
+                    barang_id,
+                    jenis,
+                    merk,
+                    tipe,
+                    tanggal_peroleh,
+                    nomor_seri,
+                    kondisi,
+                    ruangan_nama,
+                    nama_lengkap,
                     id,
-                    barang_jenis,
-                    barang_merk,
-                    barang_tipe,
-                    tanggal_peroleh,
-                    barang_nomor_seri,
-                    kondisi,
-                    ruangan_nama,
-                    users_nama_lengkap,
-                    barang_id,
-                    pengguna_id,
+                    users_id,
                     ruangan_id,
-                }) => ({
+                    bast_path,
+                    is_approved,
+                    nomor_urut_pendaftaran,
+                    sistem_operasi_id,
+                }): Barang => ({
+                    barang_id,
                     key: id,
-                    barang_jenis,
-                    barang_merk,
-                    barang_tipe,
+                    jenis,
+                    merk,
+                    tipe,
                     tanggal_peroleh,
-                    barang_nomor_seri,
+                    nomor_seri,
                     kondisi,
                     ruangan_nama,
-                    users_nama_lengkap,
-                    barang_id,
-                    pengguna_id,
+                    nama_lengkap,
+                    id,
+                    users_id,
                     ruangan_id,
+                    bast_path,
+                    is_approved,
+                    nomor_urut_pendaftaran,
+                    sistem_operasi_id,
                 })
-            ) as Barang[];
+            );
 
             setDataSource(data_master);
-            // console.log("changeeeee", { dataSource });
+            console.log("changeeeee", { dataSource });
         }, 0);
     }, [history_barang]);
 
@@ -264,64 +248,52 @@ const BarangPage = ({
             return 0;
         }
     };
-    const onFinishEdit: (values: any) => any = (values: any) => {
-        try {
-            router.patch(route("barang.update"), values, {
-                preserveScroll: true,
-                preserveState: true,
-                onStart: () => {
-                    messageApi.open({
-                        key: saveKey,
-                        content: "Sedang menyimpan perubahan...",
-                        type: "loading",
-                    });
-                },
-                onSuccess: (responsePage) => {
-                    const response: any = responsePage.props.response;
+    const onFinishEdit: (values: any) => any = async (values: any) => {
+        messageApi.open({
+            key: saveKey,
+            content: "Sedang menyimpan perubahan...",
+            type: "loading",
+        });
 
-                    return messageApi.open({
-                        key: saveKey,
-                        content: "Berhasil menyimpan perubahan data",
-                        type: "success",
-                    });
-                },
-                onError: (errors) => {
-                    return messageApi.open({
-                        key: saveKey,
-                        content: "error",
-                        type: "error",
-                    });
-                },
+        try {
+            const url = route("barang.update");
+            const response = await axios.patch(url, values, {
+                headers: { "Content-Type": "application/json" },
             });
-        } catch (error: any) {
+
             messageApi.open({
                 key: saveKey,
-                content: error.message,
+                content: "Berhasil menyimpan perubahan data",
+                type: "success",
+            });
+            router.get(
+                route("admin.kelola.history_barang.index"),
+                {},
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                }
+            );
+        } catch (error: any) {
+            // console.log({ error });
+
+            messageApi.open({
+                key: saveKey,
+                content: error.response.data.error,
                 type: "error",
             });
-            return 0;
         }
     };
-    const jenisSorter: Sorter<Barang> = createSorter("barang_jenis");
-    const tipeSorter: Sorter<Barang> = createSorter("barang_tipe");
-    const merkSorter: Sorter<Barang> = createSorter("barang_merk");
-    const nomorSeriSorter: Sorter<Barang> = createSorter("barang_nomor_seri");
+    const jenisSorter: Sorter<Barang> = createSorter("jenis");
+    const tipeSorter: Sorter<Barang> = createSorter("tipe");
+    const merkSorter: Sorter<Barang> = createSorter("merk");
+    const nomorSeriSorter: Sorter<Barang> = createSorter("nomor_seri");
     const tahunPerolehSorter: Sorter<Barang> = createSorter("tanggal_peroleh");
-    interface Column {
-        key?: React.Key;
-        title: string;
-        dataIndex: string;
-        sorter?: CompareFn<object>;
-        editable?: boolean;
-        filters?: ColumnFilterItem[];
-        onCell?: (record: DataType) => object;
-        render?: (value: any, record: Barang) => React.ReactNode;
-    }
 
     const defaultColumns: ColumnsType<Barang> = [
         {
             title: "jenis",
-            dataIndex: "barang_jenis",
+            dataIndex: "jenis",
             filters: [
                 {
                     text: "PC",
@@ -333,17 +305,17 @@ const BarangPage = ({
                 },
             ],
             onFilter: (value: string | number | boolean, record: Barang) =>
-                record.barang_jenis === value,
+                record.jenis === value,
             sorter: jenisSorter as CompareFn<object>,
         },
         {
             title: "merk",
-            dataIndex: "barang_merk",
+            dataIndex: "merk",
             sorter: merkSorter as CompareFn<object>,
         },
         {
             title: "tipe",
-            dataIndex: "barang_tipe",
+            dataIndex: "tipe",
             sorter: tipeSorter as CompareFn<object>,
         },
         {
@@ -352,8 +324,8 @@ const BarangPage = ({
             sorter: tahunPerolehSorter as CompareFn<object>,
         },
         {
-            title: "barang_nomor_seri",
-            dataIndex: "barang_nomor_seri",
+            title: "nomor_seri",
+            dataIndex: "nomor_seri",
             sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
@@ -412,88 +384,73 @@ const BarangPage = ({
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
-            title: "users_nama_lengkap",
-            dataIndex: "users_nama_lengkap",
+            title: "Nama Pemegang",
+            dataIndex: "nama_lengkap",
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
-            title: "operation",
-            dataIndex: "operation",
-            fixed: "right",
-            render: (_, record: Barang) => {
-                const items: MenuProps["items"] = [
-                    {
-                        label: (
-                            <a>
-                                <EditOutlined /> Ubah
-                            </a>
-                        ),
-                        key: "0",
-                        onClick: () => {
-                            const recordEdited = {
-                                pengguna_id: record.pengguna_id,
-                                jenis: record.barang_jenis,
-                                merk: record.barang_merk,
-                                tipe: record.barang_tipe,
-                                nomor_seri: record.barang_nomor_seri,
-                                id: record.key,
-                                ruangan_id: record.ruangan_id,
-                            };
-                            itemAddForm.setFieldsValue(recordEdited);
-                            itemAddForm.setFieldValue(
-                                "tanggal_peroleh",
-                                dayjs(
-                                    record.tanggal_peroleh !== "0"
-                                        ? record.tanggal_peroleh
-                                        : "2000-01-01",
-                                    "YYYY-MM-DD"
-                                )
-                            );
-                            setOpenModalUbah(true);
-                        },
-                    },
-                    {
-                        label: (
-                            <Popconfirm
-                                title="Hapus dari master"
-                                description="Apakah anda yakin akan menghapus ini ? "
-                                onConfirm={() => handleDelete(record.key ?? 0)}
-                                onCancel={() => console.log("Cancel")}
-                                okText="Ya"
-                                cancelText="Batalkan"
-                            >
-                                <DeleteOutlined /> Hapus
-                            </Popconfirm>
-                        ),
-                        key: "1",
-                    },
-                ];
-                return dataSource.length >= 1 ? (
-                    <Dropdown
-                        menu={{ items }}
-                        trigger={["hover"]}
-                        placement="bottomRight"
+            title: "edit",
+            render: (_, record) => (
+                <Button
+                    onClick={() => {
+                        setOpenModalUbah(true);
+
+                        // itemEditForm.setFieldsValue(record);
+                        itemEditForm.setFieldValue("id", record.key);
+                        itemEditForm.setFieldValue("jenis", record.jenis);
+                        itemEditForm.setFieldValue("merk", record.merk);
+                        itemEditForm.setFieldValue("tipe", record.tipe);
+                        itemEditForm.setFieldValue("users_id", record.users_id);
+                        itemEditForm.setFieldValue("kondisi", record.kondisi);
+                        // itemEditForm.setFieldValue("kondisi", "Rusak Berat");
+                        itemEditForm.setFieldValue(
+                            "sistem_operasi_id",
+                            record.sistem_operasi_id
+                        );
+                        itemEditForm.setFieldValue(
+                            "ruangan_id",
+                            record.ruangan_id
+                        );
+                        itemEditForm.setFieldValue(
+                            "tanggal_peroleh",
+                            dayjs(record.tanggal_peroleh)
+                        );
+                        itemEditForm.setFieldValue(
+                            "nomor_urut_pendaftaran",
+                            record.nomor_urut_pendaftaran
+                        );
+                        itemEditForm.setFieldValue(
+                            "nomor_seri",
+                            record.nomor_seri
+                        );
+                    }}
+                >
+                    <EditOutlined />
+                    edit
+                </Button>
+            ),
+        },
+        {
+            title: "delete",
+            render: (_: any, record: any) => (
+                <Button>
+                    <Popconfirm
+                        title="Hapus dari master"
+                        description="Apakah anda yakin akan menghapus ini ? "
+                        onConfirm={() => handleDelete(record.key ?? 0)}
+                        onCancel={() => console.log("Cancel")}
+                        okText="Ya"
+                        cancelText="Batalkan"
                     >
-                        <Button
-                            style={{
-                                color: "#fff",
-                            }}
-                            onClick={(e) => e.preventDefault()}
-                            type="primary"
-                        >
-                            <Space>
-                                Aksi
-                                <CaretDownOutlined />
-                            </Space>
-                        </Button>
-                    </Dropdown>
-                ) : null;
-            },
+                        <DeleteOutlined /> Hapus
+                    </Popconfirm>
+                </Button>
+            ),
         },
     ];
 
     return (
-        <div>
+        <Space direction="vertical" style={{ width: "100%" }}>
             <Head title="Daftar Barang Pegawai" />
             <MyModal
                 title={"Tambah History Barang"}
@@ -508,7 +465,7 @@ const BarangPage = ({
                 <HistoryBarangForm form={itemAddForm} onFinish={onFinishAdd} />
             </MyModal>
             <MyModal
-                title={"Ubah History Barang"}
+                title={"Kelola Barang"}
                 openModal={openModalUbah}
                 handleOk={handleOkUbah}
                 confirmLoadingModal={confirmLoadingModalUbah}
@@ -516,8 +473,8 @@ const BarangPage = ({
                 okText="Simpan"
                 cancelText="Batal"
             >
-                <Divider />
-                <BarangForm form={itemAddForm} onFinish={onFinishEdit} />
+                {/* <Divider /> */}
+                <BarangForm form={itemEditForm} onFinish={onFinishEdit} />
             </MyModal>
 
             {contextHolder}
@@ -537,7 +494,7 @@ const BarangPage = ({
                     style={{ marginBottom: 16 }}
                     icon={<PlusOutlined />}
                 >
-                    Add a row
+                    Tambah Barang
                 </Button>
             </Space>
 
@@ -553,7 +510,7 @@ const BarangPage = ({
                 )}
                 columns={defaultColumns}
             />
-        </div>
+        </Space>
     );
 };
 

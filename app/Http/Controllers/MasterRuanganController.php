@@ -20,7 +20,7 @@ class MasterRuanganController extends Controller
     public function index()
     {
         $master_ruangan = MasterRuangan::join('users', 'users.id', 'master_ruangan.users_id')
-            ->select('master_ruangan.id', 'master_ruangan.nama', 'users.nama_lengkap as users_nama', 'users.id as users_id')->get();
+            ->select('master_ruangan.*', 'users.nama_lengkap as users_nama', 'users.id as users_id')->get();
         return Inertia::render('Admin/MasterRuangan', ['master_ruangan' => $master_ruangan]);
     }
 
@@ -103,6 +103,11 @@ class MasterRuanganController extends Controller
                 [
                     'nama' => $validatedData['nama'],
                     'users_id' => $validatedData['users_id'],
+                    'kode_siman' => $validatedData['kode_siman'],
+                    'kode_baru' => $validatedData['kode_baru'],
+                    'gedung' => isset($validatedData['gedung']) ? $validatedData['gedung'] : '',
+                    'lantai' => isset($validatedData['lantai']) ? $validatedData['gedung'] : '',
+                    // 'lantai' => $validatedData['lantai'],
                     // 'id'=>$validatedData['id'],
                 ]
             );
@@ -138,11 +143,13 @@ class MasterRuanganController extends Controller
             ];
             $master_ruangan = [];
         }
-
-        return Inertia::render('Admin/MasterRuangan', [
-            'response' => $response,
-            'master_ruangan' => $master_ruangan
-        ]);
+        return response()->json([
+            'message' => 'Berhasil menyimpan perubahan',
+        ], 201);
+        // return Inertia::render('Admin/MasterRuangan', [
+        //     'response' => $response,
+        //     'master_ruangan' => $master_ruangan
+        // ]);
     }
 
     /**

@@ -51,7 +51,7 @@ interface Item {
     jenis: string;
     merk: string;
     tipe: string;
-    tahun_peroleh: string;
+    tanggal_peroleh: string;
     nomor_seri: string;
 }
 
@@ -60,7 +60,7 @@ interface DataType {
     jenis: string;
     merk: string;
     tipe: string;
-    tahun_peroleh: string;
+    tanggal_peroleh: string;
     nomor_seri: string;
 }
 interface MasterBarang {
@@ -69,7 +69,7 @@ interface MasterBarang {
     jenis: string;
     tipe: string;
     merk: string;
-    tahun_peroleh?: number | string | any;
+    tanggal_peroleh?: number | string | any;
     nomor_seri: string;
     nomor_urut_pendaftaran: string;
 }
@@ -86,6 +86,7 @@ const MasterBarang = ({
     const [messageApi, contextHolder] = message.useMessage();
     const saveKey = "updatable";
     const [itemAddForm] = Form.useForm();
+    const [itemEditForm] = Form.useForm();
 
     // modal
     const [openModal, setOpenModal] = useState(false);
@@ -117,7 +118,7 @@ const MasterBarang = ({
             jenis,
             merk,
             tipe,
-            tahun_peroleh,
+            tanggal_peroleh,
             nomor_seri,
             nomor_urut_pendaftaran,
         }): MasterBarang => ({
@@ -125,7 +126,7 @@ const MasterBarang = ({
             jenis,
             merk,
             tipe,
-            tahun_peroleh,
+            tanggal_peroleh,
             nomor_seri,
             nomor_urut_pendaftaran,
         })
@@ -145,7 +146,7 @@ const MasterBarang = ({
                     jenis,
                     merk,
                     tipe,
-                    tahun_peroleh,
+                    tanggal_peroleh,
                     nomor_seri,
                     nomor_urut_pendaftaran,
                 }) => ({
@@ -153,7 +154,7 @@ const MasterBarang = ({
                     jenis,
                     merk,
                     tipe,
-                    tahun_peroleh,
+                    tanggal_peroleh,
                     nomor_seri,
                     nomor_urut_pendaftaran,
                 })
@@ -308,7 +309,7 @@ const MasterBarang = ({
         "nomor_urut_pendaftaran"
     );
     const tahunPerolehSorter: Sorter<MasterBarang> =
-        createSorter("tahun_peroleh");
+        createSorter("tanggal_peroleh");
     interface Column {
         key?: React.Key;
         title: string;
@@ -343,9 +344,14 @@ const MasterBarang = ({
             sorter: tipeSorter as CompareFn<object>,
         },
         {
-            title: "tahun_peroleh",
-            dataIndex: "tahun_peroleh",
-            sorter: tahunPerolehSorter as CompareFn<object>,
+            title: "tanggal_peroleh",
+            dataIndex: "tanggal_peroleh",
+            render: (value: any) =>
+                new Intl.DateTimeFormat("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                }).format(new Date(value)),
         },
         {
             title: "Nomor Urut Pendaftaran (NUP)",
@@ -358,82 +364,57 @@ const MasterBarang = ({
             sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
-            title: "operation",
-            dataIndex: "operation",
-            render: (_, record: MasterBarang) => {
-                const items: MenuProps["items"] = [
-                    {
-                        label: (
-                            <a>
-                                <EditOutlined /> Ubah
-                            </a>
-                        ),
-                        key: "0",
-                        onClick: () => {
-                            setOpenModalUbah(true);
-                            const recordEdited = {
-                                jenis: record.jenis,
-                                merk: record.merk,
-                                tipe: record.tipe,
-                                nomor_seri: record.nomor_seri,
-                                nomor_urut_pendaftaran:
-                                    record.nomor_urut_pendaftaran,
-                                id: record.key,
-                            };
-                            itemAddForm.setFieldsValue(recordEdited);
-                            itemAddForm.setFieldValue(
-                                "tahun_peroleh",
-                                dayjs(
-                                    record.tahun_peroleh !== "0"
-                                        ? record.tahun_peroleh
-                                        : "2000-01-01",
-                                    "YYYY-MM-DD"
-                                )
-                            );
-                        },
-                    },
-                    {
-                        label: (
-                            <Popconfirm
-                                title="Hapus dari master"
-                                description="Apakah anda yakin akan menghapus ini ? "
-                                onConfirm={() => handleDelete(record.key ?? 0)}
-                                onCancel={() => console.log("Cancel")}
-                                okText="Ya"
-                                cancelText="Batalkan"
-                            >
-                                <DeleteOutlined /> Hapus
-                            </Popconfirm>
-                        ),
-                        key: "1",
-                    },
-                ];
-                return dataSource.length >= 1 ? (
-                    <Dropdown
-                        menu={{ items }}
-                        trigger={["hover"]}
-                        placement="bottomRight"
+            title: "edit",
+            render: (_, record) => (
+                <Button
+                    onClick={() => {
+                        setOpenModalUbah(true);
+
+                        // itemEditForm.setFieldsValue(record);
+                        itemEditForm.setFieldValue("id", record.key);
+                        itemEditForm.setFieldValue("jenis", record.jenis);
+                        itemEditForm.setFieldValue("merk", record.merk);
+                        itemEditForm.setFieldValue("tipe", record.tipe);
+                        itemEditForm.setFieldValue(
+                            "tanggal_peroleh",
+                            dayjs(record.tanggal_peroleh)
+                        );
+                        itemEditForm.setFieldValue(
+                            "nomor_urut_pendaftaran",
+                            record.nomor_urut_pendaftaran
+                        );
+                        itemEditForm.setFieldValue(
+                            "nomor_seri",
+                            record.nomor_seri
+                        );
+                    }}
+                >
+                    <EditOutlined />
+                    edit
+                </Button>
+            ),
+        },
+        {
+            title: "delete",
+            render: (_: any, record: any) => (
+                <Button>
+                    <Popconfirm
+                        title="Hapus dari master"
+                        description="Apakah anda yakin akan menghapus ini ? "
+                        onConfirm={() => handleDelete(record.key ?? 0)}
+                        onCancel={() => console.log("Cancel")}
+                        okText="Ya"
+                        cancelText="Batalkan"
                     >
-                        <Button
-                            style={{
-                                color: "#fff",
-                            }}
-                            onClick={(e) => e.preventDefault()}
-                            type="primary"
-                        >
-                            <Space>
-                                Aksi
-                                <CaretDownOutlined />
-                            </Space>
-                        </Button>
-                    </Dropdown>
-                ) : null;
-            },
+                        <DeleteOutlined /> Hapus
+                    </Popconfirm>
+                </Button>
+            ),
         },
     ];
 
     return (
-        <div>
+        <Space direction="vertical" style={{ width: "100%" }}>
             <Head title="Master Barang" />
             <MyModal
                 title={"Tambah Master Barang"}
@@ -457,7 +438,7 @@ const MasterBarang = ({
                 cancelText="Batal"
             >
                 <Divider />
-                <MasterBarangForm form={itemAddForm} onFinish={onFinishEdit} />
+                <MasterBarangForm form={itemEditForm} onFinish={onFinishEdit} />
             </MyModal>
 
             {contextHolder}
@@ -480,8 +461,12 @@ const MasterBarang = ({
                     Add a row
                 </Button>
             </Space>
-
             <Table
+                style={{
+                    width: "100%",
+                    overflowX: "auto",
+                    backgroundColor: "#fff",
+                }}
                 rowClassName={() => "editable-row"}
                 bordered
                 dataSource={dataSource.filter((item) =>
@@ -492,7 +477,7 @@ const MasterBarang = ({
                 )}
                 columns={defaultColumns}
             />
-        </div>
+        </Space>
     );
 };
 

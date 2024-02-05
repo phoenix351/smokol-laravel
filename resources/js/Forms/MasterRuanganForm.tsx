@@ -4,6 +4,7 @@ import {
     Divider,
     Form,
     Input,
+    InputNumber,
     InputRef,
     Select,
     Space,
@@ -136,6 +137,18 @@ const MasterRuanganForm: React.FC<{
                     }))}
                     optionFilterProp="label"
                 />
+            </Form.Item>
+            <Form.Item {...formItemLayout} name="kode_siman" label="kode_siman">
+                <InputNumber />
+            </Form.Item>
+            <Form.Item {...formItemLayout} name="kode_baru" label="kode_baru">
+                <InputNumber />
+            </Form.Item>
+            <Form.Item {...formItemLayout} name="gedung" label="gedung">
+                <InputNumber />
+            </Form.Item>
+            <Form.Item {...formItemLayout} name="lantai" label="lantai">
+                <InputNumber />
             </Form.Item>
         </Form>
     );

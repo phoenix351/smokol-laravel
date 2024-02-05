@@ -28,19 +28,19 @@ const PemeriksaanBMN: React.FC<{
                 }
             );
 
-            console.log({ response });
+            // console.log({ response });
             messageApi.open({
                 key: saveKey,
                 content: "Berhasil menambahkan data",
                 type: "success",
             });
+            router.get(route("admin.kelola.pengajuan"));
         } catch (error: any) {
             messageApi.open({
                 key: saveKey,
                 content: error.message,
                 type: "error",
             });
-            return 0;
         } finally {
             // messageApi.close();
         }

@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string("jenis", 50);
             $table->string("merk", 50);
             $table->string("tipe", 50);
-            $table->date("tahun_peroleh");
+            $table->date("tanggal_peroleh")->nullable();
             $table->string("nomor_seri", 50);
-            $table->timestamps();
+            // $table->timestamps();
         });
     }
 

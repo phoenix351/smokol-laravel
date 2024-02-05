@@ -1,6 +1,7 @@
 import {
     Button,
     DatePicker,
+    DatePickerProps,
     Divider,
     Form,
     Input,
@@ -9,11 +10,14 @@ import {
     Space,
     message,
 } from "antd";
+import dayjs from "dayjs";
+
 import { useEffect, useRef, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 import { router } from "@inertiajs/react";
+import moment from "moment";
 
 const formItemLayout = {
     wrapperCol: { span: 24 },
@@ -35,6 +39,8 @@ const MasterBarangForm: React.FC<{
     const [messageApi, contextHolder] = message.useMessage();
     const saveKey = "updatable";
 
+    const dateFormat = "YYYY/MM/DD";
+
     const onJenisNameChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
         setJenisName(event.target.value);
     };
@@ -43,6 +49,9 @@ const MasterBarangForm: React.FC<{
     };
     const onTipeNameChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTipeName(event.target.value);
+    };
+    const onChange: DatePickerProps["onChange"] = (date, dateString) => {
+        console.log(date, dateString);
     };
     useEffect(() => {
         // call api jenis
@@ -258,8 +267,8 @@ const MasterBarangForm: React.FC<{
 
             <Form.Item
                 {...formItemLayout}
-                label="Tahun Perolehan"
-                name="tahun_peroleh"
+                label="Tanggal Perolehan"
+                name="tanggal_peroleh"
                 rules={[
                     {
                         required: true,
@@ -267,7 +276,8 @@ const MasterBarangForm: React.FC<{
                     },
                 ]}
             >
-                <DatePicker picker="year" />
+                {/* <DatePicker onChange={onChange} /> */}
+                <DatePicker format={"DD MMM YYYY"} />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}

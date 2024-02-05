@@ -39,8 +39,8 @@ const EditStatusForm: React.FC<{
             const response = await axios.get(route("maintenance.status.fetch"));
             // implement kode status > current code not yet
             console.log(response);
-            let statusList = response.data.data.map((item: any) => ({
-                label: item.deskripsi,
+            let statusList = response.data.map((item: any) => ({
+                label: `${item.kode_status}. ${item.deskripsi}`,
                 value: item.kode_status,
             }));
             setStatusList(statusList);
@@ -157,6 +157,7 @@ const EditStatusForm: React.FC<{
                     // style={{ display: "none" }}
                 >
                     <Select
+                        showSearch
                         onChange={(value) => setKodeStatus(value)}
                         options={statusList}
                     />

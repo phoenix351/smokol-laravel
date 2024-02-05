@@ -5,6 +5,7 @@ import {
     Form,
     Input,
     InputRef,
+    Radio,
     Select,
     Space,
     message,
@@ -14,6 +15,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 
 import { router } from "@inertiajs/react";
+import KondisiRadio from "@/Components/KondisiRadio";
 
 const formItemLayout = {
     wrapperCol: { span: 24 },
@@ -33,8 +35,10 @@ const HistoryBarangForm: React.FC<{
     const [jenisItems, setJenisItems] = useState<string[]>([]);
     const [jenisName, setJenisName] = useState("");
 
+    const [kondisiValue, setKondisiValue] = useState("Baik");
+
     const [lokasiItems, setLokasiItems] = useState<string[]>([]);
-    const [lokasiName, setLokasiName] = useState("");
+    const [osItems, setOsItems] = useState<string[]>([]);
 
     const inputRef = useRef<InputRef>(null);
 
@@ -46,6 +50,12 @@ const HistoryBarangForm: React.FC<{
     ) => {
         setPenggunaName(event.target.value);
     };
+    useEffect(() => {
+        setKondisiValue(form.getFieldValue("kondisi"));
+        console.log("====================================");
+        console.log("change happen");
+        console.log("====================================");
+    }, [form, form.getFieldValue("kondisi")]);
 
     useEffect(() => {
         // call api jenis
@@ -53,6 +63,7 @@ const HistoryBarangForm: React.FC<{
             try {
                 const penggunaResponse = await axios.get(route("users.get"));
                 const lokasiResponse = await axios.get(route("lokasi.get"));
+                const osResponse = await axios.get(route("os.get"));
 
                 // console.log({ arr: response.data[0] });
                 let penggunaItemsDB = penggunaResponse.data[0].map(
@@ -61,14 +72,20 @@ const HistoryBarangForm: React.FC<{
                         nama_lengkap: item.nama_lengkap,
                     })
                 );
-                setPenggunaItems([...penggunaItems, ...penggunaItemsDB]);
+                setPenggunaItems(penggunaItemsDB);
 
-                let lokasiDB = lokasiResponse.data[0].map((item: any) => ({
+                let lokasiItemsDB = lokasiResponse.data[0].map((item: any) => ({
                     id: item.id,
                     name: item.nama,
                 }));
 
-                setLokasiItems([...lokasiItems, ...lokasiDB]);
+                setLokasiItems(lokasiItemsDB);
+                let osDB = osResponse.data.map((item: any) => ({
+                    id: item.id,
+                    name: item.nama_os,
+                }));
+
+                setOsItems(osDB);
 
                 // setJenisItems(response.data);
             } catch (error) {
@@ -114,7 +131,7 @@ const HistoryBarangForm: React.FC<{
             <Form.Item
                 {...formItemLayout}
                 label="Pegawai Pengguna"
-                name="pengguna_id"
+                name="users_id"
                 rules={[
                     {
                         required: true,
@@ -155,6 +172,29 @@ const HistoryBarangForm: React.FC<{
                     onSearch={(value) => {}}
                     optionFilterProp="label"
                     options={lokasiItems.map((item: any) => ({
+                        label: item.name,
+                        value: item.id,
+                    }))}
+                />
+            </Form.Item>
+            <KondisiRadio
+                handleChange={(event) => {
+                    setKondisiValue(event.target.value);
+                    form.setFieldValue("kondisi", event.target.value);
+                }}
+                kondisiValue={kondisiValue}
+            />
+
+            <Form.Item
+                {...formItemLayout}
+                label="Sistem operasi yang digunakan"
+                name="sistem_operasi_id"
+            >
+                <Select
+                    showSearch
+                    onSearch={(value) => {}}
+                    optionFilterProp="label"
+                    options={osItems.map((item: any) => ({
                         label: item.name,
                         value: item.id,
                     }))}
@@ -210,17 +250,7 @@ const HistoryBarangForm: React.FC<{
             >
                 <DatePicker disabled style={disabledStyle} />
             </Form.Item>
-            <Form.Item
-                {...formItemLayout}
-                label="Nomor Seri"
-                name="nomor_seri"
-                rules={[
-                    {
-                        required: true,
-                        message: "Isian nomor seri harus diisi",
-                    },
-                ]}
-            >
+            <Form.Item {...formItemLayout} label="Nomor Seri" name="nomor_seri">
                 <Input disabled style={disabledStyle} />
             </Form.Item>
         </Form>

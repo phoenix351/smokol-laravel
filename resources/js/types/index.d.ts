@@ -19,7 +19,9 @@ export type PageProps<
 };
 
 export interface KondisiSummary {
-    kondisi: string;
+    rusakRingan: number;
+    rusakBerat: number;
+    baik: number;
     jumlah: number;
 }
 
@@ -48,18 +50,20 @@ export interface Barang {
     id: number;
     key: number;
     barang_id: number;
-    barang_jenis: string;
-    barang_tipe: string;
-    barang_merk: string;
+    jenis: string;
+    tipe: string;
+    merk: string;
     tanggal_peroleh?: number | string | any;
-    barang_nomor_seri: string;
+    nomor_seri: string | null;
+    nomor_urut_pendaftaran: number;
     kondisi: string;
     ruangan_nama: string;
-    users_nama_lengkap: string;
-    bast_path?: string | null;
-    is_approved?: boolean;
-    pengguna_id: number;
+    nama_lengkap: string;
+    bast_path: string | null;
+    is_approved: boolean | null;
+    users_id: number;
     ruangan_id: number;
+    sistem_operasi_id: number;
 }
 
 export interface BastType {

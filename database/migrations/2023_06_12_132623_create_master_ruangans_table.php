@@ -15,7 +15,10 @@ return new class extends Migration
         Schema::create('master_ruangan', function (Blueprint $table) {
             $table->id();
             $table->string("nama", 100);
-            $table->timestamps();
+            $table->string('kode_baru', 3)->nullable();
+            $table->string('gedung', 2)->nullable();
+            $table->string('kode_siman', 3)->nullable();
+            $table->string('lantai', 1)->nullable();
         });
     }
 
