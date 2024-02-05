@@ -45,7 +45,6 @@ import {
     SortOrder,
 } from "antd/es/table/interface";
 import MyModal from "@/Components/Modal";
-import Bast from "@/Components/Bast";
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
 import { Barang, DataType } from "@/types";
 import axios, { formToJSON } from "axios";
@@ -70,15 +69,9 @@ const BarangPage = ({
 
     const [itemAddForm] = Form.useForm();
     const [formUpload] = Form.useForm();
-
-    const [currentBarangId, setCurrentBarangId] = useState(0); //
-
-    const [currentRecord, setCurrentRecord] = useState({});
-
     // modal
     const [openModal, setOpenModal] = useState(false);
     const [openModalUbah, setOpenModalUbah] = useState(false);
-    const [openBast, setOpenBast] = useState(false);
 
     const [openPengajuan, setOpenPengajuan] = useState(false);
 
@@ -109,11 +102,6 @@ const BarangPage = ({
         setOpenModalUbah(false);
         setConfirmLoadingModalUbah(false);
     };
-    const handleOkBast = async () => {
-        // handle opening
-        setOpenBast(false);
-        setConfirmLoadingBast(false);
-    };
 
     const handleOkPengajuan = async () => {
         // handle opening
@@ -133,9 +121,7 @@ const BarangPage = ({
     const handleCancelUbah = () => {
         setOpenModalUbah(false);
     };
-    const handleCancelBast = () => {
-        setOpenBast(false);
-    };
+
     const handleCancelPengajuan = () => {
         setOpenPengajuan(false);
     };
@@ -555,7 +541,7 @@ const BarangPage = ({
                             );
                             pengajuanForm.setFieldValue("merk", record.merk);
                             pengajuanForm.setFieldValue("tipe", record.tipe);
-                            setCurrentRecord(record);
+
                             setOpenPengajuan(true);
                         }}
                     >
@@ -592,18 +578,6 @@ const BarangPage = ({
             >
                 <Divider />
                 <HistoryBarangForm form={itemAddForm} onFinish={onFinishEdit} />
-            </MyModal>
-            <MyModal
-                title="Daftar BAST"
-                openModal={openBast}
-                handleOk={handleOkBast}
-                confirmLoadingModal={confirmLoadingBast}
-                handleCancel={handleCancelBast}
-                okText="Ok"
-                cancelText="Batal"
-                width={800}
-            >
-                <Bast data={dataBast} barang_id={currentBarangId} />
             </MyModal>
 
             <MyModal

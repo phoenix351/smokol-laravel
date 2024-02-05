@@ -41,7 +41,7 @@ import {
     SortOrder,
 } from "antd/es/table/interface";
 import MyModal from "@/Components/Modal";
-import Bast from "@/Components/Bast";
+
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
 
 import { Maintenance, MaintenanceHistory, DataType } from "@/types";
