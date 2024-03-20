@@ -31,12 +31,12 @@ const AuthSider: React.FC<AuthSiderProps> = ({
     handleMenuClick,
 }) => {
     let menuItems = [
-        {
-            key: "dashboard",
-            icon: <DashboardOutlined />,
-            onClick: () => handleMenuClick("dashboard"),
-            label: "Dashboard",
-        },
+        // {
+        //     key: "dashboard",
+        //     icon: <DashboardOutlined />,
+        //     onClick: () => handleMenuClick("dashboard"),
+        //     label: "Dashboard",
+        // },
 
         {
             key: "barang",

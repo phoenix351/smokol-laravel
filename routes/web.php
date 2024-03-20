@@ -183,6 +183,10 @@ Route::middleware('auth')->group(function () {
 
 
     route::get('/', function () {
+        if (auth()->user()->role == 'basic') {
+
+            return to_route('barang');
+        }
         return to_route('dashboard');
     })->name('root');
 

@@ -25,6 +25,8 @@ import {
     DatePicker,
     Table,
     FormInstance,
+    Tour,
+    TourProps,
 } from "antd";
 import {
     EditOutlined,
@@ -85,6 +87,27 @@ const BarangPage = ({
     const [openWarningModal, setOpenWarningModal] = useState(false);
     const [confirmLoadingWarningModal, setConfirmLoadingWarningModal] =
         useState(false);
+
+    const [dataSource, setDataSource] = useState<Barang[]>([]);
+    // data for current barang bast
+    const [dataBast, setDataBast] = useState<BastType[]>([]);
+    const [pengajuanForm] = Form.useForm();
+
+    // define hook for tour
+    const [openTour, setOpenTour] = useState<boolean>(true);
+    const ref1 = useRef(null);
+    const ref2 = useRef(null);
+    const ref3 = useRef(null);
+    const ref4 = useRef(null);
+
+    const tourSteps: TourProps["steps"] = [
+        {
+            title: "Selamat datang pada tutorial penggunaan aplikasi Smokol",
+            description:
+                "Ikuti langkah-langkah berikut supaya faham penggunaan aplikasi",
+        },
+    ];
+
     const handleOkWarningModal = async () => {
         router.get(route("pengajuan"));
     };
@@ -125,10 +148,6 @@ const BarangPage = ({
     const handleCancelPengajuan = () => {
         setOpenPengajuan(false);
     };
-
-    const [dataSource, setDataSource] = useState<Barang[]>([]);
-    // data for current barang bast
-    const [dataBast, setDataBast] = useState<BastType[]>([]);
 
     useEffect(() => {
         if (csrfTokenMeta) {
@@ -177,9 +196,6 @@ const BarangPage = ({
             ) as Barang[];
 
             setDataSource(data_master);
-            console.log("====================================");
-            console.log(data_master);
-            console.log("====================================");
         }, 0);
     }, [history_barang]);
 
@@ -218,6 +234,7 @@ const BarangPage = ({
             {},
             {
                 preserveState: true,
+                preserveScroll: true,
             }
         );
     };
@@ -339,7 +356,7 @@ const BarangPage = ({
             return 0;
         }
     };
-    const [pengajuanForm] = Form.useForm();
+
     const pengajuanFinish = (values: any) => {
         messageApi.open({
             key: saveKey,
@@ -555,6 +572,12 @@ const BarangPage = ({
     return (
         <div>
             <Head title="History Barang" />
+            <Tour
+                open={openTour}
+                onClose={() => setOpenTour(false)}
+                steps={tourSteps}
+            />
+
             <MyModal
                 title={"Tambah History Barang"}
                 openModal={openModal}
@@ -647,7 +670,8 @@ BarangPage.layout = (
         user={page.props.auth.user}
         header={<h2 className="">Kelola Barang Saya</h2>}
         selectedKey="barang"
-        children={page}
-    ></AuthenticatedLayout>
+    >
+        {page}
+    </AuthenticatedLayout>
 );
 export default BarangPage;
