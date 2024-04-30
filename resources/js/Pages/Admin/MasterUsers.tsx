@@ -298,8 +298,6 @@ const User = ({ users }: PageProps & { users: User[] }) => {
         { title: "jabatan", dataIndex: "jabatan" },
         { title: "role", dataIndex: "role" },
         { title: "username", dataIndex: "username" },
-        { title: "foto", dataIndex: "foto" },
-        { title: "password_hash", dataIndex: "password_hash" },
 
         {
             title: "edit",

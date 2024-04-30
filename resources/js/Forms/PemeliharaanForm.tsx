@@ -176,7 +176,7 @@ const PemeliharaanForm: React.FC<{
                 {previewImage && (
                     <img
                         alt="Preview"
-                        style={{ width: "100%", marginTop: "10px" }}
+                        style={{ width: 300, marginTop: "10px" }}
                         src={previewImage as string}
                     />
                 )}

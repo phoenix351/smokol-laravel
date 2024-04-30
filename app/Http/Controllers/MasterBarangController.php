@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MasterBarang;
 use App\Http\Requests\StoreMasterBarangRequest;
 use App\Http\Requests\UpdateMasterBarangRequest;
-
+use App\Models\Barang;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 
@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 use Inertia\Inertia;
 use Illuminate\Support\Carbon;
-
+use Illuminate\Support\Facades\DB;
 
 class MasterBarangController extends Controller
 {
@@ -42,38 +42,44 @@ class MasterBarangController extends Controller
 
         try {
             $validatedData = $request->validate($request->rules());
-            $validatedData['tahun_peroleh'] = Carbon::parse($validatedData['tahun_peroleh'])->format('Y-m-d H:i:s');
+            $validatedData['tanggal_peroleh'] = Carbon::parse($validatedData['tanggal_peroleh'])->format('Y-m-d H:i:s');
             $response = [
                 'message' => 'Data berhasil ditambahkan',
             ];
-
-            MasterBarang::create($validatedData);
-            $master_barang = MasterBarang::all();
+            DB::beginTransaction();
+            $master_barang = MasterBarang::create($validatedData);
+            $data = [
+                'barang_id' => $master_barang->id,
+                'sistem_operasi_id' => 5,
+                'users_id' => 5,
+                'ruangan_id' => 5,
+            ];
+            Barang::create($data);
+            DB::commit();
+            $statusCode = 201;
         } catch (QueryException $e) {
+            DB::rollBack();
             $response = [
                 'message' => 'Koneksi gagal',
-                'data_sent' => $validatedData,
                 'errors' => $e->getMessage(),
             ];
-            $master_barang = [];
         } catch (ValidationException $e) {
+            DB::rollBack();
             $response = [
                 'message' => 'Validation error',
-                'errors' => $e->errors(),
+                'errors' => $e->getMessage(),
             ];
-            $master_barang = [];
+            $statusCode = 422;
         } catch (\Exception $e) {
+            DB::rollBack();
             $response = [
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_barang = [];
+            $statusCode = 500;
         }
 
-        return Inertia::render('Admin/MasterBarang', [
-            'response' => $response,
-            'master_barang' => $master_barang
-        ]);
+        return response()->json($response, $statusCode);
     }
 
     /**
@@ -101,7 +107,7 @@ class MasterBarangController extends Controller
 
         try {
             $validatedData = $request->validate($request->rules());
-            $validatedData['tahun_peroleh'] = Carbon::parse($validatedData['tahun_peroleh'])->format('Y-m-d H:i:s');
+            $validatedData['tanggal_peroleh'] = Carbon::parse($validatedData['tanggal_peroleh'])->format('Y-m-d H:i:s');
 
             $updateRecord = MasterBarang::findOrFail($request->id);
 
@@ -112,42 +118,40 @@ class MasterBarangController extends Controller
                 'data' => $updateRecord
             ];
 
-            $master_barang = MasterBarang::all();
+            $statusCode = 200;
         } catch (QueryException $e) {
             $response = [
-                'message' => 'An error occurred',
-                'errors' => $e->getMessage(),
+                'message' => 'Gagal melakukan update data: QueryException',
+                'error' => $e->getMessage()
             ];
-            $master_barang = [];
+            $statusCode = 500; // Internal Server Error
         } catch (ModelNotFoundException $e) {
             $response = [
-                'errors' => 'Record not found',
+                'message' => 'Gagal melakukan update data: ModelNotFoundException',
+                'error' => $e->getMessage()
             ];
-            $master_barang = [];
+            $statusCode = 404; // Not Found
         } catch (ValidationException $e) {
             $response = [
-                'message' => 'Validation error',
-                'errors' => $e->errors(),
+                'message' => 'Gagal melakukan update data: ValidationException',
+                'error' => $e->getMessage()
             ];
-            $master_barang = [];
+            $statusCode = 422; // Unprocessable Entity
+        } catch (\Illuminate\Database\Eloquent\MassAssignmentException $e) {
+            $response = [
+                'message' => 'Gagal melakukan update data: MassAssignmentException',
+                'error' => $e->getMessage()
+            ];
+            $statusCode = 500; // Internal Server Error
         } catch (\Exception $e) {
             $response = [
-                'message' => 'An error occurred',
-                'errors' => $e->getMessage(),
+                'message' => 'Gagal melakukan update data: Exception',
+                'error' => $e->getMessage()
             ];
-            $master_barang = [];
-        } catch (\Illuminate\Database\Eloquent\MassAssignmentException $e) {
-            // Tangkap exception jika terjadi kesalahan mass assignment
-            $response = [
-                'message' => 'Gagal melakukan update data: ' . $e->getMessage(),
-                'error' => $e->getMessage(),
-            ];
+            $statusCode = 500; // Internal Server Error
         }
 
-        return Inertia::render('Admin/MasterBarang', [
-            'response' => $response,
-            'master_barang' => $master_barang
-        ]);
+        return response()->json($response, $statusCode);
     }
 
     /**
@@ -172,24 +176,20 @@ class MasterBarangController extends Controller
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_barang = [];
         } catch (ModelNotFoundException $e) {
             $response = [
                 'errors' => 'Record not founsadsadd' . $request->query('id'),
             ];
-            $master_barang = [];
         } catch (ValidationException $e) {
             $response = [
                 'message' => 'Validation error',
                 'errors' => $e->errors(),
             ];
-            $master_barang = [];
         } catch (\Exception $e) {
             $response = [
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_barang = [];
         }
         return Inertia::render('Admin/MasterBarang', [
             'response' => $response,

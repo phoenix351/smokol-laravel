@@ -272,7 +272,7 @@ const MasterBarangForm: React.FC<{
                 rules={[
                     {
                         required: true,
-                        message: "Isian Tahun Perolehan harus diisi",
+                        message: "Isian Tanggal Perolehan harus diisi",
                     },
                 ]}
             >

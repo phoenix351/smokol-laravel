@@ -40,7 +40,10 @@ class UserController extends Controller
             $validatedReq = $request->validate($request->rules());
             $newUser = [];
 
-            $validatedReq['foto_url'] = $validatedReq['foto'];
+            if (isset($validatedReq['foto'])) {
+
+                $validatedReq['foto_url'] = $validatedReq['foto'];
+            }
             $validatedReq['password'] = Hash::make($validatedReq['password']);
             // $newUser = $item;
 

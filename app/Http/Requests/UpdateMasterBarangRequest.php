@@ -26,7 +26,7 @@ class UpdateMasterBarangRequest extends FormRequest
             'jenis' => 'required',
             'tipe' => 'required',
             'merk' => 'required',
-            'tahun_peroleh' => 'required',
+            'tanggal_peroleh' => 'required',
             'nomor_seri' => 'required',
             'nomor_urut_pendaftaran' => 'required',
         ];

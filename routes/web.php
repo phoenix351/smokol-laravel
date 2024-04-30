@@ -8,6 +8,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangUserController;
 use App\Http\Controllers\BastController;
 use App\Http\Controllers\HistoryBarangUserController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MasterPerusahaanController;
@@ -221,6 +222,8 @@ Route::middleware('auth')->group(function () {
     route::get('/admin/kelola-pengajuan', [MaintenanceController::class, 'admin'])->name('admin.kelola.pengajuan');
     route::get('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_fetch'])->name('admin.pengajuan.fetch');
     route::post('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_approve'])->name('admin.pengajuan.approve');
+
+    route::get('/admin/laporan/cetak', [LaporanController::class, 'cetak'])->name('admin.laporan.cetak');
 
     Route::get('/editable', function () {
         return Inertia::render('Editable');

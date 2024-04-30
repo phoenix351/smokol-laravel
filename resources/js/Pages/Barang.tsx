@@ -7,7 +7,6 @@ import {
     JSXElementConstructor,
     ReactPortal,
     useRef,
-    useContext,
     useEffect,
     useState,
 } from "react";
@@ -19,25 +18,20 @@ import {
     Space,
     // Table,
     message,
-    Popconfirm,
-    Dropdown,
-    MenuProps,
-    DatePicker,
     Table,
     FormInstance,
     Tour,
     TourProps,
+    Popconfirm,
 } from "antd";
 import {
-    EditOutlined,
-    CaretDownOutlined,
     MedicineBoxOutlined,
-    MailOutlined,
     WarningOutlined,
     StopOutlined,
     CheckCircleOutlined,
     UploadOutlined,
     FilePdfOutlined,
+    QuestionCircleOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
@@ -49,11 +43,10 @@ import {
 import MyModal from "@/Components/Modal";
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
 import { Barang, DataType } from "@/types";
-import axios, { formToJSON } from "axios";
+import axios from "axios";
 
 import PemeliharaanForm from "@/Forms/PemeliharaanForm";
 import Upload from "antd/es/upload/Upload";
-import { FormContextProps } from "antd/es/form/context";
 
 const { Search } = Input;
 
@@ -94,17 +87,41 @@ const BarangPage = ({
     const [pengajuanForm] = Form.useForm();
 
     // define hook for tour
-    const [openTour, setOpenTour] = useState<boolean>(true);
-    const ref1 = useRef(null);
-    const ref2 = useRef(null);
-    const ref3 = useRef(null);
-    const ref4 = useRef(null);
+    const [openTour, setOpenTour] = useState<boolean>(false);
+    const tableRef = useRef(null);
+    const bastRef = useRef(null);
+    const pemeliharaanRef = useRef(null);
+
+    // const  = useRef(null);
 
     const tourSteps: TourProps["steps"] = [
         {
             title: "Selamat datang pada tutorial penggunaan aplikasi Smokol",
             description:
                 "Ikuti langkah-langkah berikut supaya faham penggunaan aplikasi",
+        },
+        {
+            title: "Daftar Barang",
+            description:
+                "ini merupakan daftar barang beserta spesifikasi yang saat ini dalam penguasaan anda",
+            target: () => tableRef.current,
+        },
+        {
+            title: "Upload BAST",
+            description: "Anda dapat mengunggah dokumen BAST pada menu ini",
+            target: () => bastRef.current,
+        },
+        {
+            title: "Pengajuan Pemeliharaan",
+            description:
+                "Apabila barang anda dalam kondisi kurang mendukung pekerjaan sehari-hari, silahkan bisa mengajukan pemeliharaan pada menu ini",
+            target: () => pemeliharaanRef.current,
+        },
+        {
+            title: "Pengajuan Pemeliharaan",
+            description:
+                "Barang yang sudah diajukan dapat dilihat statusnya pada menu Daftar Pengajuan",
+            // target: () => pemeliharaanRef.current,
         },
     ];
 
@@ -203,10 +220,6 @@ const BarangPage = ({
         setSearchLoading(true);
         setSearchText(value);
         setSearchLoading(false);
-    };
-    const handleAdd = () => {
-        itemAddForm.resetFields();
-        setOpenModal(true);
     };
 
     type Sorter<T> = (a: T, b: T, sortOrder?: SortOrder) => number;
@@ -512,6 +525,7 @@ const BarangPage = ({
                 !value ? (
                     <Button>
                         <Upload
+                            ref={bastRef}
                             onChange={(value) =>
                                 handleUploadBast(value, record, formUpload)
                             }
@@ -522,20 +536,36 @@ const BarangPage = ({
                         </Upload>
                     </Button>
                 ) : (
-                    <Button onClick={() => window.open(value, "_blank")}>
-                        {" "}
-                        <FilePdfOutlined /> Lihat Dokumen
-                    </Button>
+                    <Space>
+                        <Button onClick={() => window.open(value, "_blank")}>
+                            {" "}
+                            <FilePdfOutlined /> Lihat Dokumen
+                        </Button>
+
+                        <Button>
+                            <Upload
+                                ref={bastRef}
+                                onChange={(value) =>
+                                    handleUploadBast(value, record, formUpload)
+                                }
+                                beforeUpload={() => false}
+                                accept=".pdf"
+                                style={{ display: "none" }}
+                            ></Upload>
+                            <UploadOutlined /> Upload Bast
+                        </Button>
+                    </Space>
                 ),
         },
 
         {
             title: "Pemeliharaan",
             dataIndex: "maintenance",
-            fixed: "right",
+            // fixed: "right",
             render: (_, record: Barang) => {
                 return (
                     <Button
+                        ref={pemeliharaanRef}
                         onClick={async () => {
                             const { data } = await axios.post(
                                 route("maintenance.check"),
@@ -645,9 +675,14 @@ const BarangPage = ({
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
+                <Button onClick={() => setOpenTour(true)}>
+                    <QuestionCircleOutlined />
+                    buka tutorial
+                </Button>
             </Space>
 
             <Table
+                ref={tableRef}
                 rowClassName={() => "editable-row"}
                 scroll={{ x: 1500 }}
                 bordered

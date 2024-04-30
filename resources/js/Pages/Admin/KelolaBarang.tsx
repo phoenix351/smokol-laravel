@@ -488,14 +488,6 @@ const BarangPage = ({
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
-                <Button
-                    onClick={handleAdd}
-                    type="primary"
-                    style={{ marginBottom: 16 }}
-                    icon={<PlusOutlined />}
-                >
-                    Tambah Barang
-                </Button>
             </Space>
 
             <Table

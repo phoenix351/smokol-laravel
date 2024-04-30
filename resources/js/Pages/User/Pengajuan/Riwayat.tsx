@@ -357,7 +357,7 @@ const BarangPage = ({
                 style={{ backgroundColor: "whitesmoke" }}
                 onClick={() => window.history.back()}
             >
-                <Button type="primary" icon={<LeftOutlined />}>
+                <Button type="default" icon={<LeftOutlined />}>
                     Kembali
                 </Button>
             </Space>
@@ -392,14 +392,24 @@ const BarangPage = ({
             <Divider />
             {/* <h1>{detail_barang.image_path}</h1> */}
             {detail_barang.image_path ? (
-                <Image src={detail_barang.image_path} alt="Example Image" />
+                <div
+                    style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        padding: "20px",
+                    }}
+                >
+                    <Image src={detail_barang.image_path} alt="Example Image" />
+                </div>
             ) : (
                 ""
             )}
 
             <Table
                 rowClassName={() => "editable-row"}
-                scroll={{ x: 1500 }}
+                // scroll={{ x: 1500 }}
                 bordered
                 dataSource={dataSource.filter((item) =>
                     Object.values(item)
@@ -408,6 +418,7 @@ const BarangPage = ({
                         .includes(searchText.toLowerCase())
                 )}
                 columns={defaultColumns}
+                pagination={false}
             />
         </div>
     );

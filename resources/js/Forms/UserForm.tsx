@@ -35,7 +35,7 @@ const UserForm: React.FC<{
     const [jabatanList, setJabatanList] = useState([]);
 
     const roleList = [
-        { label: "basic", value: "basic" },
+        { label: "Pegawai", value: "basic" },
         { label: "Tim IPDS", value: "Tim IPDS" },
         { label: "Tim BMN", value: "Tim BMN" },
         { label: "Tim PBJ/PPK", value: "Tim PBJ/PPK" },
@@ -119,12 +119,7 @@ const UserForm: React.FC<{
             >
                 <Input />
             </Form.Item>
-            <Form.Item
-                {...formItemLayout}
-                label="role"
-                name="role"
-                // style={{ display: "none" }}
-            >
+            <Form.Item {...formItemLayout} label="role" name="role">
                 <Select options={roleList} />
             </Form.Item>
             <Form.Item
@@ -135,14 +130,7 @@ const UserForm: React.FC<{
             >
                 <Input />
             </Form.Item>
-            <Form.Item
-                {...formItemLayout}
-                label="foto"
-                name="foto"
-                // style={{ display: "none" }}
-            >
-                <Input />
-            </Form.Item>
+
             <Form.Item
                 {...formItemLayout}
                 label="password"

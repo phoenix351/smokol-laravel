@@ -80,9 +80,19 @@ class BastController extends Controller
     public function upload(Request $request)
     {
         try {
-            //code...
-            $path = $request->file('file')->store('public/files/bast');
+            //check is already have docs
             $barang_id = $request->post('barang_id');
+            $current_path = Barang::where('id', $barang_id)->value('bast_path');
+            if (Storage::exists($current_path)) {
+                // Delete the file
+                Storage::delete($current_path);
+                $message = 'File deleted successfully.';
+            } else {
+                $message = 'File not found.';
+            }
+            // return response()->json($current_path, 200);
+
+            $path = $request->file('file')->store('public/files/bast');
 
             Barang::where('id', $barang_id)->update(
                 ['bast_path' => $path]

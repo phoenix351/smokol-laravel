@@ -469,7 +469,7 @@ MasterRuangan.layout = (
     <AuthenticatedLayout
         user={page.props.auth.user}
         header={<h2 className="">Master Ruangan</h2>}
-        selectedKey="admin.master.Ruangan"
+        selectedKey="admin.master.ruangan"
         children={page}
     ></AuthenticatedLayout>
 );

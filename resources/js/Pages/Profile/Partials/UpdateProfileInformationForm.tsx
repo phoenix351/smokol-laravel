@@ -27,58 +27,6 @@ export default function UpdateProfileInformation({ auth }: PageProps) {
                     Update your account's profile information and email address.
                 </p>
             </header>
-            <Form
-                onFinish={handleSave}
-                className="login-form__form"
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ maxWidth: 600 }}
-                autoComplete="off"
-                method="post"
-                action={route("login")}
-            >
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}></Form.Item>
-                <Form.Item
-                    label={<label>username</label>}
-                    name="Username"
-                    colon={false}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Please input your Username!",
-                        },
-                    ]}
-                >
-                    <Input defaultValue={auth.user.username} />
-                </Form.Item>
-                <Form.Item
-                    label={<label>email</label>}
-                    name="email"
-                    colon={false}
-                    rules={[
-                        {
-                            required: true,
-                            message: "Please input your email!",
-                        },
-                        {
-                            type: "email",
-                            message: "Please input valid email !",
-                        },
-                    ]}
-                >
-                    <Input defaultValue={auth.user.email} />
-                </Form.Item>
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        className="login-form__submit-btn bg-primary"
-                    >
-                        Save
-                    </Button>
-                </Form.Item>
-            </Form>
         </section>
     );
 }

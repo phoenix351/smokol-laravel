@@ -13,12 +13,12 @@ import {
 } from "react";
 
 const Edit = ({ auth }: PageProps) => {
+    console.log({ auth });
+
     return (
         <>
             <Head title="Profile" />
             <Space direction="vertical" size="middle">
-                <UpdateProfileInformationForm auth={auth} />
-
                 <UpdatePasswordForm />
             </Space>
         </>
