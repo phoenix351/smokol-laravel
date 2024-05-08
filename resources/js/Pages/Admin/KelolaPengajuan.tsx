@@ -221,22 +221,6 @@ const KelolaPengajuanPage = () => {
                 </Button>
             </Form>
 
-            {/* <Space
-                style={{
-                    marginBottom: "20px",
-                    marginTop: "5px",
-                    width: "100%",
-                }}
-                direction="vertical"
-            >
-                <Search
-                    placeholder="Cari berdasarakan nama pegawai atau nama barang, ataupun nomor urut pendaftaran"
-                    allowClear
-                    onSearch={onSearch}
-                    loading={searchLoading}
-                    style={{ width: "100%" }}
-                />
-            </Space> */}
             {searchLoading ? Loading() : renderContent()}
         </div>
     );

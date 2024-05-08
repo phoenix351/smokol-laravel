@@ -1,3 +1,8 @@
+@php
+    setlocale(LC_TIME, 'id_ID');
+    \Carbon\Carbon::setLocale('id');
+    \Carbon\Carbon::now()->formatLocalized('%A, %d %B %Y');
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,6 +13,10 @@
     <title>Document</title>
 </head>
 <style>
+    @page {
+        size: A4 landscape;
+    }
+
     body {
         font-size: 13px
     }
@@ -30,7 +39,7 @@
     .table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 10px;
+        margin-top: 5px;
     }
 
     .table-bordered {
@@ -86,7 +95,7 @@
     .peringatan {
         border: 1px solid #ddd;
         padding: 10px;
-        margin-top: 100px;
+        margin-top: 30px;
     }
 
     .container {
@@ -237,7 +246,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <div style="height: 80px"></div>
+                        <div style="height: 40px"></div>
                     </td>
                     <td></td>
                     <td></td>
