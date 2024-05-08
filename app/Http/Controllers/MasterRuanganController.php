@@ -21,7 +21,7 @@ class MasterRuanganController extends Controller
     {
         $master_ruangan = MasterRuangan::join('users', 'users.id', 'master_ruangan.users_id')
             ->select('master_ruangan.*', 'users.nama_lengkap as users_nama', 'users.id as users_id')->get();
-        return Inertia::render('Admin/MasterRuangan', ['master_ruangan' => $master_ruangan]);
+        return Inertia::render('Admin/Master/Ruangan', ['master_ruangan' => $master_ruangan]);
     }
 
     /**
@@ -106,7 +106,7 @@ class MasterRuanganController extends Controller
                     'kode_siman' => $validatedData['kode_siman'],
                     'kode_baru' => $validatedData['kode_baru'],
                     'gedung' => isset($validatedData['gedung']) ? $validatedData['gedung'] : '',
-                    'lantai' => isset($validatedData['lantai']) ? $validatedData['gedung'] : '',
+                    'lantai' => isset($validatedData['lantai']) ? $validatedData['lantai'] : '',
                     // 'lantai' => $validatedData['lantai'],
                     // 'id'=>$validatedData['id'],
                 ]

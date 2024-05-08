@@ -28,7 +28,7 @@ export default function Authenticated({
     } = theme.useToken();
 
     const handleMenuClick = async (key: string) => {
-        router.visit(route(key));
+        router.visit(route(key), { preserveState: true, preserveScroll: true });
     };
 
     useEffect(() => {

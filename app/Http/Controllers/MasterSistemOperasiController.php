@@ -20,7 +20,7 @@ class MasterSistemOperasiController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Admin/MasterSistemOperasi', ['master_sistem_operasi' => MasterSistemOperasi::all()]);
+        return Inertia::render('Admin/Master/SistemOperasi', ['master_sistem_operasi' => MasterSistemOperasi::all()]);
     }
 
     /**

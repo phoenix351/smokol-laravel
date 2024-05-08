@@ -45,6 +45,7 @@ import {
 import MyModal from "@/Components/Modal";
 import MasterSistemOperasiForm from "@/Forms/MasterSistemOperasiForm";
 import { findSourceMap } from "module";
+import axios from "axios";
 
 interface DataType {
     key: React.Key;
@@ -219,33 +220,31 @@ const MasterSistemOperasi = ({
             return 0;
         }
     };
-    const onFinishEdit: (values: any) => any = (values: any) => {
+    const onFinishEdit: (values: any) => any = async (values: any) => {
         messageApi.open({
             key: saveKey,
             content: "Sedang menambahkan data...",
             type: "loading",
         });
         try {
-            router.patch(route("admin.master.sistem_operasi.update"), values, {
-                onSuccess: (responsePage) => {
-                    const response: any = responsePage.props.response;
-                    console.log({ response });
-                    if (response.errors?.length > 1) {
-                        return messageApi.open({
-                            key: saveKey,
-                            content: response.errors,
-                            type: "error",
-                        });
-                    }
-                    messageApi.open({
-                        key: saveKey,
-                        content: "Berhasil menyimpan perubahan data",
-                        type: "success",
-                    });
-
-                    return 1;
-                },
+            const response = await axios.patch(
+                route("admin.master.sistem_operasi.update"),
+                values,
+                { headers: { "Content-Type": "application/json" } }
+            );
+            messageApi.open({
+                key: saveKey,
+                content: "Berhasil menyimpan perubahan data",
+                type: "success",
             });
+            router.get(
+                route("admin.master.sistem_operasi"),
+                {},
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                }
+            );
         } catch (error: any) {
             messageApi.open({
                 key: saveKey,

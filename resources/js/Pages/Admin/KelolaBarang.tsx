@@ -123,6 +123,7 @@ const BarangPage = ({
                     is_approved,
                     nomor_urut_pendaftaran,
                     sistem_operasi_id,
+                    created_at,
                 }): Barang => ({
                     barang_id,
                     key: id,
@@ -141,6 +142,7 @@ const BarangPage = ({
                     is_approved,
                     nomor_urut_pendaftaran,
                     sistem_operasi_id,
+                    created_at,
                 })
             );
 
@@ -322,6 +324,18 @@ const BarangPage = ({
             title: "tanggal_peroleh",
             dataIndex: "tanggal_peroleh",
             sorter: tahunPerolehSorter as CompareFn<object>,
+            render: (value: any) => {
+                try {
+                    let formattedDate = new Intl.DateTimeFormat("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                    }).format(new Date(value));
+                    return formattedDate;
+                } catch (error) {
+                    return value;
+                }
+            },
         },
         {
             title: "nomor_seri",

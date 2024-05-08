@@ -283,6 +283,7 @@ class MaintenanceController extends Controller
             'maintenance_sequences.biaya',
             'maintenance_sequences.problem_img_path',
             'maintenance_sequences.kondisi_final',
+            'maintenance_sequences.created_at',
 
 
             'master_barang.merk',
@@ -411,6 +412,7 @@ class MaintenanceController extends Controller
 
             $maintenance['kode_status'] = '5';
             $updatedSequence['solution'] = $validatedData['solution'];
+            MaintenanceSequence::where('id', $validatedData['sequence_id'])->update($updatedSequence);
         }
         $maintenanceStored = Maintenance::create($maintenance);
 

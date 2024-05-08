@@ -20,7 +20,7 @@ class MasterJabatanController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('Admin/Master/Jabatan', ['master_jabatan' => MasterJabatan::all()]);
     }
 
     /**

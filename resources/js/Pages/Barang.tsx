@@ -89,6 +89,7 @@ const BarangPage = ({
     // define hook for tour
     const [openTour, setOpenTour] = useState<boolean>(false);
     const tableRef = useRef(null);
+
     const bastRef = useRef(null);
     const pemeliharaanRef = useRef(null);
 
@@ -108,7 +109,7 @@ const BarangPage = ({
         },
         {
             title: "Upload BAST",
-            description: "Anda dapat mengunggah dokumen BAST pada menu ini",
+            description: `Anda dapat mengunggah dokumen BAST pada menu ini (mengunggah ulang akan menimpa file yang sudah ada)`,
             target: () => bastRef.current,
         },
         {
@@ -191,6 +192,7 @@ const BarangPage = ({
                     nomor_urut_pendaftaran,
                     ruangan_id,
                     nama_lengkap,
+                    created_at,
                 }) => ({
                     key: id,
                     jenis,
@@ -209,6 +211,7 @@ const BarangPage = ({
                     nomor_urut_pendaftaran,
                     ruangan_id,
                     nama_lengkap,
+                    created_at,
                 })
             ) as Barang[];
 
@@ -542,17 +545,18 @@ const BarangPage = ({
                             <FilePdfOutlined /> Lihat Dokumen
                         </Button>
 
-                        <Button>
+                        <Button ref={bastRef}>
                             <Upload
-                                ref={bastRef}
                                 onChange={(value) =>
                                     handleUploadBast(value, record, formUpload)
                                 }
                                 beforeUpload={() => false}
                                 accept=".pdf"
                                 style={{ display: "none" }}
-                            ></Upload>
-                            <UploadOutlined /> Upload Bast
+                            >
+                                {" "}
+                                <UploadOutlined /> Upload Bast
+                            </Upload>
                         </Button>
                     </Space>
                 ),

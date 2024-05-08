@@ -67,18 +67,17 @@ const UserForm: React.FC<{
             layout="vertical"
         >
             {contextHolder}
-            <Form.Item
-                {...formItemLayout}
-                label="id"
-                name="id"
-                style={{ display: type == "add" ? "none" : "" }}
-            >
+            <Form.Item {...formItemLayout} label="id" name="id" hidden>
                 <Input />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}
                 label="nama_lengkap"
                 name="nama_lengkap"
+                required
+                rules={[
+                    { required: true, message: "Nama Lengkap wajib diisi" },
+                ]}
                 // style={{ display: "none" }}
             >
                 <Input />
@@ -87,23 +86,30 @@ const UserForm: React.FC<{
                 {...formItemLayout}
                 label="nip"
                 name="nip"
-                // style={{ display: "none" }}
+                required
+                rules={[{ required: true, message: "NIP wajib diisi" }]}
             >
-                <Input />
+                <Input placeholder="19921023982093021001" />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}
                 label="email"
                 name="email"
+                required
+                rules={[
+                    { required: true, message: "Email wajib diisi" },
+                    { type: "email", message: "Format tidak sesuai" },
+                ]}
                 // style={{ display: "none" }}
             >
-                <Input />
+                <Input placeholder="email@bps.go.id" />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}
                 label="Jabatan"
                 name="jabatan_id"
-                // style={{ display: "none" }}
+                required
+                rules={[{ required: true, message: "Jabatan wajib diisi" }]}
             >
                 <Select
                     showSearch
@@ -115,18 +121,27 @@ const UserForm: React.FC<{
                 {...formItemLayout}
                 label="bidang"
                 name="bidang"
+                required
+                rules={[{ required: true, message: "Bidang wajib diisi" }]}
                 // style={{ display: "none" }}
             >
                 <Input />
             </Form.Item>
-            <Form.Item {...formItemLayout} label="role" name="role">
+            <Form.Item
+                {...formItemLayout}
+                label="role"
+                name="role"
+                rules={[{ required: true, message: "Role wajib diisi" }]}
+                required
+            >
                 <Select options={roleList} />
             </Form.Item>
             <Form.Item
                 {...formItemLayout}
                 label="username"
                 name="username"
-                // style={{ display: "none" }}
+                required
+                rules={[{ required: true, message: "Username wajib diisi" }]}
             >
                 <Input />
             </Form.Item>
@@ -135,7 +150,15 @@ const UserForm: React.FC<{
                 {...formItemLayout}
                 label="password"
                 name="password"
-                style={{ display: type == "edit" ? "none" : "" }}
+                required={type != "edit" ? true : false}
+                // style={{ display: type == "edit" ? "none" : "" }}
+                // hidden={type == "edit" ? true : false}
+                rules={[
+                    {
+                        required: type != "edit" ? true : false,
+                        message: "Password wajib diisi",
+                    },
+                ]}
             >
                 <Input type="password" />
             </Form.Item>

@@ -33,22 +33,7 @@ const rules = [
         message: "Please upload a file",
     },
 ];
-// interface PengajuanItem {
-//     sequence_id: number;
-//     bidang: string;
-//     deskripsi: string;
-//     kode_status: string;
-//     jenis: string;
-//     merk: string;
-//     tipe: string;
-//     users_id: number;
-//     nama_lengkap: string;
-//     nomor_seri: string;
-//     nomor_urut_pendaftaran: string;
-//     keluhan: string;
-//     biaya: number;
-//     role: string;
-// }
+
 interface ApproveProps {
     users_id: number;
     kode_status: string;
@@ -361,7 +346,10 @@ const PengajuanCard: React.FC<{
                                         <Text
                                             strong
                                         >{`${item.nama_lengkap}`}</Text>
-                                        <Text type="secondary">{`${item.bidang}`}</Text>
+                                        <Text type="secondary">{`${item.created_at.substring(
+                                            0,
+                                            4
+                                        )}/TI/${item.sequence_id}`}</Text>
                                     </Space>
                                     <Space style={{ alignItems: "start" }}>
                                         <Text

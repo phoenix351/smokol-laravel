@@ -24,7 +24,8 @@ class MasterBarangController extends Controller
      */
     public function index()
     {
-        //
+
+        return Inertia::render('Admin/Master/Barang', ['master_barang' => MasterBarang::all()]);
     }
 
     /**

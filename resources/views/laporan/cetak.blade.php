@@ -88,6 +88,10 @@
         padding: 10px;
         margin-top: 100px;
     }
+
+    .container {
+        page-break-inside: avoid
+    }
 </style>
 
 <body>
@@ -143,7 +147,7 @@
                 <td>: BPS SULUT</td>
                 <td></td>
                 <td>NAMA RUANGAN</td>
-                <td>: Ruang SKF Kepegawaian</td>
+                <td>: {{ $ruangan['nama'] }}</td>
             </tr>
 
             <tr>
@@ -151,7 +155,7 @@
                 <td>: 054011700428701000KD</td>
                 <td></td>
                 <td>KODE RUANGAN</td>
-                <td>: 404</td>
+                <td>: {{ $ruangan['kode_baru'] }}</td>
             </tr>
 
         </tbody>
@@ -178,7 +182,7 @@
             @foreach ($data as $index => $item)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $jenis_kode[$item['jenis']] }}</td>
+                    <td>{{ $item['kode_barang'] }}</td>
                     <td>{{ $item['jenis'] }}</td>
                     <td class="text-right">{{ $item['nomor_urut_pendaftaran'] }}</td>
                     <td>{{ $item['merk'] . '/' . $item['tipe'] }}</td>
@@ -196,60 +200,63 @@
 
         </tbody>
     </table>
-    <div class="peringatan">Tidak dibenarkan memindahkan barang-barang yang ada pada daftar ini tanpa sepengetahuan
-        penanggung jawab Unit
-        Akutansi Kuasa Pengguna barang (UAKPB) dan penanggung jawab ruangan ini</div>
-    <table class="text-center table">
-        {{-- <thead>
+    <div class="container">
+
+        <div class="peringatan">Tidak dibenarkan memindahkan barang-barang yang ada pada daftar ini tanpa sepengetahuan
+            penanggung jawab Unit
+            Akutansi Kuasa Pengguna barang (UAKPB) dan penanggung jawab ruangan ini</div>
+        <table class="text-center table">
+            {{-- <thead>
             <tr>
                 <th></th>
                 <th></th>
                 <th></th>
             </tr>
         </thead> --}}
-        <tbody>
-            <tr>
-                <td></td>
-                <td></td>
-                <td>Kota Manado, {{ \Carbon\Carbon::now()->format('j F Y') }}
-                </td>
-            </tr>
-            <tr>
-                <td>Satker Pengguna Ruangan</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>[054011700428701000KD]</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Penanggung Jawab UAPKPB/UAKPB</td>
-                <td></td>
-                <td>Penanggung Jawab Ruangan</td>
-            </tr>
-            <tr>
-                <td>
-                    <div style="height: 80px"></div>
-                </td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td style="padding:0px">{{ $nama_kepala }}</td>
-                <td style="padding:0px"></td>
-                <td style="padding:0px">{{ $nama_pj }}</td>
-                {{-- <td>{{ $nip_pj }}</td> --}}
-            </tr>
-            <tr>
-                <td style="padding:0px">NIP. {{ $nip_kepala }}</td>
-                <td style="padding:0px"></td>
-                <td style="padding:0px">NIP. {{ $nip_pj }}</td>
-                {{-- <td>{{ $nip_pj }}</td> --}}
-            </tr>
-        </tbody>
-    </table>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>Kota Manado, {{ \Carbon\Carbon::now()->format('j F Y') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Satker Pengguna Ruangan</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>[054011700428701000KD]</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Penanggung Jawab UAPKPB/UAKPB</td>
+                    <td></td>
+                    <td>Penanggung Jawab Ruangan</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="height: 80px"></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="padding:0px">{{ $nama_kepala }}</td>
+                    <td style="padding:0px"></td>
+                    <td style="padding:0px">{{ $ruangan['nama_lengkap'] }}</td>
+                    {{-- <td>{{ $nip_pj }}</td> --}}
+                </tr>
+                <tr>
+                    <td style="padding:0px">NIP. {{ $nip_kepala }}</td>
+                    <td style="padding:0px"></td>
+                    <td style="padding:0px">NIP. {{ $ruangan['nip'] }}</td>
+                    {{-- <td>{{ $nip_pj }}</td> --}}
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 
 </html>

@@ -64,6 +64,7 @@ export interface Barang {
     users_id: number;
     ruangan_id: number;
     sistem_operasi_id: number;
+    created_at: string;
 }
 
 export interface BastType {
@@ -131,4 +132,5 @@ export interface PengajuanItem {
     keluhan: string;
     biaya: number;
     role: string;
+    created_at: string;
 }

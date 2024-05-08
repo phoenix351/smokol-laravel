@@ -14,7 +14,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::get();
-        return Inertia::render('Admin/MasterUsers', ['users' => $users]);
+        return Inertia::render('Admin/Master/Pengguna', ['users' => $users]);
     }
     public function update(UserUpdateRequest $request)
     {

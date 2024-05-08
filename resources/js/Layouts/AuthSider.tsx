@@ -1,5 +1,5 @@
 import ApplicationLogo from "@/Components/ApplicationLogo";
-import { Menu, Space } from "antd";
+import { Menu, MenuProps, Space } from "antd";
 import Sider from "antd/es/layout/Sider";
 import {
     DashboardOutlined,
@@ -15,6 +15,8 @@ import {
     CarOutlined,
     CarryOutFilled,
     CarryOutOutlined,
+    FolderOutlined,
+    TableOutlined,
 } from "@ant-design/icons";
 import { User } from "@/types";
 type AuthSiderProps = {
@@ -22,7 +24,9 @@ type AuthSiderProps = {
     collapsed: boolean;
     selectedKey: string;
     handleMenuClick: (key: string) => void;
+    children?: { key: string; label: string }[];
 };
+type MenuItem = Required<MenuProps>["items"][number];
 
 const AuthSider: React.FC<AuthSiderProps> = ({
     user,
@@ -30,7 +34,7 @@ const AuthSider: React.FC<AuthSiderProps> = ({
     selectedKey,
     handleMenuClick,
 }) => {
-    let menuItems = [
+    let menuItems: MenuItem[] = [
         // {
         //     key: "dashboard",
         //     icon: <DashboardOutlined />,
@@ -87,34 +91,56 @@ const AuthSider: React.FC<AuthSiderProps> = ({
                 onClick: () => handleMenuClick("admin.kelola.pengajuan"),
             },
             {
-                key: "admin.master.barang",
-                icon: <DatabaseOutlined />,
-                label: "Master Barang",
-                onClick: () => handleMenuClick("admin.master.barang"),
+                key: "laporan",
+                label: "Laporan",
+                icon: <TableOutlined />,
+                onClick: () => true,
+                children: [
+                    {
+                        key: "admin.laporan.dbr",
+                        label: "DBR",
+                        onClick: () => handleMenuClick("admin.laporan.dbr"),
+                    },
+                ],
             },
             {
-                key: "admin.master.ruangan",
-                icon: <HomeOutlined />,
-                label: "Master Ruangan",
-                onClick: () => handleMenuClick("admin.master.ruangan"),
-            },
-            {
-                key: "admin.master.jabatan",
-                icon: <CarryOutOutlined />,
-                label: "Master Jabatan",
-                onClick: () => handleMenuClick("admin.master.jabatan"),
-            },
-            {
-                key: "admin.master.sistem_operasi.index",
-                icon: <DesktopOutlined />,
-                label: "Master Sistem Operasi",
-                onClick: () => handleMenuClick("admin.master.sistem_operasi"),
-            },
-            {
-                key: "admin.master.users",
-                icon: <UserOutlined />,
-                label: "Master Users",
-                onClick: () => handleMenuClick("admin.master.users"),
+                key: "master",
+                label: "Kelola Master",
+                icon: <FolderOutlined />,
+                onClick: () => console.log(""),
+                children: [
+                    {
+                        key: "admin.master.barang",
+                        // icon: <DatabaseOutlined />,
+                        label: "Barang",
+                        onClick: () => handleMenuClick("admin.master.barang"),
+                    },
+                    {
+                        key: "admin.master.ruangan",
+                        // icon: <HomeOutlined />,
+                        label: "Ruangan",
+                        onClick: () => handleMenuClick("admin.master.ruangan"),
+                    },
+                    {
+                        key: "admin.master.jabatan",
+                        // icon: <CarryOutOutlined />,
+                        label: "Jabatan",
+                        onClick: () => handleMenuClick("admin.master.jabatan"),
+                    },
+                    {
+                        key: "admin.master.sistem_operasi.index",
+                        // icon: <DesktopOutlined />,
+                        label: "Sistem Operasi",
+                        onClick: () =>
+                            handleMenuClick("admin.master.sistem_operasi"),
+                    },
+                    {
+                        key: "admin.master.users",
+                        // icon: <UserOutlined />,
+                        label: "Pengguna",
+                        onClick: () => handleMenuClick("admin.master.users"),
+                    },
+                ],
             },
         ];
     }

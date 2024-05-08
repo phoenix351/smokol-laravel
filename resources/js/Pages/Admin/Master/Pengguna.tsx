@@ -1,14 +1,12 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
 import { PageProps } from "@/types";
-import dayjs from "dayjs";
 
 import {
     ReactElement,
     JSXElementConstructor,
     ReactPortal,
     useRef,
-    useContext,
     useEffect,
     useState,
 } from "react";
@@ -16,32 +14,15 @@ import {
     Button,
     Divider,
     Form,
-    FormInstance,
     Input,
-    InputRef,
-    Modal,
     Space,
     Table,
     message,
     Popconfirm,
-    Dropdown,
-    MenuProps,
-    DatePicker,
 } from "antd";
-import {
-    EditOutlined,
-    CaretDownOutlined,
-    DeleteOutlined,
-    PlusOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import React from "react";
-import {
-    ColumnFilterItem,
-    ColumnType,
-    ColumnsType,
-    CompareFn,
-    SortOrder,
-} from "antd/es/table/interface";
+import { ColumnsType, SortOrder } from "antd/es/table/interface";
 import MyModal from "@/Components/Modal";
 import UserForm from "@/Forms/UserForm";
 import axios from "axios";
@@ -70,7 +51,7 @@ interface User {
 }
 
 const { Search } = Input;
-const User = ({ users }: PageProps & { users: User[] }) => {
+const Pengguna = ({ users }: PageProps & { users: User[] }) => {
     // console.log({ master_barang });
     const csrfTokenRef = useRef<string | null>(null);
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
@@ -88,9 +69,15 @@ const User = ({ users }: PageProps & { users: User[] }) => {
     const [confirmLoadingModalUbah, setConfirmLoadingModalUbah] =
         useState(false);
     const handleOk = async () => {
-        itemAddForm.submit();
-        // setOpenModal(false);
-        setConfirmLoadingModal(false);
+        // return;
+        try {
+            const validate = await itemAddForm.validateFields();
+            // console.log({ validate });
+
+            itemAddForm.submit();
+            setOpenModal(false);
+            setConfirmLoadingModal(false);
+        } catch (error) {}
     };
     const handleOkUbah = async () => {
         try {
@@ -245,21 +232,6 @@ const User = ({ users }: PageProps & { users: User[] }) => {
             type: "loading",
         });
         try {
-            // router.patch(route("users.update"), values, {
-            //     onSuccess: (responsePage) => {
-            //         const response: any = responsePage.props.response;
-            //         console.log({ response });
-            //         if (response.errors?.length > 1) {
-            //             return messageApi.open({
-            //                 key: saveKey,
-            //                 content: response.errors,
-            //                 type: "error",
-            //             });
-            //         }
-
-            //         return 1;
-            //     },
-            // });
             const url = route("admin.users.update");
             const response = await axios.patch(url, values, {
                 headers: { "Content-Type": "application/json" },
@@ -409,7 +381,7 @@ const User = ({ users }: PageProps & { users: User[] }) => {
     );
 };
 
-User.layout = (
+Pengguna.layout = (
     page: ReactElement<any, JSXElementConstructor<any>> | ReactPortal
 ) => (
     <AuthenticatedLayout
@@ -419,4 +391,4 @@ User.layout = (
         children={page}
     ></AuthenticatedLayout>
 );
-export default User;
+export default Pengguna;

@@ -46,17 +46,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     //route master barang
-    route::get('/admin/master-barang', function () {
-        return Inertia::render('Admin/MasterBarang', ['master_barang' => MasterBarang::all()]);
-    })->name('admin.master.barang');
+    route::get('/admin/master-barang', [MasterBarangController::class, 'index'])->name('admin.master.barang');
     Route::patch('/admin/master-barang', [MasterBarangController::class, 'update'])->name('master_barang.update');
     Route::post('/admin/master-barang', [MasterBarangController::class, 'store'])->name('master_barang.store');
     Route::delete('/admin/master-barang', [MasterBarangController::class, 'destroy'])->name('master_barang.destroy');
 
     //route master jabatan
-    route::get('/admin/master-jabatan', function () {
-        return Inertia::render('Admin/MasterJabatan', ['master_jabatan' => MasterJabatan::all()]);
-    })->name('admin.master.jabatan');
+    route::get('/admin/master-jabatan', [MasterJabatanController::class, 'index'])->name('admin.master.jabatan');
     Route::patch('/admin/master-jabatan', [MasterJabatanController::class, 'update'])->name('master_jabatan.update');
     Route::post('/admin/master-jabatan', [MasterJabatanController::class, 'store'])->name('master_jabatan.store');
     Route::delete('/admin/master-jabatan', [MasterJabatanController::class, 'destroy'])->name('master_jabatan.destroy');
@@ -84,7 +80,7 @@ Route::middleware('auth')->group(function () {
 
 
     //route master sistem operasi
-    route::get('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'index'])->name('admin.master.sistem_operasi.index');
+    route::get('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'index'])->name('admin.master.sistem_operasi');
     Route::patch('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'update'])->name('admin.master.sistem_operasi.update');
     Route::post('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'store'])->name('admin.master.sistem_operasi.store');
     Route::delete('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'destroy'])->name('admin.master.sistem_operasi.destroy');
@@ -223,7 +219,9 @@ Route::middleware('auth')->group(function () {
     route::get('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_fetch'])->name('admin.pengajuan.fetch');
     route::post('/admin/pengajuan', [MaintenanceController::class, 'pengajuan_approve'])->name('admin.pengajuan.approve');
 
-    route::get('/admin/laporan/cetak', [LaporanController::class, 'cetak'])->name('admin.laporan.cetak');
+    route::get('/admin/laporan/dbr/cetak/{id_ruangan}', [LaporanController::class, 'cetak_dbr'])->name('admin.laporan.dbr.cetak');
+    route::get('/admin/laporan/dbr/fetch/{id_ruangan}', [LaporanController::class, 'fetch_dbr'])->name('admin.laporan.dbr.fetch');
+    route::get('/admin/laporan/dbr', [LaporanController::class, 'dbr'])->name('admin.laporan.dbr');
 
     Route::get('/editable', function () {
         return Inertia::render('Editable');
