@@ -2,22 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePerusahaanRequest;
-use App\Http\Requests\UpdatePerusahaanRequest;
+use App\Http\Requests\StorePenanggungjawabRequest;
+use App\Http\Requests\UpdatePenanggungjawabRequest;
 use App\Models\MasterPenanggungJawab;
-use App\Models\MasterPerusahaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 
-class MasterPerusahaanController extends Controller
+class MasterPenanggungJawabController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Admin/Master/Perusahaan/index', ['master_perusahaan' => MasterPerusahaan::all(), 'master_pj' => MasterPenanggungJawab::all()]);
     }
 
     /**
@@ -31,7 +28,7 @@ class MasterPerusahaanController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePerusahaanRequest $request)
+    public function store(StorePenanggungjawabRequest $request)
     {
         $validatedRequest = $request->validate($request->rules());
 
@@ -39,7 +36,7 @@ class MasterPerusahaanController extends Controller
             //code...
             DB::beginTransaction();
 
-            MasterPerusahaan::create($validatedRequest);
+            MasterPenanggungJawab::create($validatedRequest);
             DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -66,7 +63,7 @@ class MasterPerusahaanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePerusahaanRequest $request)
+    public function update(UpdatePenanggungjawabRequest $request)
     {
         $validatedRequest = $request->validate($request->rules());
 
@@ -74,13 +71,13 @@ class MasterPerusahaanController extends Controller
             //code...
             DB::beginTransaction();
 
-            $perusahaan = MasterPerusahaan::find($validatedRequest['id']);
-            $perusahaan->nama = $validatedRequest['nama'];
-            $perusahaan->alamat = $validatedRequest['alamat'];
-            $perusahaan->npwp = $validatedRequest['npwp'];
-            $perusahaan->bank = $validatedRequest['bank'];
-            $perusahaan->nomor_rekening = $validatedRequest['nomor_rekening'];
-            $perusahaan->save();
+            $penanggungjawab = MasterPenanggungJawab::find($validatedRequest['id']);
+            $penanggungjawab->nama = $validatedRequest['nama'];
+            $penanggungjawab->jabatan = $validatedRequest['jabatan'];
+            $penanggungjawab->email = $validatedRequest['email'];
+            $penanggungjawab->nomor_wa = $validatedRequest['nomor_wa'];
+            $penanggungjawab->perusahaan_id = $validatedRequest['perusahaan_id'];
+            $penanggungjawab->save();
             DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -98,9 +95,9 @@ class MasterPerusahaanController extends Controller
             //code...
             DB::beginTransaction();
 
-            $perusahaan = MasterPerusahaan::find($id);
+            $penanggungjawab = MasterPenanggungJawab::find($id);
 
-            $perusahaan->delete();
+            $penanggungjawab->delete();
             DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -109,15 +106,13 @@ class MasterPerusahaanController extends Controller
     }
     public function fetch(Request $request)
     {
-        $perusahaan_id = $request->input('perusahaan_id');
+        $perusahaan_id = $request->input('id');
 
-        if (strlen($perusahaan_id) > 0) {
-            $data = MasterPerusahaan::where('master_perusahaan.id', $perusahaan_id)
-                ->join('master_pj_perusahaan', 'master_pj_perusahaan.id', 'master_perusahaan.id')
-                ->select('master_perusahaan.*', 'master_pj_perusahaan.nama as nama_pj', 'master_pj_perusahaan.jabatan as jabatan_pj')
-                ->first();
-        } else {
-            $data = MasterPerusahaan::get();
+        if ($perusahaan_id > 0) {
+            $data = MasterPenanggungJawab::where('perusahaan_id', $perusahaan_id)
+                ->get();
+        } else if ($perusahaan_id == 0) {
+            $data = MasterPenanggungJawab::all();
         }
         return response()->json([
             'data' => $data

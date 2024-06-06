@@ -444,23 +444,23 @@ const BarangPage = ({
                 </Button>
             ),
         },
-        {
-            title: "delete",
-            render: (_: any, record: any) => (
-                <Button>
-                    <Popconfirm
-                        title="Hapus dari master"
-                        description="Apakah anda yakin akan menghapus ini ? "
-                        onConfirm={() => handleDelete(record.key ?? 0)}
-                        onCancel={() => console.log("Cancel")}
-                        okText="Ya"
-                        cancelText="Batalkan"
-                    >
-                        <DeleteOutlined /> Hapus
-                    </Popconfirm>
-                </Button>
-            ),
-        },
+        // {
+        //     title: "delete",
+        //     render: (_: any, record: any) => (
+        //         <Button>
+        //             <Popconfirm
+        //                 title="Hapus dari master"
+        //                 description="Apakah anda yakin akan menghapus ini ? "
+        //                 onConfirm={() => handleDelete(record.key ?? 0)}
+        //                 onCancel={() => console.log("Cancel")}
+        //                 okText="Ya"
+        //                 cancelText="Batalkan"
+        //             >
+        //                 <DeleteOutlined /> Hapus
+        //             </Popconfirm>
+        //         </Button>
+        //     ),
+        // },
     ];
 
     return (

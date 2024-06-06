@@ -134,3 +134,21 @@ export interface PengajuanItem {
     role: string;
     created_at: string;
 }
+export interface Perusahaan {
+    id: number;
+    nama: string;
+    alamat: string;
+    npwp: string;
+    bank: string;
+    nomor_rekening: string;
+    penanggung_jawab_id: number;
+}
+export interface PenanggungJawab {
+    id: number;
+    key?: number;
+    perusahaan_id: number;
+    nama: string;
+    jabatan: string;
+    nomor_wa: string;
+    email: string;
+}

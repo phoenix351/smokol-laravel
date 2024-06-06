@@ -59,7 +59,7 @@ const BarangPage = ({
     history_list,
     detail_barang,
 }: PageProps & { history_list: MaintenanceHistory[]; detail_barang: any }) => {
-    // console.log({ history_list });
+    console.log({ history_list });
 
     const csrfTokenRef = useRef<string | null>(null);
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');

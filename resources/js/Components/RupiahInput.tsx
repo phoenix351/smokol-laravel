@@ -15,6 +15,7 @@ const RupiahInput: React.FC<RupiahInputProps> = ({
     return (
         <div style={{ display: "flex", alignItems: "center" }}>
             <InputNumber
+                min={1000}
                 style={{ width: "100%", textAlign: "right" }}
                 formatter={(value: any) =>
                     `Rp ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")

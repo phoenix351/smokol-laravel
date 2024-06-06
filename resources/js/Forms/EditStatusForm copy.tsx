@@ -133,10 +133,20 @@ const EditStatusForm: React.FC<{
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item {...formItemLayout} label="merk" name="merk">
+                <Form.Item
+                    {...formItemLayout}
+                    label="merk"
+                    name="merk"
+                    // style={{ display: "none" }}
+                >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item {...formItemLayout} label="tipe" name="tipe">
+                <Form.Item
+                    {...formItemLayout}
+                    label="tipe"
+                    name="tipe"
+                    // style={{ display: "none" }}
+                >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
                 <Form.Item

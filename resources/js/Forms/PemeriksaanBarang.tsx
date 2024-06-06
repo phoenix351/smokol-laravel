@@ -13,33 +13,28 @@ const PemeriksaanForm: React.FC<{
     };
     const [messageApi, contextHolder] = message.useMessage();
 
-    const onFinish = (values: any) => {
+    const onFinish = async (values: any) => {
+        const saveKey = "pemeriksaan IPDS";
         messageApi.open({
-            // key: saveKey,
+            key: saveKey,
             content: "Sedang menambahkan data...",
             type: "loading",
         });
         try {
-            router.post(route("maintenance.inspect.ipds.store"), values, {
-                onSuccess: (responsePage) => {
-                    const response: any = responsePage.props.response;
-                    console.log({ response });
-                    if (response.errors?.length > 1) {
-                        return messageApi.open({
-                            // key: saveKey,
-                            content: response.errors,
-                            type: "error",
-                        });
-                    }
-                    messageApi.open({
-                        // key: saveKey,
-                        content: "Berhasil menambahkan data",
-                        type: "success",
-                    });
+            const response = await axios.post(
+                route("maintenance.inspect.ipds.store"),
+                values,
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
 
-                    router.get(route("admin.kelola.pengajuan"));
-                },
+            messageApi.open({
+                key: saveKey,
+                content: "Berhasil menambahkan data",
+                type: "success",
             });
+            router.get(route("admin.kelola.pengajuan"));
         } catch (error: any) {
             messageApi.open({
                 // key: saveKey,
@@ -65,7 +60,7 @@ const PemeriksaanForm: React.FC<{
                     {...formItemLayout}
                     label="sequence_id"
                     name="sequence_id"
-                    // style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -73,7 +68,7 @@ const PemeriksaanForm: React.FC<{
                     {...formItemLayout}
                     label="barang_id"
                     name="barang_id"
-                    style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -81,24 +76,17 @@ const PemeriksaanForm: React.FC<{
                     {...formItemLayout}
                     label="users_id"
                     name="users_id"
-                    // style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="merk"
-                    name="merk"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="merk" name="merk">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="tipe"
-                    name="tipe"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="tipe" name="tipe">
+                    <Input disabled={true} style={{ color: "#000" }} />
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="keluhan" name="keluhan">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
                 <Form.Item
@@ -124,7 +112,6 @@ const PemeriksaanForm: React.FC<{
                             message: "Silahkan isi Tindak Lanjut",
                         },
                     ]}
-                    // style={{ display: "none" }}
                 >
                     <Select
                         onChange={() => {
@@ -142,14 +129,7 @@ const PemeriksaanForm: React.FC<{
                                     <span>Diiperbaiki langsung Oleh IPDS</span>
                                 ),
                             },
-                            // {
-                            //     value: "1",
-                            //     label: (
-                            //         <span>
-                            //             Tidak memungkinkan untuk Diperbaiki
-                            //         </span>
-                            //     ),
-                            // },
+
                             {
                                 value: "2",
                                 label: (

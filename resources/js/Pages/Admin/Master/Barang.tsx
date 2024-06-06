@@ -232,6 +232,12 @@ const MasterBarang = ({
             type: "loading",
         });
         try {
+            const response = await axios.patch(
+                route("admin.master.barang"),
+                values,
+                { headers: { "Content-Type": "application/json" } }
+            );
+
             router.get(
                 route("admin.master.barang"),
                 {},

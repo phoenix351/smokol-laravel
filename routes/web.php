@@ -11,11 +11,13 @@ use App\Http\Controllers\HistoryBarangUserController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\MasterPenanggungJawabController;
 use App\Http\Controllers\MasterPerusahaanController;
 use App\Http\Controllers\MasterPjPerusahaanController;
 use App\Http\Controllers\UserController;
 use App\Models\MasterBarang;
 use App\Models\MasterJabatan;
+use App\Models\MasterPenanggungJawab;
 use App\Models\MasterRuangan;
 use App\Models\MasterSistemOperasi;
 use App\Models\User;
@@ -62,6 +64,20 @@ Route::middleware('auth')->group(function () {
     Route::patch('/admin/master-ruangan', [MasterRuanganController::class, 'update'])->name('master_ruangan.update');
     Route::post('/admin/master-ruangan', [MasterRuanganController::class, 'store'])->name('master_ruangan.store');
     Route::delete('/admin/master-ruangan', [MasterRuanganController::class, 'destroy'])->name('master_ruangan.destroy');
+
+    //route master perusahaan
+    route::get('/admin/master/perusahaan', [MasterPerusahaanController::class, 'index'])->name('admin.master.perusahaan');
+    Route::patch('/admin/master/perusahaan', [MasterPerusahaanController::class, 'update'])->name('master_perusahaan.update');
+    Route::post('/admin/master/perusahaan', [MasterPerusahaanController::class, 'store'])->name('master_perusahaan.store');
+    Route::delete('/admin/master/perusahaan/{id}', [MasterPerusahaanController::class, 'destroy'])->name('master_perusahaan.destroy');
+
+    //route master penanggungjawab perusahaan
+    route::get('/admin/master/penanggungjawab', [MasterPenanggungJawabController::class, 'index'])->name('admin.master.penanggungjawab');
+    Route::patch('/admin/master/penanggungjawab', [MasterPenanggungJawabController::class, 'update'])->name('admin.master.penanggungjawab.update');
+    Route::post('/admin/master/penanggungjawab', [MasterPenanggungJawabController::class, 'store'])->name('admin.master.penanggungjawab.store');
+    Route::delete('/admin/master/penanggungjawab/{id}', [MasterPenanggungJawabController::class, 'destroy'])->name('admin.master.penanggungjawab.destroy');
+
+
     // route api for ruangan
     route::get('/api/master/ruangan/nama', function () {
         $namaList = MasterRuangan::select(["nama"])->groupBy(['nama'])->get();
@@ -92,6 +108,7 @@ Route::middleware('auth')->group(function () {
 
     // master perusahaan
     Route::get('api/master/perusahaan', [MasterPerusahaanController::class, 'fetch'])->name('master.perusahaan.fetch');
+    Route::get('api/master/penanggungjawab', [MasterPenanggungJawabController::class, 'fetch'])->name('master.penanggungjawab.fetch');
     Route::get('api/master/perusahaan/pj', [MasterPjPerusahaanController::class, 'fetch'])->name('master.perusahaan.pj.fetch');
     Route::get('api/maintenance/status', [MaintenanceController::class, 'fetch_status'])->name('maintenance.status.fetch');
 
@@ -210,6 +227,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/maintenance/store', [MaintenanceController::class, 'store'])->name('maintenance.store');
     Route::post('/maintenance/update', [MaintenanceController::class, 'update'])->name('maintenance.update');
     Route::post('/maintenance/status/update', [MaintenanceController::class, 'status_update'])->name('maintenance.status.update');
+    Route::post('/maintenance/status/finish-penyedia', [MaintenanceController::class, 'finish_penyedia'])->name('maintenance.status.finish-penyedia');
+    Route::post('/maintenance/status/finish-ipds', [MaintenanceController::class, 'finish_ipds'])->name('maintenance.status.finish-ipds');
+    Route::post('/maintenance/status/kembali-pengguna', [MaintenanceController::class, 'kembali_pengguna'])->name('maintenance.status.kembali-pengguna');
     Route::post('/maintenance/check', [MaintenanceController::class, 'check'])->name('maintenance.check');
     Route::post('/maintenance/inspect/ipds', [MaintenanceController::class, 'PemeriksaanIPDS'])->name('maintenance.inspect.ipds.store');
     Route::post('/maintenance/inspect/bmn', [MaintenanceController::class, 'PemeriksaanBMN'])->name('maintenance.inspect.bmn.store');

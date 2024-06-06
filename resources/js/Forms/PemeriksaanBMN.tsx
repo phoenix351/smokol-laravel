@@ -28,7 +28,6 @@ const PemeriksaanBMN: React.FC<{
                 }
             );
 
-            // console.log({ response });
             messageApi.open({
                 key: saveKey,
                 content: "Berhasil menambahkan data",
@@ -60,40 +59,23 @@ const PemeriksaanBMN: React.FC<{
                     {...formItemLayout}
                     label="sequence_id"
                     name="sequence_id"
-                    // style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="barang_id"
-                    name="barang_id"
-                    style={{ display: "none" }}
-                >
-                    <Input disabled={true} style={{ color: "#000" }} />
-                </Form.Item>
+
                 <Form.Item
                     {...formItemLayout}
                     label="users_id"
                     name="users_id"
-                    // style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="merk"
-                    name="merk"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="merk" name="merk">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="tipe"
-                    name="tipe"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="tipe" name="tipe">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
             </Form>
