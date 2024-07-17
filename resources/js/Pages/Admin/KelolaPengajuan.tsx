@@ -76,18 +76,17 @@ const KelolaPengajuanPage = () => {
             try {
                 // Make a fetch request to your API endpoint
                 setSearchLoading(true);
-                const response = await fetch(
-                    route("admin.pengajuan.fetch", { type: "99" })
-                );
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                // Parse the JSON response
-                const dataPengajuan = await response.json();
-                console.log(dataPengajuan);
+                // const response = await fetch(
+                //     route("admin.pengajuan.fetch", { type: "99" })
+                // );
 
+
+                // Parse the JSON response
+                // const dataPengajuan = await response.json();
+                const { data } = await axios.get(route('admin.pengajuan.fetch', { type: '99' }));
+                console.log({ data });
                 // Update the state with the fetched items
-                setDataSource(dataPengajuan.data);
+                setDataSource(data);
                 setSearchLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -107,16 +106,17 @@ const KelolaPengajuanPage = () => {
     const PengajuanColumns: ColumnsType<PengajuanItem> = [
         {
             title: "Nomor Tiket",
-            dataIndex: "key",
+            dataIndex: "id",
             render: (value: string, record: PengajuanItem) => (
-                <Link href={route("pengajuan.riwayat", record.sequence_id)}>
-                    {record.created_at.substring(0, 4)}/TI/{record.sequence_id}
+                <Link href={route("pengajuan.riwayat", value)}>
+                    {record.created_at.substring(0, 4)}/TI/{value}
                 </Link>
             ),
         },
         {
             title: "jenis",
-            dataIndex: "jenis",
+            dataIndex: "barang",
+            render: value => value.barang.jenis,
             filters: [
                 {
                     text: "PC",
@@ -135,9 +135,11 @@ const KelolaPengajuanPage = () => {
         },
         {
             title: "Nama Barang (Merk/Type)",
-            dataIndex: "merk",
-            render: (_: string, record: PengajuanItem) =>
-                `${record.merk} / ${record.tipe}`,
+
+            dataIndex: "barang",
+            // render:value=>value.barang.jenis,
+            render: (_, record: PengajuanItem) =>
+                `${_.barang.merk} / ${_.barang.tipe}`,
         },
         // {
         //     title: "tipe",
@@ -147,24 +149,28 @@ const KelolaPengajuanPage = () => {
 
         {
             title: "nomor_seri",
-            dataIndex: "nomor_seri",
+            dataIndex: "barang",
+            render: value => value.barang.nomor_seri,
             sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
             title: "NUP",
-            dataIndex: "nomor_urut_pendaftaran",
+            dataIndex: "barang",
+            render: value => value.barang.nomor_urut_pendaftaran,
         },
 
         {
             title: "Status",
-            dataIndex: "kode_status",
-            render: (value: string, record: PengajuanItem) =>
-                `${record.kode_status}. ${record.deskripsi}`,
+            dataIndex: "maintenance",
+            render: (value, record: PengajuanItem) =>
+                record.maintenance.length > 0 ? `${value[0].kode_status}. ${value[0].status.deskripsi}`:'as',
+                // value[0].kode_status,
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
             title: "Nama Pemegang",
-            dataIndex: "nama_lengkap",
+            dataIndex: "user",
+            render:value=>value.nama_lengkap
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
@@ -177,11 +183,14 @@ const KelolaPengajuanPage = () => {
         },
         {
             title: "Perusahaan",
-            dataIndex: "nama_perusahaan",
+            dataIndex: "perusahaan",
+            render:value=>value?.nama
         },
         {
             title: "PJ Perusahaan",
-            dataIndex: "nama_pj",
+            
+            dataIndex: "perusahaan",
+            render:value=>value?.nama_pj
         },
         {
             title: "Solusi yang diambil",
@@ -201,7 +210,7 @@ const KelolaPengajuanPage = () => {
             title: "Tindakan",
             dataIndex: "tindakan",
             render: (_, record) => {
-                if (record.kode_status == "0")
+                if (record.maintenance[0].kode_status == "0")
                     return (
                         <div
                             style={{
@@ -220,7 +229,7 @@ const KelolaPengajuanPage = () => {
                             </Button>
                         </div>
                     );
-                else if (record.kode_status == "1")
+                else if (record.maintenance[0].kode_status == "1")
                     return (
                         <div
                             style={{
@@ -239,7 +248,7 @@ const KelolaPengajuanPage = () => {
                             </Button>
                         </div>
                     );
-                else if (record.kode_status == "2")
+                else if (record.maintenance[0].kode_status == "2")
                     return (
                         <div
                             style={{
@@ -255,7 +264,7 @@ const KelolaPengajuanPage = () => {
                             </Button>
                         </div>
                     );
-                else if (record.kode_status == "3")
+                else if (record.maintenance[0].kode_status == "3")
                     return (
                         <Popconfirm
                             title="Mulai diproses penyedia..."
@@ -273,7 +282,7 @@ const KelolaPengajuanPage = () => {
                             </Button>
                         </Popconfirm>
                     );
-                else if (record.kode_status == "4")
+                else if (record.maintenance[0].kode_status == "4")
                     return (
                         <Button
                             style={{ color: "green" }}
@@ -282,7 +291,7 @@ const KelolaPengajuanPage = () => {
                             Selesai Proses Penyedia <RightOutlined />
                         </Button>
                     );
-                else if (record.kode_status == "5")
+                else if (record.maintenance[0].kode_status == "5")
                     return (
                         <Button
                             style={{ color: "green" }}
@@ -291,7 +300,7 @@ const KelolaPengajuanPage = () => {
                             Selesai Proses IPDS <RightOutlined />
                         </Button>
                     );
-                else if (record.kode_status == "6")
+                else if (record.maintenance[0].kode_status == "6")
                     return (
                         <Popconfirm
                             title="Kembalikan barang kepada pengguna..."
@@ -299,11 +308,11 @@ const KelolaPengajuanPage = () => {
                             // open={openKembaliPengguna}
                             onConfirm={() => handleApprove(record)}
                             okButtonProps={{ loading: loadingKembaliPengguna }}
-                            // onCancel={() => setOpenKembaliPengguna(false)}
+                        // onCancel={() => setOpenKembaliPengguna(false)}
                         >
                             <Button
                                 style={{ color: "green" }}
-                                // onClick={() => setOpenKembaliPengguna(true)}
+                            // onClick={() => setOpenKembaliPengguna(true)}
                             >
                                 Proses Penyedia <RightOutlined />
                             </Button>
@@ -426,7 +435,7 @@ const KelolaPengajuanPage = () => {
                     }
                 );
                 router.get(route("admin.kelola.pengajuan"));
-            } catch (error) {}
+            } catch (error) { }
         } else if (record.kode_status == "4") {
             changeStatusForm.setFieldsValue({
                 sequence_id: record.sequence_id,
@@ -457,7 +466,7 @@ const KelolaPengajuanPage = () => {
                     }
                 );
                 router.get(route("admin.kelola.pengajuan"));
-            } catch (error) {}
+            } catch (error) { }
         }
     };
     return (
@@ -472,7 +481,7 @@ const KelolaPengajuanPage = () => {
                         const isValid = await pemeriksaanForm.validateFields();
                         pemeriksaanForm.submit();
                         setOpenTechCheckForm(false);
-                    } catch (error) {}
+                    } catch (error) { }
                 }}
                 openModal={openTechCheckForm}
                 okText="Setujui"
@@ -489,7 +498,7 @@ const KelolaPengajuanPage = () => {
                         const isValid = await pemeriksaanBMN.validateFields();
                         pemeriksaanBMN.submit();
                         setOpenBMNCheckForm(false);
-                    } catch (error) {}
+                    } catch (error) { }
                 }}
                 openModal={openBMNCheckForm}
                 okText="Setujui"
@@ -507,7 +516,7 @@ const KelolaPengajuanPage = () => {
                             await pemeriksaanPbjPpk.validateFields();
                         pemeriksaanPbjPpk.submit();
                         setOpenPbjPpkCheckForm(false);
-                    } catch (error) {}
+                    } catch (error) { }
                 }}
                 openModal={openPbjPpkCheckForm}
                 okText="Setujui"

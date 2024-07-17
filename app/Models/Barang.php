@@ -30,7 +30,7 @@ class Barang extends Model
     }
     public function Ruangan(): BelongsTo
     {
-        return $this->belongsTo(MasterRuangan::class);
+        return $this->belongsTo(Ruangan::class);
     }
     public function Barang(): BelongsTo
     {
@@ -38,6 +38,6 @@ class Barang extends Model
     }
     public function SistemOperasi(): BelongsTo
     {
-        return $this->belongsTo(MasterSistemOperasi::class);
+        return $this->belongsTo(SistemOperasi::class);
     }
 }

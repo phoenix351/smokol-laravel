@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreMasterJabatanRequest extends FormRequest
+class UpdateSistemOperasiRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,7 @@ class StoreMasterJabatanRequest extends FormRequest
     {
         return [
             'nama' => 'required',
-            'jenis' => 'required',
-            'tingkat' => 'required',
+            'arsitektur' => 'required',
         ];
     }
 }

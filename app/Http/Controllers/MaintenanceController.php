@@ -271,85 +271,32 @@ class MaintenanceController extends Controller
         $type = $request->query('type'); // Retrieve the 'type' query parameter
         // $id = $request->query('id'); // Retrieve the 'id' query parameter
         $query_search = $request->query('querySearch');
+        $keyword = "%$query_search%";
         $is_user = $request->query('isUser'); // Retrieve the 'id' query parameter
         $user = auth()->user();
 
 
-        // Use $type and $id in your query logic
-        // Example:
+        $query = MaintenanceSequence::with(['User', 'Barang', 'Barang.Barang', 'Perusahaan', 'Maintenance', 'Maintenance.Status']);
+        if ($type !== '99') {
+            if ($type === '0') {
 
-        // Query based on 'type'
-        $maintenance_list = MaintenanceSequence::select(
-            // Your select statements here
-            'maintenance_sequences.id as sequence_id',
-            'maintenance_sequences.keluhan',
-            'maintenance_sequences.biaya',
-            'maintenance_sequences.problems',
-            'maintenance_sequences.solution',
-            'maintenance_sequences.problem_img_path',
-            'maintenance_sequences.kondisi_final',
-            'maintenance_sequences.created_at',
+                $query = $query->whereRelation('Maintenance', 'kode_status', 'in', ['0', '1', '2']);
+            }
+            $query = $query->where('maintenances.kode_status', $type);
+        }
+        if ($is_user == '1') {
+            $query = $query->whereRelation('User', 'id', '=', $user->id);
+        }
+        if (strlen($query_search) > 0) {
+            $query->whereRelation('User', 'nama_lengkap', 'like', $keyword)
+                ->orWhereRelation('Barang', 'nomor_urut_pendaftaran', 'like', $keyword)
+                ->orWhereRelation('Barang', 'merk', 'like', $keyword)
+                ->orWhereRelation('Barang', 'tipe', 'like', $keyword)
+                ->orWhereRelation('Barang', 'jenis', 'like', $keyword);
+            // ->orWhereRelation('Barang','status_pemeliharaasn.deskripsi', 'like', $keyword);
+        }
+        $maintenance_list = $query->get();
 
-            'maintenance_sequences.perusahaan_id',
-            'master_perusahaan.nama as nama_perusahaan',
-            'maintenance_sequences.penanggung_jawab_id',
-            'master_pj_perusahaan.nama as nama_pj',
-
-            'master_barang.merk',
-            'master_barang.tipe',
-            'master_barang.jenis',
-            'master_barang.nomor_seri',
-            'master_barang.nomor_urut_pendaftaran',
-
-            'status_pemeliharaan.deskripsi',
-            'status_pemeliharaan.kode_status',
-
-            'users.id as users_id',
-            'users.nama_lengkap',
-            'users.bidang',
-        )
-            ->join('maintenances', function ($join) {
-                $join->on('maintenances.sequence_id', '=', 'maintenance_sequences.id')
-                    ->whereRaw('maintenances.id = (
-                    SELECT id FROM maintenances as sub_maintenances
-                    WHERE sub_maintenances.sequence_id = maintenances.sequence_id
-                    ORDER BY sub_maintenances.id DESC
-                    LIMIT 1
-                )');
-            })
-            ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', 'maintenances.kode_status')
-            ->join('barang', 'maintenance_sequences.barang_id', 'barang.id')
-            ->leftJoin('master_perusahaan', 'maintenance_sequences.perusahaan_id', 'master_perusahaan.id')
-            ->leftJoin('master_pj_perusahaan', 'maintenance_sequences.penanggung_jawab_id', 'master_pj_perusahaan.id')
-            ->join('master_barang', 'master_barang.id', 'barang.barang_id')
-            ->join('users', 'users.id', 'maintenance_sequences.users_id')
-            ->when($type === '99', function ($query) {
-                // If type is 99, ignore type in the SQL query
-                return $query;
-            }, function ($query) use ($type) {
-                // Otherwise, add the type condition to the query
-                if ($type === '0') {
-                    return $query->whereIn('maintenances.kode_status', ['0', '1', "2"]);
-                }
-                return $query->where('maintenances.kode_status', $type);
-            })
-
-            ->when($is_user == '1', function ($query) use ($user) {
-                // If query is not empty, add the search conditions to the query
-                return $query->where('users.id', 'like', $user->id);
-            })
-            ->when($query_search, function ($query) use ($query_search) {
-                // If query is not empty, add the search conditions to the query
-                return $query->where(function ($query) use ($query_search) {
-                    $query->where('users.nama_lengkap', 'like', '%' . $query_search . '%')
-                        ->orWhere('master_barang.nomor_urut_pendaftaran', 'like', '%' . $query_search . '%')
-                        ->orWhere('master_barang.merk', 'like', '%' . $query_search . '%')
-                        ->orWhere('master_barang.tipe', 'like', '%' . $query_search . '%')
-                        ->orWhere('master_barang.jenis', 'like', '%' . $query_search . '%')
-                        ->orWhere('status_pemeliharaan.deskripsi', 'like', '%' . $query_search . '%');
-                });
-            })
-            ->get();
         $maintenance_list->transform(function ($item, $key) use ($user) {
             $item['role'] = $user->role;
             $item['problem_img_path'] = Storage::url($item['problem_img_path']);
@@ -357,9 +304,7 @@ class MaintenanceController extends Controller
 
             return $item;
         });
-        return response()->json([
-            'data' => $maintenance_list,
-        ]);
+        return response()->json($maintenance_list, 200);
     }
     public function pengajuan_approve(Request $request)
     {

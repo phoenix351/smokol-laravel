@@ -23,6 +23,7 @@ import {
     Tour,
     TourProps,
     Popconfirm,
+    Pagination,
 } from "antd";
 import {
     MedicineBoxOutlined,
@@ -40,6 +41,7 @@ import {
     CompareFn,
     SortOrder,
 } from "antd/es/table/interface";
+import dayjs from 'dayjs';
 import MyModal from "@/Components/Modal";
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
 import { Barang, DataType } from "@/types";
@@ -50,15 +52,13 @@ import Upload from "antd/es/upload/Upload";
 
 const { Search } = Input;
 
-const BarangPage = ({
-    history_barang,
-}: PageProps & { history_barang: Barang[] }) => {
+const BarangPage = () => {
     // console.log({ history_barang });
 
     const csrfTokenRef = useRef<string | null>(null);
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     const [searchText, setSearchText] = useState("");
-    const [searchLoading, setSearchLoading] = useState(false);
+    const [dataLoading, setDataLoading] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
     const saveKey = "updatable";
 
@@ -73,7 +73,7 @@ const BarangPage = ({
     const [confirmLoadingModal, setConfirmLoadingModal] = useState(false);
     const [confirmLoadingModalUbah, setConfirmLoadingModalUbah] =
         useState(false);
-    const [confirmLoadingBast, setConfirmLoadingBast] = useState(false);
+    // const [confirmLoadingBast, setConfirmLoadingBast] = useState(false);
     const [confirmLoadingPengajuan, setConfirmLoadingPengajuan] =
         useState(false);
 
@@ -81,9 +81,16 @@ const BarangPage = ({
     const [confirmLoadingWarningModal, setConfirmLoadingWarningModal] =
         useState(false);
 
+    // table 
     const [dataSource, setDataSource] = useState<Barang[]>([]);
+    const [total, setTotal] = useState<number>(0);
+    const [current, setCurrent] = useState<number>(1);
+    const [pageSize, setPageSize] = useState<number>(10);
+
+
+
     // data for current barang bast
-    const [dataBast, setDataBast] = useState<BastType[]>([]);
+    // const [dataBast, setDataBast] = useState<BastType[]>([]);
     const [pengajuanForm] = Form.useForm();
 
     // define hook for tour
@@ -92,6 +99,8 @@ const BarangPage = ({
 
     const bastRef = useRef(null);
     const pemeliharaanRef = useRef(null);
+
+
 
     // const  = useRef(null);
 
@@ -166,17 +175,37 @@ const BarangPage = ({
     const handleCancelPengajuan = () => {
         setOpenPengajuan(false);
     };
+    const fetchData = async (currentPage: number, pageSize: number, searchText: string) => {
+        setDataLoading(true);
+        try {
+            const response = await axios.get(route("api.barang", { page: currentPage, pageSize: pageSize, searchText: searchText, isUser: 1 }));
+            // console.log({ response });
+
+            setDataSource(response.data.data);
+            setTotal(response.data.total);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setDataLoading(false);
+        }
+    };
+    function handlePageChange(current: number, pageSize: number, searchText: string): void {
+        setCurrent(current)
+        setPageSize(pageSize)
+        setSearchText(String(searchText))
+    }
+    useEffect(() => {
+        fetchData(current, pageSize, searchText);
+    }, [current, pageSize, searchText]);
 
     useEffect(() => {
         if (csrfTokenMeta) {
             csrfTokenRef.current = csrfTokenMeta.getAttribute("content");
         }
+        fetchData(current, pageSize, searchText);
+
     }, []);
-    const onSearch = async (value: string) => {
-        setSearchLoading(true);
-        setSearchText(value);
-        setSearchLoading(false);
-    };
+
 
     type Sorter<T> = (a: T, b: T, sortOrder?: SortOrder) => number;
 
@@ -386,7 +415,8 @@ const BarangPage = ({
     const defaultColumns: ColumnsType<Barang> = [
         {
             title: "jenis",
-            dataIndex: "jenis",
+            dataIndex: "barang",
+            render: value => value.jenis,
             filters: [
                 {
                     text: "PC",
@@ -403,31 +433,39 @@ const BarangPage = ({
         },
         {
             title: "merk",
-            dataIndex: "merk",
+
+            dataIndex: "barang",
+            render: value => value.merk,
             sorter: merkSorter as CompareFn<object>,
         },
         {
             title: "Nama",
-            dataIndex: "nama_lengkap",
+            dataIndex: "user",
+            render: value => value.nama_lengkap,
+
         },
         {
             title: "tipe",
-            dataIndex: "tipe",
+            dataIndex: "barang",
+            render: value => value.tipe,
             sorter: tipeSorter as CompareFn<object>,
         },
         {
             title: "tanggal_peroleh",
-            dataIndex: "tanggal_peroleh",
+            dataIndex: "record_time",
+            render: value => dayjs(new Date(value)).format('DD MMMM YYYY'),
             sorter: recordTimeSorter as CompareFn<object>,
         },
         {
             title: "nomor_seri",
-            dataIndex: "nomor_seri",
+            dataIndex: "barang",
+            render: value => value.nomor_seri,
             sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
             title: "kondisi",
             dataIndex: "kondisi",
+            // render:value=>value.kondisi,
             filters: [
                 {
                     text: "Baik",
@@ -445,22 +483,22 @@ const BarangPage = ({
             onFilter: (value: string | number | boolean, record: Barang) =>
                 record.kondisi.trim().toLowerCase() ===
                 String(value).toLowerCase(),
-            render: (value: string) => {
-                if (value === "Baik")
+            render: (value) => {
+                if (value.kondisi === "Baik")
                     return (
                         <>
                             <CheckCircleOutlined style={{ color: "green" }} />{" "}
                             Baik
                         </>
                     );
-                if (value === "Rusak Ringan")
+                if (value.kondisi === "Rusak Ringan")
                     return (
                         <>
                             <WarningOutlined style={{ color: "orange" }} />{" "}
                             Rusak Ringan
                         </>
                     );
-                if (value === "Rusak Berat")
+                if (value.kondisi === "Rusak Berat")
                     return (
                         <>
                             <StopOutlined style={{ color: "red" }} /> Rusak
@@ -472,12 +510,13 @@ const BarangPage = ({
         },
         {
             title: "ruangan_nama",
-            dataIndex: "ruangan_nama",
+            dataIndex: "ruangan",
+            render: value => value.nama,
         },
         {
             title: "File BAST",
             dataIndex: "bast_path",
-            render: (value: string, record: Barang) =>
+            render: (value, record: Barang) =>
                 !value ? (
                     <Button>
                         <Upload
@@ -527,7 +566,7 @@ const BarangPage = ({
                             const { data } = await axios.post(
                                 route("maintenance.check"),
                                 {
-                                    barang_id: record.key,
+                                    barang_id: record.id,
                                 }
                             );
                             // console.log({ dataLeng: data.length });
@@ -537,14 +576,14 @@ const BarangPage = ({
                             }
                             pengajuanForm.setFieldValue(
                                 "barang_id",
-                                record.key
+                                record.id
                             );
                             pengajuanForm.setFieldValue(
                                 "users_id",
                                 record.users_id
                             );
-                            pengajuanForm.setFieldValue("merk", record.merk);
-                            pengajuanForm.setFieldValue("tipe", record.tipe);
+                            pengajuanForm.setFieldValue("merk", record.barang.merk);
+                            pengajuanForm.setFieldValue("tipe", record.barang.tipe);
 
                             setOpenPengajuan(true);
                         }}
@@ -628,8 +667,8 @@ const BarangPage = ({
                 <Search
                     placeholder="Cari history barang ..."
                     allowClear
-                    onSearch={onSearch}
-                    loading={searchLoading}
+                    onSearch={(value) => setSearchText(value)}
+                    // loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
                 <Button onClick={() => setOpenTour(true)}>
@@ -640,16 +679,21 @@ const BarangPage = ({
 
             <Table
                 ref={tableRef}
-                rowClassName={() => "editable-row"}
+                // rowClassName={() => "editable-row"}
                 scroll={{ x: 1500 }}
                 bordered
-                dataSource={dataSource.filter((item) =>
-                    Object.values(item)
-                        .join("")
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase())
-                )}
+                pagination={false}
+                loading={dataLoading}
+                dataSource={dataSource}
                 columns={defaultColumns}
+            />
+            <Pagination
+                current={current}
+                pageSize={pageSize}
+                total={total}
+                onChange={(page, pageSize) => handlePageChange(page, pageSize, searchText)}
+                showSizeChanger
+                onShowSizeChange={(current, pageSize) => handlePageChange(current, pageSize, searchText)}
             />
         </div>
     );

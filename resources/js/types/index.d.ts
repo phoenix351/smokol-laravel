@@ -122,6 +122,10 @@ export interface PengajuanItem {
     spek_path: any;
     problem_img_path: string | null;
     sequence_id: number;
+    user:any;
+    barang:any;
+    maintenance:any[];
+    perusahaan:any;
     bidang: string;
     deskripsi: string;
     kode_status: string;

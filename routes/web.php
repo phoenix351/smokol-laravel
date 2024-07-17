@@ -2,30 +2,27 @@
 
 use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\MasterJabatanController;
-use App\Http\Controllers\MasterRuanganController;
-use App\Http\Controllers\MasterSistemOperasiController;
+use App\Http\Controllers\SistemOperasiController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\BarangUserController;
 use App\Http\Controllers\BastController;
-use App\Http\Controllers\HistoryBarangUserController;
+use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MaintenanceController;
-use App\Http\Controllers\MasterPenanggungJawabController;
-use App\Http\Controllers\MasterPerusahaanController;
 use App\Http\Controllers\MasterPjPerusahaanController;
+use App\Http\Controllers\PenanggungJawabController;
+use App\Http\Controllers\PerusahaanController;
+use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\UserController;
 use App\Models\MasterBarang;
 use App\Models\MasterJabatan;
-use App\Models\MasterPenanggungJawab;
-use App\Models\MasterRuangan;
-use App\Models\MasterSistemOperasi;
+use App\Models\Ruangan;
+use App\Models\SistemOperasi;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 /*
@@ -54,62 +51,62 @@ Route::middleware('auth')->group(function () {
     Route::delete('/admin/master-barang', [MasterBarangController::class, 'destroy'])->name('master_barang.destroy');
 
     //route master jabatan
-    route::get('/admin/master-jabatan', [MasterJabatanController::class, 'index'])->name('admin.master.jabatan');
-    Route::patch('/admin/master-jabatan', [MasterJabatanController::class, 'update'])->name('master_jabatan.update');
-    Route::post('/admin/master-jabatan', [MasterJabatanController::class, 'store'])->name('master_jabatan.store');
-    Route::delete('/admin/master-jabatan', [MasterJabatanController::class, 'destroy'])->name('master_jabatan.destroy');
+    route::get('/admin/master-jabatan', [JabatanController::class, 'index'])->name('admin.master.jabatan');
+    Route::patch('/admin/master-jabatan', [JabatanController::class, 'update'])->name('master_jabatan.update');
+    Route::post('/admin/master-jabatan', [JabatanController::class, 'store'])->name('master_jabatan.store');
+    Route::delete('/admin/master-jabatan', [JabatanController::class, 'destroy'])->name('master_jabatan.destroy');
 
     //route master ruangan
-    route::get('/admin/master-ruangan', [MasterRuanganController::class, 'index'])->name('admin.master.ruangan');
-    Route::patch('/admin/master-ruangan', [MasterRuanganController::class, 'update'])->name('master_ruangan.update');
-    Route::post('/admin/master-ruangan', [MasterRuanganController::class, 'store'])->name('master_ruangan.store');
-    Route::delete('/admin/master-ruangan', [MasterRuanganController::class, 'destroy'])->name('master_ruangan.destroy');
+    route::get('/admin/master-ruangan', [RuanganController::class, 'index'])->name('admin.master.ruangan');
+    Route::patch('/admin/master-ruangan', [RuanganController::class, 'update'])->name('master_ruangan.update');
+    Route::post('/admin/master-ruangan', [RuanganController::class, 'store'])->name('master_ruangan.store');
+    Route::delete('/admin/master-ruangan', [RuanganController::class, 'destroy'])->name('master_ruangan.destroy');
 
     //route master perusahaan
-    route::get('/admin/master/perusahaan', [MasterPerusahaanController::class, 'index'])->name('admin.master.perusahaan');
-    Route::patch('/admin/master/perusahaan', [MasterPerusahaanController::class, 'update'])->name('master_perusahaan.update');
-    Route::post('/admin/master/perusahaan', [MasterPerusahaanController::class, 'store'])->name('master_perusahaan.store');
-    Route::delete('/admin/master/perusahaan/{id}', [MasterPerusahaanController::class, 'destroy'])->name('master_perusahaan.destroy');
+    route::get('/admin/master/perusahaan', [PerusahaanController::class, 'index'])->name('admin.master.perusahaan');
+    Route::patch('/admin/master/perusahaan', [PerusahaanController::class, 'update'])->name('master_perusahaan.update');
+    Route::post('/admin/master/perusahaan', [PerusahaanController::class, 'store'])->name('master_perusahaan.store');
+    Route::delete('/admin/master/perusahaan/{id}', [PerusahaanController::class, 'destroy'])->name('master_perusahaan.destroy');
 
     //route master penanggungjawab perusahaan
-    route::get('/admin/master/penanggungjawab', [MasterPenanggungJawabController::class, 'index'])->name('admin.master.penanggungjawab');
-    Route::patch('/admin/master/penanggungjawab', [MasterPenanggungJawabController::class, 'update'])->name('admin.master.penanggungjawab.update');
-    Route::post('/admin/master/penanggungjawab', [MasterPenanggungJawabController::class, 'store'])->name('admin.master.penanggungjawab.store');
-    Route::delete('/admin/master/penanggungjawab/{id}', [MasterPenanggungJawabController::class, 'destroy'])->name('admin.master.penanggungjawab.destroy');
+    route::get('/admin/master/penanggungjawab', [PenanggungJawabController::class, 'index'])->name('admin.master.penanggungjawab');
+    Route::patch('/admin/master/penanggungjawab', [PenanggungJawabController::class, 'update'])->name('admin.master.penanggungjawab.update');
+    Route::post('/admin/master/penanggungjawab', [PenanggungJawabController::class, 'store'])->name('admin.master.penanggungjawab.store');
+    Route::delete('/admin/master/penanggungjawab/{id}', [PenanggungJawabController::class, 'destroy'])->name('admin.master.penanggungjawab.destroy');
 
 
     // route api for ruangan
     route::get('/api/master/ruangan/nama', function () {
-        $namaList = MasterRuangan::select(["nama"])->groupBy(['nama'])->get();
+        $namaList = Ruangan::select(["nama"])->groupBy(['nama'])->get();
         return response()->json([$namaList]);
     })->name('admin.master.ruangan.nama');
 
     route::get('/api/bast', [BastController::class, 'get_bast_by_barangId'])->name('bast');
     route::post('/api/bast/upload', [BastController::class, 'upload'])->name('bast.upload');
-    
+
     //route master kelola barang
     route::get('/admin/barang', [BarangController::class, 'index'])->name('admin.kelola.history_barang.index');
     Route::patch('/admin/barang', [BarangController::class, 'update'])->name('admin.kelola.history_barang.update');
     Route::post('/admin/barang', [BarangController::class, 'store'])->name('admin.kelola.history_barang.store');
     Route::delete('/admin/barang', [BarangController::class, 'destroy'])->name('admin.kelola.history_barang.destroy');
-    
+
     route::get('/api/barang', [BarangController::class, 'fetch'])->name('api.barang');
 
 
     //route master sistem operasi
-    route::get('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'index'])->name('admin.master.sistem_operasi');
-    Route::patch('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'update'])->name('admin.master.sistem_operasi.update');
-    Route::post('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'store'])->name('admin.master.sistem_operasi.store');
-    Route::delete('/admin/master-sistem-operasi', [MasterSistemOperasiController::class, 'destroy'])->name('admin.master.sistem_operasi.destroy');
+    route::get('/admin/master-sistem-operasi', [SistemOperasiController::class, 'index'])->name('admin.master.sistem_operasi');
+    Route::patch('/admin/master-sistem-operasi', [SistemOperasiController::class, 'update'])->name('admin.master.sistem_operasi.update');
+    Route::post('/admin/master-sistem-operasi', [SistemOperasiController::class, 'store'])->name('admin.master.sistem_operasi.store');
+    Route::delete('/admin/master-sistem-operasi', [SistemOperasiController::class, 'destroy'])->name('admin.master.sistem_operasi.destroy');
     // route api for arsitektur sistem operasi
     route::get('api/master/sistem_operasi/arsitektur', function () {
-        $arsitektur_list = MasterSistemOperasi::select('arsitektur')->groupBy('arsitektur')->get();
+        $arsitektur_list = SistemOperasi::select('arsitektur')->groupBy('arsitektur')->get();
         return response()->json([$arsitektur_list]);
     })->name('admin.master.sistem_operasi.arsitektur');
 
     // master perusahaan
-    Route::get('api/master/perusahaan', [MasterPerusahaanController::class, 'fetch'])->name('master.perusahaan.fetch');
-    Route::get('api/master/penanggungjawab', [MasterPenanggungJawabController::class, 'fetch'])->name('master.penanggungjawab.fetch');
+    Route::get('api/master/perusahaan', [PerusahaanController::class, 'fetch'])->name('master.perusahaan.fetch');
+    Route::get('api/master/penanggungjawab', [PenanggungJawabController::class, 'fetch'])->name('master.penanggungjawab.fetch');
     Route::get('api/master/perusahaan/pj', [MasterPjPerusahaanController::class, 'fetch'])->name('master.perusahaan.pj.fetch');
     Route::get('api/maintenance/status', [MaintenanceController::class, 'fetch_status'])->name('maintenance.status.fetch');
 
@@ -131,11 +128,11 @@ Route::middleware('auth')->group(function () {
         return response()->json([$tipeList]);
     })->name('tipe.get');
     route::get('/api/lokasi', function () {
-        $ruanganList = MasterRuangan::select('nama', 'id')->get();
+        $ruanganList = Ruangan::select('nama', 'id')->get();
         return response()->json([$ruanganList]);
     })->name('lokasi.get');
     route::get('/api/os', function () {
-        $osList = MasterSistemOperasi::selectRaw('concat(nama, " ", arsitektur) as nama_os, id')->get();
+        $osList = SistemOperasi::selectRaw('concat(nama, " ", arsitektur) as nama_os, id')->get();
         return response()->json($osList);
     })->name('os.get');
 

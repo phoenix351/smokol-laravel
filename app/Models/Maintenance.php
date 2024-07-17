@@ -20,8 +20,8 @@ class Maintenance extends Model
     {
         return $this->belongsTo(MaintenanceSequence::class);
     }
-    public function Status(): HasOne
+    public function Status(): BelongsTo
     {
-        return $this->hasOne(StatusPemeliharaan::class);
+        return $this->belongsTo(StatusPemeliharaan::class,'kode_status','kode_status');
     }
 }
