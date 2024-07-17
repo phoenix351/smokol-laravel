@@ -172,53 +172,6 @@ const BarangPage = ({
             csrfTokenRef.current = csrfTokenMeta.getAttribute("content");
         }
     }, []);
-    useEffect(() => {
-        setTimeout(() => {
-            let data_master = history_barang.map(
-                ({
-                    id,
-                    jenis,
-                    merk,
-                    tipe,
-                    tanggal_peroleh,
-                    nomor_seri,
-                    kondisi,
-                    ruangan_nama,
-                    bast_path,
-                    is_approved,
-                    users_id,
-                    barang_id,
-                    sistem_operasi_id,
-                    nomor_urut_pendaftaran,
-                    ruangan_id,
-                    nama_lengkap,
-                    created_at,
-                }) => ({
-                    key: id,
-                    jenis,
-                    merk,
-                    tipe,
-                    tanggal_peroleh,
-                    nomor_seri,
-                    kondisi,
-                    ruangan_nama,
-
-                    bast_path,
-                    is_approved,
-                    users_id,
-                    barang_id,
-                    sistem_operasi_id,
-                    nomor_urut_pendaftaran,
-                    ruangan_id,
-                    nama_lengkap,
-                    created_at,
-                })
-            ) as Barang[];
-
-            setDataSource(data_master);
-        }, 0);
-    }, [history_barang]);
-
     const onSearch = async (value: string) => {
         setSearchLoading(true);
         setSearchText(value);
@@ -418,7 +371,7 @@ const BarangPage = ({
     const tipeSorter: Sorter<Barang> = createSorter("tipe");
     const merkSorter: Sorter<Barang> = createSorter("merk");
     const nomorSeriSorter: Sorter<Barang> = createSorter("nomor_seri");
-    const tahunPerolehSorter: Sorter<Barang> = createSorter("tanggal_peroleh");
+    const recordTimeSorter: Sorter<Barang> = createSorter("record_time");
     interface Column {
         key?: React.Key;
         title: string;
@@ -465,7 +418,7 @@ const BarangPage = ({
         {
             title: "tanggal_peroleh",
             dataIndex: "tanggal_peroleh",
-            sorter: tahunPerolehSorter as CompareFn<object>,
+            sorter: recordTimeSorter as CompareFn<object>,
         },
         {
             title: "nomor_seri",
