@@ -140,6 +140,13 @@ const AuthSider: React.FC<AuthSiderProps> = ({
                         label: "Pengguna",
                         onClick: () => handleMenuClick("admin.master.users"),
                     },
+                    {
+                        key: "admin.master.perusahaan",
+                        // icon: <UserOutlined />,
+                        label: "Perusahaan",
+                        onClick: () =>
+                            handleMenuClick("admin.master.perusahaan"),
+                    },
                 ],
             },
         ];

@@ -5,27 +5,32 @@ import {
     ReactElement,
     JSXElementConstructor,
     ReactPortal,
-    useRef,
     useEffect,
     useState,
 } from "react";
 import {
     Input,
-    Space,
-    // Table,
-    message,
     MenuProps,
-    Menu,
-    Card,
-    Spin,
     Form,
     Select,
     Button,
+    Table,
+    Popconfirm,
 } from "antd";
 
-import PengajuanCard from "@/Components/PengajuanCard";
-import MyModal from "@/Components/Modal";
 import axios from "axios";
+import { ColumnsType } from "antd/es/table";
+import { PengajuanItem } from "@/types";
+import { createSorter } from "@/Functions/Sorter";
+import { CompareFn, SortOrder } from "antd/es/table/interface";
+import { CheckOutlined, CloseOutlined, RightOutlined } from "@ant-design/icons";
+import Link from "antd/es/typography/Link";
+import MyModal from "@/Components/Modal";
+import PemeriksaanForm from "@/Forms/PemeriksaanBarang";
+import PemeriksaanPBJPPK from "@/Forms/PemeriksaanPBJPPK";
+import PemeriksaanBMN from "@/Forms/PemeriksaanBMN";
+import FinishPenyedia from "./Pengajuan/Form/FinishPenyedia";
+import FinishIpds from "./Pengajuan/Form/FinishIpds";
 
 const { Search } = Input;
 
@@ -38,7 +43,34 @@ const KelolaPengajuanPage = () => {
     const [searchText, setSearchText] = useState("");
     const [searchLoading, setSearchLoading] = useState(false);
 
-    const [items, setItems] = useState([]);
+    const [pemeriksaanForm] = Form.useForm();
+    const [pemeriksaanPbjPpk] = Form.useForm();
+    const [pemeriksaanBMN] = Form.useForm();
+    const [changeStatusForm] = Form.useForm();
+    const [finishIpdsForm] = Form.useForm();
+
+    const [loadingTechCheckForm, setLoadingTechCheckForm] = useState(false);
+    const [openTechCheckForm, setOpenTechCheckForm] = useState(false);
+
+    const [loadingPbjPpkCheckForm, setLoadingPbjPpkCheckForm] = useState(false);
+    const [openPbjPpkCheckForm, setOpenPbjPpkCheckForm] = useState(false);
+
+    const [loadingBMNCheckForm, setLoadingBMNCheckForm] = useState(false);
+    const [openBMNCheckForm, setOpenBMNCheckForm] = useState(false);
+
+    const [loadingProsesPenyedia, setLoadingProseloadingProsesPenyedia] =
+        useState(false);
+    const [openProsesPenyedia, setOpenProsesPenyedia] = useState(false);
+    const [openKembaliPengguna, setOpenKembaliPengguna] = useState(false);
+    const [loadingKembaliPengguna, setLoadingKembaliPengguna] = useState(false);
+
+    const [loadingChangeStatusForm, setLoadingChangeStatusForm] =
+        useState(false);
+    const [openChangeStatusForm, setOpenChangeStatusForm] = useState(false);
+
+    const [openFinishIpds, setOpenFinishIpds] = useState(false);
+
+    const [dataSource, setDataSource] = useState([]);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -52,9 +84,10 @@ const KelolaPengajuanPage = () => {
                 }
                 // Parse the JSON response
                 const dataPengajuan = await response.json();
+                console.log(dataPengajuan);
 
                 // Update the state with the fetched items
-                setItems(dataPengajuan.data);
+                setDataSource(dataPengajuan.data);
                 setSearchLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -65,6 +98,220 @@ const KelolaPengajuanPage = () => {
         fetchData();
         daftarStatusFetch();
     }, []);
+    type Sorter<T> = (a: T, b: T, sortOrder?: SortOrder) => number;
+
+    const jenisSorter: Sorter<PengajuanItem> = createSorter("jenis");
+    const tipeSorter: Sorter<PengajuanItem> = createSorter("tipe");
+    const merkSorter: Sorter<PengajuanItem> = createSorter("merk");
+    const nomorSeriSorter: Sorter<PengajuanItem> = createSorter("nomor_seri");
+    const PengajuanColumns: ColumnsType<PengajuanItem> = [
+        {
+            title: "Nomor Tiket",
+            dataIndex: "key",
+            render: (value: string, record: PengajuanItem) => (
+                <Link href={route("pengajuan.riwayat", record.sequence_id)}>
+                    {record.created_at.substring(0, 4)}/TI/{record.sequence_id}
+                </Link>
+            ),
+        },
+        {
+            title: "jenis",
+            dataIndex: "jenis",
+            filters: [
+                {
+                    text: "PC",
+                    value: "PC",
+                },
+                {
+                    text: "Laptop",
+                    value: "Laptop",
+                },
+            ],
+            onFilter: (
+                value: string | number | boolean,
+                record: PengajuanItem
+            ) => record.jenis === value,
+            sorter: jenisSorter as CompareFn<object>,
+        },
+        {
+            title: "Nama Barang (Merk/Type)",
+            dataIndex: "merk",
+            render: (_: string, record: PengajuanItem) =>
+                `${record.merk} / ${record.tipe}`,
+        },
+        // {
+        //     title: "tipe",
+        //     dataIndex: "tipe",
+        //     sorter: tipeSorter as CompareFn<object>,
+        // },
+
+        {
+            title: "nomor_seri",
+            dataIndex: "nomor_seri",
+            sorter: nomorSeriSorter as CompareFn<object>,
+        },
+        {
+            title: "NUP",
+            dataIndex: "nomor_urut_pendaftaran",
+        },
+
+        {
+            title: "Status",
+            dataIndex: "kode_status",
+            render: (value: string, record: PengajuanItem) =>
+                `${record.kode_status}. ${record.deskripsi}`,
+            // sorter: nomorSeriSorter as CompareFn<object>,
+        },
+        {
+            title: "Nama Pemegang",
+            dataIndex: "nama_lengkap",
+            // sorter: nomorSeriSorter as CompareFn<object>,
+        },
+        {
+            title: "keluhan pengguna",
+            dataIndex: "keluhan",
+        },
+        {
+            title: "Permasalahan",
+            dataIndex: "problems",
+        },
+        {
+            title: "Perusahaan",
+            dataIndex: "nama_perusahaan",
+        },
+        {
+            title: "PJ Perusahaan",
+            dataIndex: "nama_pj",
+        },
+        {
+            title: "Solusi yang diambil",
+            dataIndex: "solution",
+        },
+        {
+            title: "Kondisi Final",
+            dataIndex: "kondisi_final",
+        },
+        {
+            title: "Biaya Perbaikan",
+            dataIndex: "biaya",
+            render: (value: string) =>
+                `Rp ${value ? Number(value).toLocaleString("id-ID") : "0,-"}`,
+        },
+        {
+            title: "Tindakan",
+            dataIndex: "tindakan",
+            render: (_, record) => {
+                if (record.kode_status == "0")
+                    return (
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-around",
+                            }}
+                        >
+                            <Button
+                                style={{ color: "green" }}
+                                onClick={() => handleApprove(record)}
+                            >
+                                Approve BMN <CheckOutlined />
+                            </Button>
+                            <Button style={{ color: "red" }}>
+                                Reject <CloseOutlined />
+                            </Button>
+                        </div>
+                    );
+                else if (record.kode_status == "1")
+                    return (
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-around",
+                            }}
+                        >
+                            <Button
+                                style={{ color: "green" }}
+                                onClick={() => handleApprove(record)}
+                            >
+                                Approve IPDS <CheckOutlined />
+                            </Button>
+                            <Button style={{ color: "red" }}>
+                                Reject <CloseOutlined />
+                            </Button>
+                        </div>
+                    );
+                else if (record.kode_status == "2")
+                    return (
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-around",
+                            }}
+                        >
+                            <Button
+                                style={{ color: "green" }}
+                                onClick={() => handleApprove(record)}
+                            >
+                                Isi Detail Penyedia <RightOutlined />
+                            </Button>
+                        </div>
+                    );
+                else if (record.kode_status == "3")
+                    return (
+                        <Popconfirm
+                            title="Mulai diproses penyedia..."
+                            // description="Mulai diproses penyedia..."
+                            open={openProsesPenyedia}
+                            onConfirm={() => handleApprove(record)}
+                            okButtonProps={{ loading: loadingProsesPenyedia }}
+                            onCancel={() => setOpenProsesPenyedia(false)}
+                        >
+                            <Button
+                                style={{ color: "green" }}
+                                onClick={() => setOpenProsesPenyedia(true)}
+                            >
+                                Proses Penyedia <RightOutlined />
+                            </Button>
+                        </Popconfirm>
+                    );
+                else if (record.kode_status == "4")
+                    return (
+                        <Button
+                            style={{ color: "green" }}
+                            onClick={() => handleApprove(record)}
+                        >
+                            Selesai Proses Penyedia <RightOutlined />
+                        </Button>
+                    );
+                else if (record.kode_status == "5")
+                    return (
+                        <Button
+                            style={{ color: "green" }}
+                            onClick={() => handleApprove(record)}
+                        >
+                            Selesai Proses IPDS <RightOutlined />
+                        </Button>
+                    );
+                else if (record.kode_status == "6")
+                    return (
+                        <Popconfirm
+                            title="Kembalikan barang kepada pengguna..."
+                            // description="Mulai diproses penyedia..."
+                            // open={openKembaliPengguna}
+                            onConfirm={() => handleApprove(record)}
+                            okButtonProps={{ loading: loadingKembaliPengguna }}
+                            // onCancel={() => setOpenKembaliPengguna(false)}
+                        >
+                            <Button
+                                style={{ color: "green" }}
+                                // onClick={() => setOpenKembaliPengguna(true)}
+                            >
+                                Proses Penyedia <RightOutlined />
+                            </Button>
+                        </Popconfirm>
+                    );
+            },
+        },
+    ];
 
     const verticalMenuItems: MenuProps["items"] = [
         {
@@ -75,10 +322,6 @@ const KelolaPengajuanPage = () => {
             label: "Menunggu Persetujuan",
             key: "0",
         },
-        // {
-        //     label: "Diperiksa",
-        //     key: "1",
-        // },
 
         {
             label: "Menunggu Penyedia",
@@ -101,29 +344,6 @@ const KelolaPengajuanPage = () => {
             key: "9",
         },
     ];
-    const [selectedVerticalMenu, setSelectedVerticalMenu] = useState("99");
-
-    // data for current barang bast
-    const fetchDataByType = async (type: string) => {
-        try {
-            // Make a fetch request to your API endpoint
-            setSearchLoading(true);
-            const response = await fetch(
-                route("admin.pengajuan.fetch", { type: type })
-            );
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            // Parse the JSON response
-            const dataPengajuan = await response.json();
-            console.log({ dataPengajuan });
-            // Update the state with the fetched items
-            setItems(dataPengajuan.data);
-            setSearchLoading(false);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-    };
 
     const fetchDataByQuery = async (querySearch: string, type: string) => {
         try {
@@ -142,42 +362,17 @@ const KelolaPengajuanPage = () => {
             const dataHasilSearch = await response.json();
             setSearchLoading(false);
             // Update the state with the fetched items
-            setItems(dataHasilSearch.data);
+            setDataSource(dataHasilSearch.data);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
 
-    const onSearch = async (value: string) => {
-        // setSearchLoading(true);
-        setSearchText(value);
-
-        fetchDataByQuery(value, selectedVerticalMenu);
-        // setSearchLoading(false);
-    };
-
-    // function handleVerticalMenuClick(event: any): MenuProps['onClick'] {
-
-    // }
     const onPengajuanFilter = (values: any) => {
         // setFilter(value);
         fetchDataByQuery(values.keyword, values.kode_status);
     };
-    const renderContent = () => {
-        return <PengajuanCard items={items} csrfToken={csrfToken} />;
-    };
 
-    const Loading = () => (
-        <Card
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-        >
-            <Spin />
-        </Card>
-    );
     const [pengajuanFilterForm] = Form.useForm();
     const [daftarStatus, setDaftarStatus] = useState([]);
     const daftarStatusFetch = async () => {
@@ -190,8 +385,177 @@ const KelolaPengajuanPage = () => {
         }));
         setDaftarStatus(daftarStatusResponse);
     };
+    const handleApprove = async (record: PengajuanItem) => {
+        console.log("approve", { record: record });
+        if (record.kode_status == "0") {
+            pemeriksaanBMN.setFieldsValue({
+                sequence_id: record.sequence_id,
+                users_id: record.users_id,
+                keluhan: record.keluhan,
+                merk: record.merk,
+                tipe: record.tipe,
+            });
+            setOpenBMNCheckForm(true);
+        } else if (record.kode_status == "1") {
+            pemeriksaanForm.setFieldsValue({
+                sequence_id: record.sequence_id,
+                users_id: record.users_id,
+                keluhan: record.keluhan,
+                merk: record.merk,
+                tipe: record.tipe,
+            });
+            setOpenTechCheckForm(true);
+        } else if (record.kode_status == "2") {
+            pemeriksaanPbjPpk.setFieldsValue({
+                sequence_id: record.sequence_id,
+                users_id: record.users_id,
+                keluhan: record.keluhan,
+                merk: record.merk,
+                tipe: record.tipe,
+            });
+            setOpenPbjPpkCheckForm(true);
+        } else if (record.kode_status == "3") {
+            try {
+                const response = await axios.post(
+                    route("maintenance.status.update"),
+                    {
+                        sequence_id: record.sequence_id,
+                        users_id: record.users_id,
+                        kode_status: "4",
+                        biaya: record.biaya,
+                    }
+                );
+                router.get(route("admin.kelola.pengajuan"));
+            } catch (error) {}
+        } else if (record.kode_status == "4") {
+            changeStatusForm.setFieldsValue({
+                sequence_id: record.sequence_id,
+
+                users_id: record.users_id,
+                merk: record.merk,
+                tipe: record.tipe,
+            });
+            setOpenChangeStatusForm(true);
+        } else if (record.kode_status == "5") {
+            finishIpdsForm.setFieldsValue({
+                sequence_id: record.sequence_id,
+
+                users_id: record.users_id,
+                merk: record.merk,
+                tipe: record.tipe,
+            });
+            setOpenFinishIpds(true);
+        } else if (record.kode_status == "6") {
+            try {
+                const response = await axios.post(
+                    route("maintenance.status.kembali-pengguna"),
+                    {
+                        sequence_id: record.sequence_id,
+                        users_id: record.users_id,
+                        kode_status: "4",
+                        biaya: record.biaya,
+                    }
+                );
+                router.get(route("admin.kelola.pengajuan"));
+            } catch (error) {}
+        }
+    };
     return (
         <div>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingTechCheckForm}
+                title="Formulir Pemeriksaan Barang oleh IPDS"
+                handleCancel={() => setOpenTechCheckForm(false)}
+                handleOk={async () => {
+                    try {
+                        const isValid = await pemeriksaanForm.validateFields();
+                        pemeriksaanForm.submit();
+                        setOpenTechCheckForm(false);
+                    } catch (error) {}
+                }}
+                openModal={openTechCheckForm}
+                okText="Setujui"
+            >
+                <PemeriksaanForm form={pemeriksaanForm} />
+            </MyModal>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingBMNCheckForm}
+                title="Formulir Pemeriksaan Barang oleh Tim BMN"
+                handleCancel={() => setOpenBMNCheckForm(false)}
+                handleOk={async () => {
+                    try {
+                        const isValid = await pemeriksaanBMN.validateFields();
+                        pemeriksaanBMN.submit();
+                        setOpenBMNCheckForm(false);
+                    } catch (error) {}
+                }}
+                openModal={openBMNCheckForm}
+                okText="Setujui"
+            >
+                <PemeriksaanBMN form={pemeriksaanBMN} />
+            </MyModal>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingPbjPpkCheckForm}
+                title="Formulir Pemeriksaan Barang oleh Tim PBJ / PPK"
+                handleCancel={() => setOpenPbjPpkCheckForm(false)}
+                handleOk={async () => {
+                    try {
+                        const isValid =
+                            await pemeriksaanPbjPpk.validateFields();
+                        pemeriksaanPbjPpk.submit();
+                        setOpenPbjPpkCheckForm(false);
+                    } catch (error) {}
+                }}
+                openModal={openPbjPpkCheckForm}
+                okText="Setujui"
+                maskClosable={false}
+            >
+                <PemeriksaanPBJPPK form={pemeriksaanPbjPpk} />
+            </MyModal>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingChangeStatusForm}
+                title="Formulir Penyelesaian Perbaikan oleh Penyedia"
+                handleCancel={() => setOpenChangeStatusForm(false)}
+                handleOk={async () => {
+                    // setOpenTechCheckForm(false);
+                    try {
+                        const isValid = await changeStatusForm.validateFields();
+                        changeStatusForm.submit();
+                        setOpenChangeStatusForm(false);
+                    } catch (error) {
+                        // console.log(error);
+                    }
+                }}
+                openModal={openChangeStatusForm}
+                okText="Simpan Perubahan"
+                maskClosable={false}
+            >
+                <FinishPenyedia form={changeStatusForm} />
+            </MyModal>
+            <MyModal
+                cancelText="Batalkan"
+                confirmLoadingModal={loadingChangeStatusForm}
+                title="Formulir Penyelesaian Perbaikan oleh IPDS"
+                handleCancel={() => setOpenFinishIpds(false)}
+                handleOk={async () => {
+                    try {
+                        const isValid = await finishIpdsForm.validateFields();
+                        finishIpdsForm.submit();
+                        setOpenFinishIpds(false);
+                    } catch (error) {
+                        // console.log(error);
+                    }
+                }}
+                openModal={openFinishIpds}
+                okText="Simpan Perubahan"
+                maskClosable={false}
+            >
+                <FinishIpds form={finishIpdsForm} />
+            </MyModal>
             <Head title="History Barang" />
             <h1 style={{ marginBottom: "10px" }}>Daftar Pengajuan Pegawai</h1>
             {/* <Divider /> */}
@@ -221,7 +585,19 @@ const KelolaPengajuanPage = () => {
                 </Button>
             </Form>
 
-            {searchLoading ? Loading() : renderContent()}
+            <Table
+                rowClassName={() => "editable-row"}
+                bordered
+                scroll={{ x: 1500 }}
+                dataSource={dataSource.filter((item) =>
+                    Object.values(item)
+                        .join("")
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase())
+                )}
+                loading={searchLoading}
+                columns={PengajuanColumns}
+            />
         </div>
     );
 };

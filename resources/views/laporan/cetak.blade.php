@@ -226,7 +226,7 @@
                 <tr>
                     <td></td>
                     <td></td>
-                    <td>Kota Manado, {{ \Carbon\Carbon::now()->format('j F Y') }}
+                    <td>Kota Manado, {{ \Carbon\Carbon::now()->formatLocalized('%d %B %Y') }}
                     </td>
                 </tr>
                 <tr>

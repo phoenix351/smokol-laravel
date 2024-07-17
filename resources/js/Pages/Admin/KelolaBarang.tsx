@@ -28,6 +28,7 @@ import {
     MenuProps,
     DatePicker,
     Table,
+    Pagination,
 } from "antd";
 import {
     EditOutlined,
@@ -37,6 +38,7 @@ import {
     CheckCircleOutlined,
     WarningOutlined,
     StopOutlined,
+    ExportOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
@@ -52,8 +54,10 @@ import { findSourceMap } from "module";
 import { Barang, DataType } from "@/types";
 import BarangForm from "@/Forms/BarangForm";
 import axios from "axios";
+import { handleExport } from "@/Functions/ExportTable";
 
 // const ExportableTablex = ExportableTable(Table);
+
 
 const { Search } = Input;
 const BarangPage = ({
@@ -62,8 +66,9 @@ const BarangPage = ({
     // console.log({ history_barang });
     const csrfTokenRef = useRef<string | null>(null);
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-    const [searchText, setSearchText] = useState("");
-    const [searchLoading, setSearchLoading] = useState(false);
+
+    const [searchText, setSearchText] = useState<string>("");
+    const [searchLoading, setSearchLoading] = useState<boolean>(false);
     const [messageApi, contextHolder] = message.useMessage();
     const saveKey = "updatable";
     const [itemAddForm] = Form.useForm();
@@ -86,7 +91,7 @@ const BarangPage = ({
             itemEditForm.submit();
             setOpenModalUbah(false);
             setConfirmLoadingModalUbah(false);
-        } catch (error) {}
+        } catch (error) { }
     };
     const handleCancel = () => {
         setOpenModal(false);
@@ -96,7 +101,14 @@ const BarangPage = ({
     };
     //end modal
 
+    // data for table
     const [dataSource, setDataSource] = useState<Barang[]>([]);
+    const [total, setTotal] = useState<number>(0);
+    const [current, setCurrent] = useState<number>(1);
+    const [pageSize, setPageSize] = useState<number>(10);
+    const [keyword, setKeyword] = useState<string>("");
+    const [kondisi, setKondisi] = useState<string>("");
+    const [dataLoading, setDataLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (csrfTokenMeta) {
@@ -104,58 +116,10 @@ const BarangPage = ({
         }
     }, []);
     useEffect(() => {
-        setTimeout(() => {
-            const data_master = history_barang.map(
-                ({
-                    barang_id,
-                    jenis,
-                    merk,
-                    tipe,
-                    tanggal_peroleh,
-                    nomor_seri,
-                    kondisi,
-                    ruangan_nama,
-                    nama_lengkap,
-                    id,
-                    users_id,
-                    ruangan_id,
-                    bast_path,
-                    is_approved,
-                    nomor_urut_pendaftaran,
-                    sistem_operasi_id,
-                    created_at,
-                }): Barang => ({
-                    barang_id,
-                    key: id,
-                    jenis,
-                    merk,
-                    tipe,
-                    tanggal_peroleh,
-                    nomor_seri,
-                    kondisi,
-                    ruangan_nama,
-                    nama_lengkap,
-                    id,
-                    users_id,
-                    ruangan_id,
-                    bast_path,
-                    is_approved,
-                    nomor_urut_pendaftaran,
-                    sistem_operasi_id,
-                    created_at,
-                })
-            );
+        fetchData(current, pageSize, searchText);
+    }, [current, pageSize, searchText]);
 
-            setDataSource(data_master);
-            console.log("changeeeee", { dataSource });
-        }, 0);
-    }, [history_barang]);
 
-    const onSearch = async (value: string) => {
-        setSearchLoading(true);
-        setSearchText(value);
-        setSearchLoading(false);
-    };
     const handleAdd = () => {
         itemAddForm.resetFields();
         setOpenModal(true);
@@ -181,6 +145,21 @@ const BarangPage = ({
             return 0;
         };
     }
+
+    const fetchData = async (currentPage: number, pageSize: number, searchText: string) => {
+        setDataLoading(true);
+        try {
+            const response = await axios.get(route("api.barang", { page: currentPage, pageSize: pageSize, searchText: searchText }));
+            console.log({ response });
+
+            setDataSource(response.data.data);
+            setTotal(response.data.total);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setDataLoading(false);
+        }
+    };
     function handleDelete(key: React.Key | string): void {
         if (key === 0) return;
         router.delete(route("history_barang.destroy", { id: key }), {
@@ -209,7 +188,7 @@ const BarangPage = ({
                 });
                 return 1;
             },
-            onFinish: () => {},
+            onFinish: () => { },
 
             onError: (event) => console.log(`Error! ${event}`),
         });
@@ -268,14 +247,7 @@ const BarangPage = ({
                 content: "Berhasil menyimpan perubahan data",
                 type: "success",
             });
-            router.get(
-                route("admin.kelola.history_barang.index"),
-                {},
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                }
-            );
+            fetchData(current, pageSize, searchText)
         } catch (error: any) {
             // console.log({ error });
 
@@ -290,12 +262,12 @@ const BarangPage = ({
     const tipeSorter: Sorter<Barang> = createSorter("tipe");
     const merkSorter: Sorter<Barang> = createSorter("merk");
     const nomorSeriSorter: Sorter<Barang> = createSorter("nomor_seri");
-    const tahunPerolehSorter: Sorter<Barang> = createSorter("tanggal_peroleh");
+    const tahunPerolehSorter: Sorter<Barang> = createSorter("record_time");
 
     const defaultColumns: ColumnsType<Barang> = [
         {
             title: "jenis",
-            dataIndex: "jenis",
+            dataIndex: "barang",
             filters: [
                 {
                     text: "PC",
@@ -306,23 +278,27 @@ const BarangPage = ({
                     value: "Laptop",
                 },
             ],
+            render: (value) => value.jenis,
             onFilter: (value: string | number | boolean, record: Barang) =>
                 record.jenis === value,
             sorter: jenisSorter as CompareFn<object>,
         },
         {
             title: "merk",
-            dataIndex: "merk",
+            dataIndex: "barang",
+            render: (value) => value.merk,
             sorter: merkSorter as CompareFn<object>,
         },
         {
             title: "tipe",
-            dataIndex: "tipe",
+
+            dataIndex: "barang",
+            render: (value) => value.tipe,
             sorter: tipeSorter as CompareFn<object>,
         },
         {
-            title: "tanggal_peroleh",
-            dataIndex: "tanggal_peroleh",
+            title: "record_time",
+            dataIndex: "record_time",
             sorter: tahunPerolehSorter as CompareFn<object>,
             render: (value: any) => {
                 try {
@@ -339,12 +315,16 @@ const BarangPage = ({
         },
         {
             title: "nomor_seri",
-            dataIndex: "nomor_seri",
+
+            dataIndex: "barang",
+            render: (value) => value.nomor_seri,
             sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
             title: "nomor_urut_pendaftaran",
-            dataIndex: "nomor_urut_pendaftaran",
+
+            dataIndex: "barang",
+            render: (value) => value.nomor_urut_pendaftaran,
         },
         {
             title: "kondisi",
@@ -394,12 +374,14 @@ const BarangPage = ({
         },
         {
             title: "ruangan_nama",
-            dataIndex: "ruangan_nama",
+            dataIndex: "ruangan",
+            render: (value) => value.nama
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
             title: "Nama Pemegang",
-            dataIndex: "nama_lengkap",
+            dataIndex: "user",
+            render: (value) => value.nama_lengkap
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
@@ -408,12 +390,13 @@ const BarangPage = ({
                 <Button
                     onClick={() => {
                         setOpenModalUbah(true);
+                        // console.log({ record });
 
                         // itemEditForm.setFieldsValue(record);
-                        itemEditForm.setFieldValue("id", record.key);
-                        itemEditForm.setFieldValue("jenis", record.jenis);
-                        itemEditForm.setFieldValue("merk", record.merk);
-                        itemEditForm.setFieldValue("tipe", record.tipe);
+                        itemEditForm.setFieldValue("id", record.id);
+                        itemEditForm.setFieldValue("jenis", record.barang.jenis);
+                        itemEditForm.setFieldValue("merk", record.barang.merk);
+                        itemEditForm.setFieldValue("tipe", record.barang.tipe);
                         itemEditForm.setFieldValue("users_id", record.users_id);
                         itemEditForm.setFieldValue("kondisi", record.kondisi);
                         // itemEditForm.setFieldValue("kondisi", "Rusak Berat");
@@ -426,16 +409,16 @@ const BarangPage = ({
                             record.ruangan_id
                         );
                         itemEditForm.setFieldValue(
-                            "tanggal_peroleh",
-                            dayjs(record.tanggal_peroleh)
+                            "record_time",
+                            dayjs(new Date(record.record_time))
                         );
                         itemEditForm.setFieldValue(
                             "nomor_urut_pendaftaran",
-                            record.nomor_urut_pendaftaran
+                            record.barang.nomor_urut_pendaftaran
                         );
                         itemEditForm.setFieldValue(
                             "nomor_seri",
-                            record.nomor_seri
+                            record.barang.nomor_seri
                         );
                     }}
                 >
@@ -444,24 +427,103 @@ const BarangPage = ({
                 </Button>
             ),
         },
-        {
-            title: "delete",
-            render: (_: any, record: any) => (
-                <Button>
-                    <Popconfirm
-                        title="Hapus dari master"
-                        description="Apakah anda yakin akan menghapus ini ? "
-                        onConfirm={() => handleDelete(record.key ?? 0)}
-                        onCancel={() => console.log("Cancel")}
-                        okText="Ya"
-                        cancelText="Batalkan"
-                    >
-                        <DeleteOutlined /> Hapus
-                    </Popconfirm>
-                </Button>
-            ),
-        },
     ];
+    const exportColumns: ColumnsType<Barang> = [
+        {
+            title: "jenis",
+            dataIndex: "barang",
+            
+            render: (value) => value.jenis,
+            onFilter: (value: string | number | boolean, record: Barang) =>
+                record.jenis === value,
+            sorter: jenisSorter as CompareFn<object>,
+        },
+        {
+            title: "merk",
+            dataIndex: "barang",
+            render: (value) => value.merk,
+            sorter: merkSorter as CompareFn<object>,
+        },
+        {
+            title: "tipe",
+
+            dataIndex: "barang",
+            render: (value) => value.tipe,
+            sorter: tipeSorter as CompareFn<object>,
+        },
+        {
+            title: "record_time",
+            dataIndex: "record_time",
+            sorter: tahunPerolehSorter as CompareFn<object>,
+            render: (value: any) => {
+                try {
+                    let formattedDate = new Intl.DateTimeFormat("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                    }).format(new Date(value));
+                    return formattedDate;
+                } catch (error) {
+                    return value;
+                }
+            },
+        },
+        {
+            title: "nomor_seri",
+
+            dataIndex: "barang",
+            render: (value) => value.nomor_seri,
+            sorter: nomorSeriSorter as CompareFn<object>,
+        },
+        {
+            title: "nomor_urut_pendaftaran",
+
+            dataIndex: "barang",
+            render: (value) => value.nomor_urut_pendaftaran,
+        },
+        {
+            title: "kondisi",
+            dataIndex: "kondisi",
+            filters: [
+                {
+                    text: "Baik",
+                    value: "Baik",
+                },
+                {
+                    text: "Rusak Ringan",
+                    value: "Rusak Ringan",
+                },
+                {
+                    text: "Rusak Berat",
+                    value: "Rusak Berat",
+                },
+            ],
+            onFilter: (value: string | number | boolean, record: Barang) =>
+                record.kondisi.trim().toLowerCase() ===
+                String(value).toLowerCase(),
+            // sorter: nomorSeriSorter as CompareFn<object>,
+        },
+        {
+            title: "ruangan_nama",
+            dataIndex: "ruangan",
+            render: (value) => value.nama
+            // sorter: nomorSeriSorter as CompareFn<object>,
+        },
+        {
+            title: "Nama Pemegang",
+            dataIndex: "user",
+            render: (value) => value.nama_lengkap
+            // sorter: nomorSeriSorter as CompareFn<object>,
+        },
+        
+    ];
+
+    function handlePageChange(current: number, pageSize: number, searchText: string): void {
+        setCurrent(current)
+        setPageSize(pageSize)
+        setSearchText(String(searchText))
+    }
+
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -498,23 +560,29 @@ const BarangPage = ({
                 <Search
                     placeholder="Cari barang ..."
                     allowClear
-                    onSearch={onSearch}
+                    onSearch={(value: string) => handlePageChange(current, pageSize, value)}
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
+                <Button onClick={() => handleExport(exportColumns, dataSource)}><ExportOutlined />Export as CSV</Button>
             </Space>
 
             <Table
                 rowClassName={() => "editable-row"}
                 bordered
                 scroll={{ x: 1500 }}
-                dataSource={dataSource.filter((item) =>
-                    Object.values(item)
-                        .join("")
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase())
-                )}
+                dataSource={dataSource}
                 columns={defaultColumns}
+                pagination={false}
+                loading={dataLoading}
+            />
+            <Pagination
+                current={current}
+                pageSize={pageSize}
+                total={total}
+                onChange={(page, pageSize) => handlePageChange(page, pageSize, searchText)}
+                showSizeChanger
+                onShowSizeChange={(current, pageSize) => handlePageChange(current, pageSize, searchText)}
             />
         </Space>
     );

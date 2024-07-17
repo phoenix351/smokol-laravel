@@ -107,7 +107,7 @@ const PemeliharaanForm: React.FC<{
                     {...formItemLayout}
                     label="barang_id"
                     name="barang_id"
-                    // style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -115,24 +115,14 @@ const PemeliharaanForm: React.FC<{
                     {...formItemLayout}
                     label="users_id"
                     name="users_id"
-                    // style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="merk"
-                    name="merk"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="merk" name="merk">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="tipe"
-                    name="tipe"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="tipe" name="tipe">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
                 <Form.Item
@@ -146,7 +136,6 @@ const PemeliharaanForm: React.FC<{
                             message: "Isian keluhan minimal 10 karakter",
                         },
                     ]}
-                    // style={{ display: "none" }}
                 >
                     <Input.TextArea />
                 </Form.Item>

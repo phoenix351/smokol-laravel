@@ -14,7 +14,7 @@ import axios from "axios";
 import { router } from "@inertiajs/react";
 import RupiahInput from "@/Components/RupiahInput";
 
-const EditStatusForm: React.FC<{
+const FinishIpds: React.FC<{
     form: any;
     // defaultPreview: string | null;
 }> = ({ form }) => {
@@ -60,7 +60,7 @@ const EditStatusForm: React.FC<{
 
         try {
             const response = await axios.post(
-                route("maintenance.status.update"),
+                route("maintenance.status.finish-ipds"),
                 values,
                 {
                     headers: {
@@ -73,6 +73,7 @@ const EditStatusForm: React.FC<{
                 content: "Berhasil menyimpan perubahan...",
                 type: "success",
             });
+            router.get(route("admin.kelola.pengajuan"));
         } catch (error: any) {
             // messageApi.open({
             //     key: saveKey,
@@ -117,14 +118,7 @@ const EditStatusForm: React.FC<{
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="barang_id"
-                    name="barang_id"
-                    hidden
-                >
-                    <Input disabled={true} style={{ color: "#000" }} />
-                </Form.Item>
+
                 <Form.Item
                     {...formItemLayout}
                     label="users_id"
@@ -141,51 +135,36 @@ const EditStatusForm: React.FC<{
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
-                    label="Pilih Status"
+                    label="Status Berikutnya"
                     name="kode_status"
-
-                    // style={{ display: "none" }}
                 >
-                    <Select
-                        showSearch
-                        onChange={(value) => setKodeStatus(value)}
-                        options={statusList}
-                    />
+                    Selesai Proses Pemeliharaan
                 </Form.Item>
-                {kodeStatus == "5" && (
-                    <Form.Item
-                        {...formItemLayout}
-                        label="Biaya Perbaikan"
-                        name="biaya"
-                        // style={{ display: "none" }}
-                    >
-                        <RupiahInput value={value} onChange={handleChange} />
-                    </Form.Item>
-                )}
-                {kodeStatus == "6" && (
-                    <Form.Item
-                        {...formItemLayout}
-                        label="Status Pasca Pemeliharaan"
-                        name="status"
-                        rules={[
-                            {
-                                required: true,
-                                message:
-                                    "Status Pasca Pemeliharaan harus diisi",
-                            },
-                        ]}
-                        // style={{ display: "none" }}
-                    >
-                        <Radio.Group buttonStyle="solid">
-                            <Radio.Button value="1">Baik</Radio.Button>
-                            <Radio.Button value="2">Rusak Ringan</Radio.Button>
-                            <Radio.Button value="3">Rusak Berat</Radio.Button>
-                        </Radio.Group>
-                    </Form.Item>
-                )}
+
+                <Form.Item
+                    {...formItemLayout}
+                    label="Status Pasca Pemeliharaan"
+                    name="kondisi_final"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Status Pasca Pemeliharaan harus diisi",
+                        },
+                    ]}
+                >
+                    <Radio.Group buttonStyle="solid">
+                        <Radio.Button value="Baik">Baik</Radio.Button>
+                        <Radio.Button value="Rusak Ringan">
+                            Rusak Ringan
+                        </Radio.Button>
+                        <Radio.Button value="Rusak Berat">
+                            Rusak Berat
+                        </Radio.Button>
+                    </Radio.Group>
+                </Form.Item>
             </Form>
         </>
     );
 };
 
-export default EditStatusForm;
+export default FinishIpds;

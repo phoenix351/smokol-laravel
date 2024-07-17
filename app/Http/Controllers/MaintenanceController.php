@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FinishIpdsRequest;
+use App\Http\Requests\FinishPenyediaRequest;
+use App\Http\Requests\KembaliPenggunaRequest;
 use App\Http\Requests\RejectRequest;
 use App\Http\Requests\StatusUpdateRequest;
 use App\Models\Maintenance;
@@ -281,10 +284,16 @@ class MaintenanceController extends Controller
             'maintenance_sequences.id as sequence_id',
             'maintenance_sequences.keluhan',
             'maintenance_sequences.biaya',
+            'maintenance_sequences.problems',
+            'maintenance_sequences.solution',
             'maintenance_sequences.problem_img_path',
             'maintenance_sequences.kondisi_final',
             'maintenance_sequences.created_at',
 
+            'maintenance_sequences.perusahaan_id',
+            'master_perusahaan.nama as nama_perusahaan',
+            'maintenance_sequences.penanggung_jawab_id',
+            'master_pj_perusahaan.nama as nama_pj',
 
             'master_barang.merk',
             'master_barang.tipe',
@@ -310,6 +319,8 @@ class MaintenanceController extends Controller
             })
             ->join('status_pemeliharaan', 'status_pemeliharaan.kode_status', 'maintenances.kode_status')
             ->join('barang', 'maintenance_sequences.barang_id', 'barang.id')
+            ->leftJoin('master_perusahaan', 'maintenance_sequences.perusahaan_id', 'master_perusahaan.id')
+            ->leftJoin('master_pj_perusahaan', 'maintenance_sequences.penanggung_jawab_id', 'master_pj_perusahaan.id')
             ->join('master_barang', 'master_barang.id', 'barang.barang_id')
             ->join('users', 'users.id', 'maintenance_sequences.users_id')
             ->when($type === '99', function ($query) {
@@ -379,7 +390,7 @@ class MaintenanceController extends Controller
 
         $validatedData = $request->validate($request->rules()); // data yg dikirim
         $sequence = MaintenanceSequence::where('id', '=', $validatedData['sequence_id'])->first();
-        $barang_status = Barang::where('barang_id', 'like', $sequence['barang_id'])->first();
+        $barang_status = Barang::where('id', 'like', $sequence['barang_id'])->first();
 
         $maintenance = [
             'sequence_id' => $validatedData['sequence_id'],
@@ -406,15 +417,16 @@ class MaintenanceController extends Controller
             $statusUpdated = Barang::where('barang_id', $sequence['barang_id'])->update($updateStatus);
             $riwayatStored = RiwayatBarang::create($riwayat_barang);
             // tambah status baru menjadi kode 1
-            $maintenance['kode_status'] = '1';
+            $maintenance['kode_status'] = '2';
         } else if ($validatedData['next_step'] == '0') {
             // tambah status barang menjadi kode 5 
 
             $maintenance['kode_status'] = '5';
             $updatedSequence['solution'] = $validatedData['solution'];
-            MaintenanceSequence::where('id', $validatedData['sequence_id'])->update($updatedSequence);
+            // MaintenanceSequence::where('id', $validatedData['sequence_id'])->update($updatedSequence);
         }
         $maintenanceStored = Maintenance::create($maintenance);
+        MaintenanceSequence::where('id', $validatedData['sequence_id'])->update($updatedSequence);
 
 
 
@@ -541,6 +553,129 @@ class MaintenanceController extends Controller
             Maintenance::create(
                 $new_maintenance
             );
+            return response()->json(
+                ['message' => 'Berhasil mengubah status pengajuan !'],
+                201
+            );
+        } catch (\Exception $e) {
+            return response()->json(['asulah' => $e->getMessage()], 400);
+        }
+    }
+    public function finish_penyedia(FinishPenyediaRequest $request)
+    {
+
+
+        $user = auth()->user();
+
+        try {
+            //code...
+            $validatedData = $request->validate($request->rules());
+            // cek kesamaan dg kode skrg
+            $currentSeq = Maintenance::where('sequence_id', $validatedData['sequence_id'])->orderBy('id', 'DESC')->first();
+            $currentStatus = $currentSeq->kode_status;
+            $new_maintenance = [
+                'kode_status' => 5,
+                'sequence_id' => $validatedData['sequence_id'],
+                'users_id' => $user->id
+            ];
+            try {
+                //code...
+                db::beginTransaction();
+                Maintenance::create(
+                    $new_maintenance
+                );
+                // MaintenanceSequence::where('id', $validatedData['sequence_id'])->update(['biaya' => $validatedData['biaya']]);
+                $maintenance_sequence = MaintenanceSequence::find($validatedData['sequence_id']);
+                $maintenance_sequence->biaya = $validatedData['biaya'];
+                $maintenance_sequence->solution = $validatedData['solution'];
+                $maintenance_sequence->save();
+                db::commit();
+            } catch (\Throwable $th) {
+                db::rollBack();
+                throw $th;
+            }
+            return response()->json(
+                ['message' => 'Berhasil mengubah status pengajuan !'],
+                201
+            );
+        } catch (\Exception $e) {
+            return response()->json(['asulah' => $e->getMessage()], 400);
+        }
+    }
+    public function finish_ipds(FinishIpdsRequest $request)
+    {
+
+
+        $user = auth()->user();
+
+        try {
+            //code...
+            $validatedData = $request->validate($request->rules());
+            // cek kesamaan dg kode skrg
+            $currentSeq = Maintenance::where('sequence_id', $validatedData['sequence_id'])->orderBy('id', 'DESC')->first();
+            $currentStatus = $currentSeq->kode_status;
+            $new_maintenance = [
+                'kode_status' => 6,
+                'sequence_id' => $validatedData['sequence_id'],
+                'users_id' => $user->id
+            ];
+            try {
+                //code...
+                db::beginTransaction();
+                Maintenance::create(
+                    $new_maintenance
+                );
+                // MaintenanceSequence::where('id', $validatedData['sequence_id'])->update(['biaya' => $validatedData['biaya']]);
+                $maintenance_sequence = MaintenanceSequence::find($validatedData['sequence_id']);
+                $maintenance_sequence->kondisi_final = $validatedData['kondisi_final'];
+                $id_barang = $maintenance_sequence->barang_id;
+                $maintenance_sequence->save();
+
+                $barang = Barang::find($id_barang);
+                $barang->kondisi = $validatedData['kondisi_final'];
+                $barang->save();
+
+                db::commit();
+            } catch (\Throwable $th) {
+                db::rollBack();
+                throw $th;
+            }
+            return response()->json(
+                ['message' => 'Berhasil mengubah status pengajuan !'],
+                201
+            );
+        } catch (\Exception $e) {
+            return response()->json(['asulah' => $e->getMessage()], 400);
+        }
+    }
+    public function kembali_pengguna(KembaliPenggunaRequest $request)
+    {
+
+
+        $user = auth()->user();
+
+        try {
+            //code...
+            $validatedData = $request->validate($request->rules());
+            // cek kesamaan dg kode skrg
+            $currentSeq = Maintenance::where('sequence_id', $validatedData['sequence_id'])->orderBy('id', 'DESC')->first();
+            $currentStatus = $currentSeq->kode_status;
+            $new_maintenance = [
+                'kode_status' => 10,
+                'sequence_id' => $validatedData['sequence_id'],
+                'users_id' => $user->id
+            ];
+            try {
+                //code...
+                db::beginTransaction();
+                Maintenance::create(
+                    $new_maintenance
+                );
+                db::commit();
+            } catch (\Throwable $th) {
+                db::rollBack();
+                throw $th;
+            }
             return response()->json(
                 ['message' => 'Berhasil mengubah status pengajuan !'],
                 201

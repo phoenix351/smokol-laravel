@@ -60,7 +60,7 @@ const PemeriksaanPBJPPK: React.FC<{
         // values.spek_path = values.spek_path.file;
         messageApi.open({
             key: "saveKey",
-            content: "Sedang menambahkan data...",
+            content: "Menyimpan data...",
             type: "loading",
         });
         try {
@@ -79,6 +79,7 @@ const PemeriksaanPBJPPK: React.FC<{
                 content: "Berhasil menambahkan data",
                 type: "success",
             });
+            router.get(route("admin.kelola.pengajuan"));
         } catch (error: any) {
             messageApi.open({
                 key: "saveKey",
@@ -93,6 +94,7 @@ const PemeriksaanPBJPPK: React.FC<{
     const fetchData = async (getUrl: string) => {
         try {
             const response = await axios.get(getUrl);
+            // console.log({ response });
 
             return response.data.data;
         } catch (error) {
@@ -171,18 +173,11 @@ const PemeriksaanPBJPPK: React.FC<{
                     {...formItemLayout}
                     label="sequence_id"
                     name="sequence_id"
-                    // style={{ display: "none" }}
+                    hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="barang_id"
-                    name="barang_id"
-                    style={{ display: "none" }}
-                >
-                    <Input disabled={true} style={{ color: "#000" }} />
-                </Form.Item>
+
                 <Form.Item
                     {...formItemLayout}
                     label="users_id"
@@ -191,20 +186,10 @@ const PemeriksaanPBJPPK: React.FC<{
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="merk"
-                    name="merk"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="merk" name="merk">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="tipe"
-                    name="tipe"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="tipe" name="tipe">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
 
@@ -244,8 +229,6 @@ const PemeriksaanPBJPPK: React.FC<{
                             message: "Perusahaan harus dipilih",
                         },
                     ]}
-
-                    // style={{ display: "none" }}
                 >
                     {/* <Input readOnly={true} style={{ color: "#000" }} /> */}
                     <Select
@@ -255,27 +238,16 @@ const PemeriksaanPBJPPK: React.FC<{
                     />
                 </Form.Item>
 
-                <Form.Item
-                    {...formItemLayout}
-                    label="alamat"
-                    name="alamat"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="alamat" name="alamat">
                     <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
-                <Form.Item
-                    {...formItemLayout}
-                    label="npwp"
-                    name="npwp"
-                    // style={{ display: "none" }}
-                >
+                <Form.Item {...formItemLayout} label="npwp" name="npwp">
                     <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
                 <Form.Item
                     {...formItemLayout}
                     label="nomor_rekening"
                     name="nomor_rekening"
-                    // style={{ display: "none" }}
                 >
                     <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -284,7 +256,6 @@ const PemeriksaanPBJPPK: React.FC<{
                     {...formItemLayout}
                     label="Nama Penanggung Jawab"
                     name="penanggung_jawab_id"
-                    // style={{ display: "none" }}
                 >
                     <Select
                         onChange={(value) => handlePjChange(value)}
@@ -297,7 +268,6 @@ const PemeriksaanPBJPPK: React.FC<{
                     {...formItemLayout}
                     label="Jabatan Penanggun Jawab"
                     name="jabatan_pj"
-                    // style={{ display: "none" }}
                 >
                     <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -305,7 +275,6 @@ const PemeriksaanPBJPPK: React.FC<{
                     {...formItemLayout}
                     label="Email Penanggung Jawab"
                     name="email"
-                    // style={{ display: "none" }}
                 >
                     <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -313,7 +282,6 @@ const PemeriksaanPBJPPK: React.FC<{
                     {...formItemLayout}
                     label="Nomor HP Penanggun Jawab"
                     name="nomor_wa"
-                    // style={{ display: "none" }}
                 >
                     <Input readOnly={true} style={{ color: "#000" }} />
                 </Form.Item>

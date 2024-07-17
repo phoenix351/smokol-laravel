@@ -10,4 +10,5 @@ class MasterPerusahaan extends Model
     use HasFactory;
     protected $table = 'master_perusahaan';
     public $timestamps = false;
+    protected $fillable = ['nama', 'alamat', 'npwp', 'bank', 'nomor_rekening'];
 }
