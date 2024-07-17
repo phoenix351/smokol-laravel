@@ -23,26 +23,9 @@ class BarangController extends Controller
      */
     public function index()
     {
-        $data = MasterBarang::join('barang', 'barang.barang_id', 'master_barang.id')
-            ->leftJoin('users', 'users.id', 'barang.users_id')
-            ->leftJoin('master_ruangan', 'master_ruangan.id', 'barang.ruangan_id')
-            ->select(
-                'barang.id',
-                'barang.users_id',
-                'barang.ruangan_id',
-                'barang.kondisi',
-                'barang.sistem_operasi_id',
-                'master_barang.jenis',
-                'master_barang.merk',
-                'master_barang.tipe',
-                'master_barang.nomor_seri',
-                'master_barang.nomor_urut_pendaftaran',
-                'master_barang.tanggal_peroleh',
-                'users.nama_lengkap',
-                'master_ruangan.nama as ruangan_nama'
-            )
-            ->get();
-        return Inertia::render('Admin/KelolaBarang', ['history_barang' => $data]);
+        
+        // $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])->paginate(10);
+        return Inertia::render('Admin/KelolaBarang');
     }
 
     /**
@@ -204,6 +187,37 @@ class BarangController extends Controller
         return Inertia::render('Admin/Barang', [
             'response' => $response,
             'history_barang' => $history_barang
+        ]);
+    }
+    public function fetch(Request $request)
+    {
+        // $current = $request->get('current');
+        $pageSize = $request->get('pageSize') ?? 10;
+        $search = $request->get('searchText');
+        $searchText = "%$search%";
+
+        // $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])
+        
+        // ->paginate($pageSize);
+        $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])
+        // $data = Barang::
+        ->whereRelation('Barang','jenis','like',$searchText)
+        ->orWhereRelation('Barang','merk','like',$searchText)
+        ->orWhereRelation('Barang','nomor_urut_pendaftaran','like',$searchText)
+        ->orWhereRelation('Ruangan','nama','like',$searchText)
+        ->orWhereRelation('SistemOperasi','nama','like',$searchText)
+        ->orWhereRelation('User','nama_lengkap','like',$searchText)
+        ->orWhere('kondisi','like',$searchText)
+        ->paginate($pageSize);
+
+        // $data = Barang::paginate($pageSize);
+        // return response()->json($data);
+        return response()->json([
+            'data' => $data->items(),
+            'searchText'=>$searchText,
+            'total' => $data->total(),
+            // 'current' => $current,
+            // 'pageSize' => $pageSize,
         ]);
     }
 }

@@ -246,9 +246,9 @@ const HistoryBarangForm: React.FC<{
             <Form.Item
                 {...formItemLayout}
                 label="Tanggal Peroleh"
-                name="tanggal_peroleh"
+                name="record_time"
             >
-                <DatePicker disabled style={disabledStyle} />
+                <DatePicker disabled style={disabledStyle} format={"DD MMMM YYYY"} />
             </Form.Item>
             <Form.Item {...formItemLayout} label="Nomor Seri" name="nomor_seri">
                 <Input disabled style={disabledStyle} />

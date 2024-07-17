@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Events\BarangUpdating;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Barang extends Model
 {
@@ -22,5 +23,21 @@ class Barang extends Model
     public function riwayat()
     {
         return $this->hasMany(RiwayatBarang::class);
+    }
+    public function User(): BelongsTo
+    {
+        return $this->belongsTo(User::class,'users_id');
+    }
+    public function Ruangan(): BelongsTo
+    {
+        return $this->belongsTo(MasterRuangan::class);
+    }
+    public function Barang(): BelongsTo
+    {
+        return $this->belongsTo(MasterBarang::class);
+    }
+    public function SistemOperasi(): BelongsTo
+    {
+        return $this->belongsTo(MasterSistemOperasi::class);
     }
 }

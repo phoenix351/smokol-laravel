@@ -86,13 +86,14 @@ Route::middleware('auth')->group(function () {
 
     route::get('/api/bast', [BastController::class, 'get_bast_by_barangId'])->name('bast');
     route::post('/api/bast/upload', [BastController::class, 'upload'])->name('bast.upload');
-
+    
     //route master kelola barang
     route::get('/admin/barang', [BarangController::class, 'index'])->name('admin.kelola.history_barang.index');
     Route::patch('/admin/barang', [BarangController::class, 'update'])->name('admin.kelola.history_barang.update');
     Route::post('/admin/barang', [BarangController::class, 'store'])->name('admin.kelola.history_barang.store');
     Route::delete('/admin/barang', [BarangController::class, 'destroy'])->name('admin.kelola.history_barang.destroy');
-
+    
+    route::get('/api/barang', [BarangController::class, 'fetch'])->name('api.barang');
 
 
     //route master sistem operasi

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MaintenanceSequence extends Model
 {
@@ -16,4 +17,8 @@ class MaintenanceSequence extends Model
         'problem_img_path', 'problems', 'next_step', 'solution',
         'created_at', 'updated_at'
     ];
+    public function Maintenance(): HasMany
+    {
+        return $this->hasMany(Maintenance::class);
+    }
 }

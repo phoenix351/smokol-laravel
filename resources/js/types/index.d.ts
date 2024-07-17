@@ -50,10 +50,13 @@ export interface Barang {
     id: number;
     key: number;
     barang_id: number;
+    barang:any;
+    ruangan:any;
+    user:any;
     jenis: string;
     tipe: string;
     merk: string;
-    tanggal_peroleh?: number | string | any;
+    record_time?: number | string | any;
     nomor_seri: string | null;
     nomor_urut_pendaftaran: number;
     kondisi: string;
