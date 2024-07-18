@@ -7,7 +7,7 @@ const BarChart: React.FC<{
     data: Summary[];
     title: string;
 }> = ({ data, title }) => {
-    console.log({ data });
+    // console.log({ data });
     const data_x = data.map((data_individu) => data_individu.label);
     const data_y = data.map((data_individu) => data_individu.value);
 
