@@ -14,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Storage;
 
 class BarangController extends Controller
 {
@@ -199,19 +199,7 @@ class BarangController extends Controller
 
         $searchText = "%$search%";
 
-
-        // $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])
-
-        // ->paginate($pageSize);
         $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])
-            // $data = Barang::
-            // ->when($isUser, function ($query) use ($user) {
-            //     $query->where('users_id', 'like', $user->id);
-            // })
-
-
-            // ->where('users_id', '=', $user->id)
-
             ->where(function ($query) use ($searchText) {
                 $query->whereRelation('Barang', 'jenis', 'like', $searchText)
                     ->orWhereRelation('Barang', 'merk', 'like', $searchText)
@@ -225,12 +213,10 @@ class BarangController extends Controller
         if ($isUser == 1) {
             $data->where('users_id', '=', $user->id);
         }
-        // dd($data->toSql());
+
+
 
         $data = $data->paginate($pageSize);
-
-        // $data = Barang::paginate($pageSize);
-        // return response()->json($data);
         return response()->json([
             'data' => $data->items(),
             'searchText' => $searchText,

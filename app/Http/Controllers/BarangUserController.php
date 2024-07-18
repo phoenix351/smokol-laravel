@@ -80,7 +80,7 @@ class BarangUserController extends Controller
         // $result is now a collection of the retrieved data
         // $history_barang = DB::table('barang_view')->where('pengguna_id', $user->id)->get();
         $data = $data->map(function ($row) {
-            $row['bast_path'] = $row['bast_path'] ? Storage::url($row['bast_path']) : NULL;
+            $row['bast_path'] = $row['bast_path'] ? str_replace('public', 'storage', Storage::url($row['bast_path'])) : NULL;
             return $row;
         });
         return Inertia::render('Barang', ['history_barang' => $data]);

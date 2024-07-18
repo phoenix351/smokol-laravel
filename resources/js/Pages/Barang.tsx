@@ -180,8 +180,10 @@ const BarangPage = () => {
         try {
             const response = await axios.get(route("api.barang", { page: currentPage, pageSize: pageSize, searchText: searchText, isUser: 1 }));
             // console.log({ response });
+            const modifiedData = [...response.data.data].map(item => ({ ...item, bast_path: String(item.bast_path).replace('public', 'storage') }));
 
-            setDataSource(response.data.data);
+
+            setDataSource(modifiedData);
             setTotal(response.data.total);
         } catch (error) {
             console.error(error);
@@ -252,7 +254,7 @@ const BarangPage = () => {
                 const file = info.fileList[0].originFileObj;
                 const formData = {
                     file: file,
-                    barang_id: record.key,
+                    barang_id: record.id,
                 };
                 // console.log({ info, record, formData });
                 // return 0;
