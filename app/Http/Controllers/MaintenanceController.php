@@ -244,27 +244,31 @@ class MaintenanceController extends Controller
 
         return response()->json($maintenance);
     }
-    public function riwayat($sequence_id)
+    public function riwayat($sequence)
     {
 
-        $maintenance_list = Maintenance::join('status_pemeliharaan', 'maintenances.kode_status', 'status_pemeliharaan.kode_status')
-            ->join('users', 'users.id', 'maintenances.users_id')
-            ->where('sequence_id', $sequence_id)->select(
-                'status_pemeliharaan.deskripsi',
-                'maintenances.*',
-                'users.nama_lengkap'
-            )->get();
-        $sequence = DB::table('maintenance_sequences')->where('id', $sequence_id)->select('barang_id', 'problem_img_path')->first();
+        // $maintenance_list = Maintenance::join('status_pemeliharaan', 'maintenances.kode_status', 'status_pemeliharaan.kode_status')
+        //     ->join('users', 'users.id', 'maintenances.users_id')
+        //     ->where('sequence_id', $sequence->id)->select(
+        //         'status_pemeliharaan.deskripsi',
+        //         'maintenances.*',
+        //         'users.nama_lengkap'
+        //     )->get();
+
+        $maintenance_sequence = MaintenanceSequence::with(['User', 'Barang', 'Barang.Barang', 'Perusahaan', 'Maintenance', 'Maintenance.Status','Maintenance.User'])
+            ->where('id', $sequence)
+            ->first();
+        // dd($maintenance_sequence);        // $sequence = DB::table('maintenance_sequences')->where('id', $sequence->id)->select('barang_id', 'problem_img_path')->first();
 
 
-        $detail_barang = DB::table('master_barang')->join('barang', 'barang.barang_id', 'master_barang.id')->where('barang.id', $sequence->barang_id)->select('jenis', 'merk', 'tipe', 'nomor_seri')->first();
-        if (strlen($sequence->problem_img_path) > 0) {
+        // $detail_barang = DB::table('master_barang')->join('barang', 'barang.barang_id', 'master_barang.id')->where('barang.id', $sequence->barang_id)->select('jenis', 'merk', 'tipe', 'nomor_seri')->first();
+        if (strlen($maintenance_sequence->problem_img_path) > 0) {
 
-            $detail_barang->image_path = Storage::url($sequence->problem_img_path);
+            $maintenance_sequence->image_path = Storage::url($maintenance_sequence->problem_img_path);
         }
 
 
-        return Inertia::render('User/Pengajuan/Riwayat', ['history_list' => $maintenance_list, 'detail_barang' => $detail_barang]);
+        return Inertia::render('User/Pengajuan/Riwayat', ['sequence' => $maintenance_sequence]);
     }
     public function pengajuan_fetch(Request $request)
     {

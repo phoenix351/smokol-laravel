@@ -219,7 +219,7 @@ Route::middleware('auth')->group(function () {
 
     //route untuk pengajuan
     route::get('/pengajuan', [MaintenanceController::class, 'index'])->name('pengajuan');
-    route::get('/pengajuan/riwayat/{sequence_id}', [MaintenanceController::class, 'riwayat'])->name('pengajuan.riwayat');
+    route::get('/pengajuan/riwayat/{sequence}', [MaintenanceController::class, 'riwayat'])->name('pengajuan.riwayat');
 
 
     Route::post('/maintenance/store', [MaintenanceController::class, 'store'])->name('maintenance.store');

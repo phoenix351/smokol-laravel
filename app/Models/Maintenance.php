@@ -22,6 +22,10 @@ class Maintenance extends Model
     }
     public function Status(): BelongsTo
     {
-        return $this->belongsTo(StatusPemeliharaan::class,'kode_status','kode_status');
+        return $this->belongsTo(StatusPemeliharaan::class, 'kode_status', 'kode_status');
+    }
+    public function User(): BelongsTo
+    {
+        return $this->belongsTo(User::class,'users_id');
     }
 }

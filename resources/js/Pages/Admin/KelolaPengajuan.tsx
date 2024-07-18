@@ -84,7 +84,7 @@ const KelolaPengajuanPage = () => {
                 // Parse the JSON response
                 // const dataPengajuan = await response.json();
                 const { data } = await axios.get(route('admin.pengajuan.fetch', { type: '99' }));
-                console.log({ data });
+                // console.log({ data });
                 // Update the state with the fetched items
                 setDataSource(data);
                 setSearchLoading(false);

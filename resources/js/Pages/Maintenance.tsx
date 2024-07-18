@@ -25,6 +25,7 @@ import {
 import UserPengajuanCard from "@/Components/UserPengajuanCard";
 import PemeliharaanForm from "@/Forms/PemeliharaanForm";
 import MyModal from "@/Components/Modal";
+import axios from "axios";
 
 const { Search } = Input;
 
@@ -46,14 +47,14 @@ const KelolaPengajuanPage = () => {
                 const response = await fetch(
                     route("admin.pengajuan.fetch", { type: "99", isUser: "1" })
                 );
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
+                const { data } = await axios.get(route("admin.pengajuan.fetch", { type: "99", isUser: "1" }));
+                console.log({ data });
+                
                 // Parse the JSON response
-                const dataPengajuan = await response.json();
+                // const dataPengajuan = await response.json();
 
                 // Update the state with the fetched items
-                setItems(dataPengajuan.data);
+                setItems(data);
                 setSearchLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);

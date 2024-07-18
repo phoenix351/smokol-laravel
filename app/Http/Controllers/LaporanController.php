@@ -11,6 +11,7 @@ use Inertia\Inertia;
 use App\Models\MasterBarang;
 use App\Models\MasterRuangan;
 use App\Models\Ruangan;
+use App\Models\User;
 
 class LaporanController extends Controller
 {
@@ -75,9 +76,9 @@ class LaporanController extends Controller
     {
         $dbr = $this->get_dbr($id_ruangan);
 
-
-        $nama_kepala = "Asim Saputra, S.ST, M.Ec.Dev";
-        $nip_kepala = "19760927 199901 1 001";
+        $kepala = User::whereRelation('Jabatan','nama','like','%kepala%')->first();
+        $nama_kepala = $kepala->nama_lengkap;
+        $nip_kepala = "19670322 199401 1 001";
 
 
         $pdf = Pdf::loadView('laporan.cetak', ['data' => $dbr['dbr'], 'jenis_kode' => $this->jenis_kode, 'nama_kepala' => $nama_kepala, 'nip_kepala' => $nip_kepala, 'ruangan' => $dbr['ruangan']]);
