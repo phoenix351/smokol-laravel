@@ -56,10 +56,9 @@ const { Search } = Input;
 const { Text } = Typography;
 
 const BarangPage = ({
-    history_list,
-    detail_barang,
-}: PageProps & { history_list: MaintenanceHistory[]; detail_barang: any }) => {
-    console.log({ history_list });
+sequence
+}: PageProps & { sequence:any }) => {
+    console.log({ sequence });
 
     const csrfTokenRef = useRef<string | null>(null);
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
@@ -98,40 +97,8 @@ const BarangPage = ({
         setConfirmLoadingModal(false);
     };
 
-    const data_master = history_list.map(
-        ({
-            id,
-            sequence_id,
-            barang_id,
-            created_at,
-            kode_status,
-            deskripsi,
-            users_id,
-            nama_lengkap,
-            maintenance_id,
-            jenis,
-            merk,
-            tipe,
-            nomor_seri,
-        }): MaintenanceHistory => ({
-            id,
-            sequence_id,
-            key: id,
-            barang_id,
-            created_at,
-            kode_status,
-            deskripsi,
-            users_id,
-            nama_lengkap,
-            maintenance_id,
-            jenis,
-            merk,
-            tipe,
-            nomor_seri,
-        })
-    );
     const [dataSource, setDataSource] =
-        useState<MaintenanceHistory[]>(data_master);
+        useState<MaintenanceHistory[]>(sequence.maintenance);
     // data for current barang bast
 
     useEffect(() => {
@@ -139,44 +106,7 @@ const BarangPage = ({
             csrfTokenRef.current = csrfTokenMeta.getAttribute("content");
         }
     }, []);
-    useEffect(() => {
-        setTimeout(() => {
-            let data_master = history_list.map(
-                ({
-                    id,
-                    sequence_id,
-                    barang_id,
-                    created_at,
-                    kode_status,
-                    deskripsi,
-                    users_id,
-                    nama_lengkap,
-                    maintenance_id,
-                    jenis,
-                    merk,
-                    tipe,
-                    nomor_seri,
-                }): MaintenanceHistory => ({
-                    id,
-                    sequence_id,
-                    key: id,
-                    barang_id,
-                    created_at,
-                    kode_status,
-                    deskripsi,
-                    users_id,
-                    nama_lengkap,
-                    maintenance_id,
-                    jenis,
-                    merk,
-                    tipe,
-                    nomor_seri,
-                })
-            ) as MaintenanceHistory[];
-
-            setDataSource(data_master);
-        }, 0);
-    }, [history_list]);
+   
 
     const onFinishAdd: (values: any) => any = (values: any) => {
         messageApi.open({
@@ -310,11 +240,13 @@ const BarangPage = ({
         },
         {
             title: "Status Pengajuan",
-            dataIndex: "deskripsi",
+            dataIndex: "status",
+            render: value=>value.deskripsi
         },
         {
             title: "Nama Petugas",
-            dataIndex: "nama_lengkap",
+            dataIndex: "user",
+            render:value=>value.nama_lengkap
         },
     ];
 
@@ -369,17 +301,17 @@ const BarangPage = ({
                 <Space direction="vertical">
                     <h1>Riwayat Pengajuan</h1>
                     <h3>
-                        {detail_barang.jenis} : {detail_barang.merk}{" "}
-                        {detail_barang.tipe}
+                        {sequence.barang.barang.jenis} : {sequence.barang.barang.merk}{" "}
+                        {sequence.barang.barang.tipe}
                     </h3>
                 </Space>
                 <Space>
-                    {detail_barang.spek_path ? (
+                    {sequence.barang.barang.spek_path ? (
                         <Button
                             type="primary"
                             icon={<FilePdfOutlined />}
                             onClick={() =>
-                                window.open(detail_barang.spek_path, "_blank")
+                                window.open(sequence.barang.barang.spek_path, "_blank")
                             }
                         >
                             Lihat Spek
@@ -390,8 +322,8 @@ const BarangPage = ({
                 </Space>
             </Space>
             <Divider />
-            {/* <h1>{detail_barang.image_path}</h1> */}
-            {detail_barang.image_path ? (
+            {/* <h1>{sequence.barang.barang.image_path}</h1> */}
+            {sequence.barang.barang.image_path ? (
                 <div
                     style={{
                         width: "100%",
@@ -401,7 +333,7 @@ const BarangPage = ({
                         padding: "20px",
                     }}
                 >
-                    <Image src={detail_barang.image_path} alt="Example Image" />
+                    <Image src={sequence.barang.barang.image_path} alt="Example Image" />
                 </div>
             ) : (
                 ""

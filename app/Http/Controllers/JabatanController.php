@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreJabatanRequest;
 use App\Models\MasterJabatan;
 use App\Http\Requests\StoreMasterJabatanRequest;
+use App\Http\Requests\UpdateJabatanRequest;
 use App\Http\Requests\UpdateMasterJabatanRequest;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -13,7 +15,7 @@ use Inertia\Inertia;
 
 
 
-class MasterJabatanController extends Controller
+class JabatanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +36,7 @@ class MasterJabatanController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMasterJabatanRequest $request)
+    public function store(StoreJabatanRequest $request)
     {
         try {
             $validatedData = $request->validate($request->rules());
@@ -91,7 +93,7 @@ class MasterJabatanController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMasterJabatanRequest $request, MasterJabatan $masterJabatan)
+    public function update(UpdateJabatanRequest $request, MasterJabatan $masterJabatan)
     {
         try {
             $validatedData = $request->validate($request->rules());

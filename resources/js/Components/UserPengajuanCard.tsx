@@ -24,7 +24,7 @@ const layout = {
 interface ApproveProps {
     users_id: number;
     kode_status: string;
-    sequence_id: number;
+    id: number;
 }
 const actionIconStyle = {
     marginRight: 13,
@@ -35,19 +35,21 @@ const actionStyle = {
     justifyContent: "center",
 };
 
-const handleReject = (
-    event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-    { users_id, kode_status, sequence_id }: ApproveProps,
-    csrfToken: string | null
-) => {
-    // return users_id + kode_status + sequence_id;
-};
+// const handleReject = (
+//     event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+//     { users_id, kode_status, sequence_id }: ApproveProps,
+//     csrfToken: string | null
+// ) => {
+//     // return users_id + kode_status + sequence_id;
+// };
 const handleView = (
     event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
-    { users_id, kode_status, sequence_id }: ApproveProps,
+    id : number,
     csrfToken: string | null
 ) => {
-    router.visit(route("pengajuan.riwayat", sequence_id));
+    
+    
+    router.visit(`/pengajuan/riwayat/${id}`);
 
     // return users_id + kode_status + sequence_id;
 };
@@ -85,7 +87,7 @@ const UserPengajuanCard: React.FC<{
         });
         setUrlImage(item.problem_img_path);
         setOpenPengajuan(true);
-        console.log({ item });
+        // console.log({ item });
     };
 
     return (
@@ -102,7 +104,7 @@ const UserPengajuanCard: React.FC<{
                                     color: "green",
                                 }}
                                 onClick={(event) =>
-                                    handleView(event, item, csrfToken)
+                                    handleView(event, item.id, csrfToken)
                                 }
                             >
                                 <EyeOutlined style={actionIconStyle} /> Lihat
@@ -127,7 +129,7 @@ const UserPengajuanCard: React.FC<{
                                     color: "green",
                                 }}
                                 onClick={(event) =>
-                                    handleView(event, item, csrfToken)
+                                    handleView(event, item.id, csrfToken)
                                 }
                             >
                                 <EyeOutlined style={actionIconStyle} /> Lihat
@@ -149,20 +151,20 @@ const UserPengajuanCard: React.FC<{
                                 }}
                             >
                                 <Space direction="vertical">
-                                    <Text strong>{`${item.nama_lengkap}`}</Text>
-                                    <Text type="secondary">{`${item.bidang}`}</Text>
+                                    <Text strong>{`${item.user.nama_lengkap}`}</Text>
+                                    <Text type="secondary">{`${item.user.bidang}`}</Text>
                                 </Space>
                                 <Space style={{ alignItems: "start" }}>
                                     <Text
                                         style={{ color: "#26aa99" }}
-                                    >{`${item.deskripsi}`}</Text>{" "}
+                                    >{`${item.maintenance[0].status.deskripsi}`}</Text>{" "}
                                 </Space>
                             </Space>
                             <Divider />
                             <Space direction="vertical">
                                 <Text
                                     strong
-                                >{`${item.merk} ${item.tipe} (${item.jenis})`}</Text>
+                                >{`${item.barang.barang.merk} ${item.barang.barang.tipe} (${item.barang.barang.jenis})`}</Text>
                                 <Text>{`Keluhan : ${item.keluhan}`}</Text>
                             </Space>
                             {item.kode_status > "4" ? (

@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePenanggungjawabRequest;
 use App\Http\Requests\UpdatePenanggungjawabRequest;
 use App\Models\MasterPenanggungJawab;
+use App\Models\Penanggungjawab;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class MasterPenanggungJawabController extends Controller
+class PenanggungJawabController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -36,7 +37,7 @@ class MasterPenanggungJawabController extends Controller
             //code...
             DB::beginTransaction();
 
-            MasterPenanggungJawab::create($validatedRequest);
+            Penanggungjawab::create($validatedRequest);
             DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -71,7 +72,7 @@ class MasterPenanggungJawabController extends Controller
             //code...
             DB::beginTransaction();
 
-            $penanggungjawab = MasterPenanggungJawab::find($validatedRequest['id']);
+            $penanggungjawab = PenanggungJawab::find($validatedRequest['id']);
             $penanggungjawab->nama = $validatedRequest['nama'];
             $penanggungjawab->jabatan = $validatedRequest['jabatan'];
             $penanggungjawab->email = $validatedRequest['email'];
@@ -95,7 +96,7 @@ class MasterPenanggungJawabController extends Controller
             //code...
             DB::beginTransaction();
 
-            $penanggungjawab = MasterPenanggungJawab::find($id);
+            $penanggungjawab = PenanggungJawab::find($id);
 
             $penanggungjawab->delete();
             DB::commit();
@@ -109,10 +110,10 @@ class MasterPenanggungJawabController extends Controller
         $perusahaan_id = $request->input('id');
 
         if ($perusahaan_id > 0) {
-            $data = MasterPenanggungJawab::where('perusahaan_id', $perusahaan_id)
+            $data = PenanggungJawab::where('perusahaan_id', $perusahaan_id)
                 ->get();
         } else if ($perusahaan_id == 0) {
-            $data = MasterPenanggungJawab::all();
+            $data = PenanggungJawab::all();
         }
         return response()->json([
             'data' => $data

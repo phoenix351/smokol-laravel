@@ -10,6 +10,8 @@ use Inertia\Inertia;
 
 use App\Models\MasterBarang;
 use App\Models\MasterRuangan;
+use App\Models\Ruangan;
+use App\Models\User;
 
 class LaporanController extends Controller
 {
@@ -31,7 +33,7 @@ class LaporanController extends Controller
             "Printer" => "3100203003",
             "Scanner" => "3100203004",
         ];
-        $ruangan = MasterRuangan::where('master_ruangan.id', $id_ruangan)
+        $ruangan = Ruangan::where('master_ruangan.id', $id_ruangan)
             ->leftJoin('users', 'users.id', 'master_ruangan.users_id')
             ->select('master_ruangan.*', 'users.nama_lengkap', 'users.nip')->first();
 
@@ -67,16 +69,16 @@ class LaporanController extends Controller
     public function dbr()
     {
         $dbr = $this->get_dbr();
-        $daftar_ruangan = MasterRuangan::select('id', 'nama')->get();
+        $daftar_ruangan = Ruangan::select('id', 'nama')->get();
         return Inertia::render('Admin/Laporan/Dbr', ['daftar_ruangan' => $daftar_ruangan]);
     }
     public function cetak_dbr($id_ruangan)
     {
         $dbr = $this->get_dbr($id_ruangan);
 
-
-        $nama_kepala = "Asim Saputra, S.ST, M.Ec.Dev";
-        $nip_kepala = "19760927 199901 1 001";
+        $kepala = User::whereRelation('Jabatan','nama','like','%kepala%')->first();
+        $nama_kepala = $kepala->nama_lengkap;
+        $nip_kepala = "19670322 199401 1 001";
 
 
         $pdf = Pdf::loadView('laporan.cetak', ['data' => $dbr['dbr'], 'jenis_kode' => $this->jenis_kode, 'nama_kepala' => $nama_kepala, 'nip_kepala' => $nip_kepala, 'ruangan' => $dbr['ruangan']]);
