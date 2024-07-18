@@ -78,7 +78,7 @@ class LaporanController extends Controller
 
         $kepala = User::whereRelation('Jabatan','nama','like','%kepala%')->first();
         $nama_kepala = $kepala->nama_lengkap;
-        $nip_kepala = "19670322 199401 1 001";
+        $nip_kepala = $kepala->nip;
 
 
         $pdf = Pdf::loadView('laporan.cetak', ['data' => $dbr['dbr'], 'jenis_kode' => $this->jenis_kode, 'nama_kepala' => $nama_kepala, 'nip_kepala' => $nip_kepala, 'ruangan' => $dbr['ruangan']]);
