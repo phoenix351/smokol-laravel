@@ -83,22 +83,22 @@ class BastController extends Controller
             //check is already have docs
             $barang_id = $request->post('barang_id');
             $current_path = Barang::where('id', $barang_id)->value('bast_path');
-            if (Storage::exists($current_path)) {
+            // dd($barang_id);
+            if ($current_path && Storage::exists($current_path)) {
                 // Delete the file
                 Storage::delete($current_path);
                 $message = 'File deleted successfully.';
-            } else {
-                $message = 'File not found.';
             }
+            
             // return response()->json($current_path, 200);
-
             $path = $request->file('file')->store('public/files/bast');
-
             Barang::where('id', $barang_id)->update(
                 ['bast_path' => $path]
             );
+            dd($path);
+
             return response()->json(
-                ['message' => 'Berhasil mengunnggah dokumen BAST'],
+                ['message' => 'Berhasil mengunggah dokumen BAST'],
                 201
             );
         } catch (\Throwable $th) {

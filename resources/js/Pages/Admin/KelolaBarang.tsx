@@ -39,6 +39,7 @@ import {
     WarningOutlined,
     StopOutlined,
     ExportOutlined,
+    FilePdfOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
@@ -432,7 +433,7 @@ const BarangPage = ({
         {
             title: "jenis",
             dataIndex: "barang",
-            
+
             render: (value) => value.jenis,
             onFilter: (value: string | number | boolean, record: Barang) =>
                 record.jenis === value,
@@ -515,7 +516,7 @@ const BarangPage = ({
             render: (value) => value.nama_lengkap
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
-        
+
     ];
 
     function handlePageChange(current: number, pageSize: number, searchText: string): void {
@@ -564,7 +565,7 @@ const BarangPage = ({
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
-                <Button onClick={() => handleExport(exportColumns, dataSource)}><ExportOutlined />Export as CSV</Button>
+                <Button type="primary" onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText }), "_blank")}><FilePdfOutlined />cetak hasil pencarian</Button>
             </Space>
 
             <Table

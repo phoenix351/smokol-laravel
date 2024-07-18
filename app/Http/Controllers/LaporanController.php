@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Http\Request;
@@ -15,14 +16,19 @@ use App\Models\User;
 
 class LaporanController extends Controller
 {
-    protected $jenis_kode  = [
-        "PC Workstation" => "3100101007",
-        "P.C Unit" => "3100102001",
-        "Lap Top" => "3100102002",
-        "Note Book" => "3100102003",
-        "Printer" => "3100203003",
-        "Scanner" => "3100203004",
-    ];
+    
+    private function generate_code(string $jenis) 
+    {
+        $jenis_kode  = [
+            "PC Workstation" => "3100101007",
+            "P.C Unit" => "3100102001",
+            "Lap Top" => "3100102002",
+            "Note Book" => "3100102003",
+            "Printer" => "3100203003",
+            "Scanner" => "3100203004",
+        ];
+        return $jenis_kode[$jenis];
+    }
     private function get_dbr($id_ruangan = 0)
     {
         $jenis_kode = [
@@ -60,7 +66,7 @@ class LaporanController extends Controller
             ->orderBy('nomor_urut_pendaftaran', 'asc')
             ->get();
         $data->transform(function ($item, $key) {
-            $item['kode_barang'] = $this->jenis_kode[$item['jenis']];
+            $item['kode_barang'] = $this->generate_code($item['jenis']);
             return $item;
         });
 
@@ -76,12 +82,12 @@ class LaporanController extends Controller
     {
         $dbr = $this->get_dbr($id_ruangan);
 
-        $kepala = User::whereRelation('Jabatan','nama','like','%kepala%')->first();
+        $kepala = User::whereRelation('Jabatan', 'nama', 'like', '%kepala%')->first();
         $nama_kepala = $kepala->nama_lengkap;
         $nip_kepala = $kepala->nip;
 
 
-        $pdf = Pdf::loadView('laporan.cetak', ['data' => $dbr['dbr'], 'jenis_kode' => $this->jenis_kode, 'nama_kepala' => $nama_kepala, 'nip_kepala' => $nip_kepala, 'ruangan' => $dbr['ruangan']]);
+        $pdf = Pdf::loadView('laporan.cetak', ['data' => $dbr['dbr'],  'nama_kepala' => $nama_kepala, 'nip_kepala' => $nip_kepala, 'ruangan' => $dbr['ruangan']]);
         return $pdf->stream();
     }
     public function fetch_dbr($id_ruangan)
@@ -89,4 +95,5 @@ class LaporanController extends Controller
         $dbr = $this->get_dbr($id_ruangan);
         return response()->json($dbr, 200);
     }
+
 }

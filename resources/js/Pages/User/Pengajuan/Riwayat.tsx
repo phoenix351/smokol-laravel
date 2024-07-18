@@ -323,7 +323,7 @@ sequence
             </Space>
             <Divider />
             {/* <h1>{sequence.barang.barang.image_path}</h1> */}
-            {sequence.barang.barang.image_path ? (
+            {sequence.image_path ? (
                 <div
                     style={{
                         width: "100%",
@@ -333,7 +333,7 @@ sequence
                         padding: "20px",
                     }}
                 >
-                    <Image src={sequence.barang.barang.image_path} alt="Example Image" />
+                    <Image src={sequence.image_path} alt="Example Image" />
                 </div>
             ) : (
                 ""
