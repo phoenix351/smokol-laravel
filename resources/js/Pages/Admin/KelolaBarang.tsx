@@ -39,6 +39,7 @@ import {
     WarningOutlined,
     StopOutlined,
     ExportOutlined,
+    FilePdfOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
@@ -564,7 +565,7 @@ const BarangPage = ({
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
-                <Button onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText }), "_blank")}><ExportOutlined />Export as CSV</Button>
+                <Button type="primary" onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText }), "_blank")}><FilePdfOutlined />cetak hasil pencarian</Button>
             </Space>
 
             <Table
