@@ -432,7 +432,7 @@ const BarangPage = ({
         {
             title: "jenis",
             dataIndex: "barang",
-            
+
             render: (value) => value.jenis,
             onFilter: (value: string | number | boolean, record: Barang) =>
                 record.jenis === value,
@@ -515,7 +515,7 @@ const BarangPage = ({
             render: (value) => value.nama_lengkap
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
-        
+
     ];
 
     function handlePageChange(current: number, pageSize: number, searchText: string): void {
@@ -564,7 +564,7 @@ const BarangPage = ({
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
-                <Button onClick={() => handleExport(exportColumns, dataSource)}><ExportOutlined />Export as CSV</Button>
+                <Button onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText }), "_blank")}><ExportOutlined />Export as CSV</Button>
             </Space>
 
             <Table

@@ -86,6 +86,7 @@ Route::middleware('auth')->group(function () {
 
     //route master kelola barang
     route::get('/admin/barang', [BarangController::class, 'index'])->name('admin.kelola.history_barang.index');
+    route::get('/admin/barang/cetak', [BarangController::class, 'cetak'])->name('admin.kelola.history_barang.cetak');
     Route::patch('/admin/barang', [BarangController::class, 'update'])->name('admin.kelola.history_barang.update');
     Route::post('/admin/barang', [BarangController::class, 'store'])->name('admin.kelola.history_barang.store');
     Route::delete('/admin/barang', [BarangController::class, 'destroy'])->name('admin.kelola.history_barang.destroy');

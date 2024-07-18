@@ -7,7 +7,8 @@ use App\Models\Barang;
 use App\Models\MasterBarang;
 use App\Http\Requests\StoreBarangRequest;
 use App\Http\Requests\UpdateBarangRequest;
-
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
@@ -193,11 +194,34 @@ class BarangController extends Controller
     {
         // $current = $request->get('current');
         $user = auth()->user();
+        $data = $this->get_barang($request);
         $pageSize = $request->get('pageSize') ?? 10;
         $search = $request->get('searchText');
+
         $isUser = $request->get('isUser');
 
         $searchText = "%$search%";
+
+        $data = $data->paginate($pageSize);
+        return response()->json([
+            'data' => $data->items(),
+            'searchText' => $searchText,
+            'total' => $data->total(),
+            'user' => $user->id,
+            // 'current' => $current,
+            // 'pageSize' => $pageSize,
+        ]);
+    }
+
+    public function get_barang(Request $request)
+    {
+        $user = auth()->user();
+        $pageSize = $request->get('pageSize') ?? 10;
+        $search = $request->get('searchText');
+
+        $isUser = $request->get('isUser');
+        $searchText = "%$search%";
+
 
         $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])
             ->where(function ($query) use ($searchText) {
@@ -213,17 +237,30 @@ class BarangController extends Controller
         if ($isUser == 1) {
             $data->where('users_id', '=', $user->id);
         }
+        return $data;
+    }
+    private function generate_code(string $jenis)
+    {
+        $jenis_kode  = [
+            "PC Workstation" => "3100101007",
+            "P.C Unit" => "3100102001",
+            "Lap Top" => "3100102002",
+            "Note Book" => "3100102003",
+            "Printer" => "3100203003",
+            "Scanner" => "3100203004",
+        ];
+        return $jenis_kode[$jenis];
+    }
+    public function cetak(Request $request)
+    {
+        $barang = $this->get_barang($request)->get();
+        $barang->transform(function ($item, $key) {
+            $item['kode_barang'] = $this->generate_code($item->Barang['jenis']);
+            return $item;
+        });
+        // dd($barang);
 
-
-
-        $data = $data->paginate($pageSize);
-        return response()->json([
-            'data' => $data->items(),
-            'searchText' => $searchText,
-            'total' => $data->total(),
-            'user' => $user->id,
-            // 'current' => $current,
-            // 'pageSize' => $pageSize,
-        ]);
+        $pdf = FacadePdf::loadView('laporan.barang', ['data' => $barang]);
+        return $pdf->stream();
     }
 }
