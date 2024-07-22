@@ -20,40 +20,7 @@ class BarangUserController extends Controller
     public function index()
     {
         $user = auth()->user();
-        // $history_barang = Barang::join('master_barang', 'barang.barang_id', '=', 'master_barang.id')
-        //     ->join('master_ruangan', 'barang.ruangan_id', '=', 'master_ruangan.id')
-        //     ->join('master_sistem_operasi', 'barang.sistem_operasi_id', '=', 'master_sistem_operasi.id')
-        //     ->join('users', 'barang.users_id', '=', 'users.id')
-        //     ->join('master_jabatan', 'users.jabatan_id', '=', 'master_jabatan.id')
-        //     // ->leftJoin('bast', 'bast.barang_id', 'like', 'barang.id')
-        //     ->select(
-        //         'barang.id',
-        //         'barang.barang_id',
-        //         'barang.sistem_operasi_id',
-        //         'barang.users_id',
-        //         'barang.ruangan_id',
-        //         'master_barang.tanggal_peroleh',
-        //         // 'barang.tanggal_kembali',
-        //         'barang.kondisi',
-        //         'barang.status_pemeliharaan',
-        //         'barang.bast_path',
-        //         'barang.bast_upload_date',
-        //         'barang.is_approved',
-        //         'master_barang.jenis as barang_jenis',
-        //         'master_barang.merk as barang_merk',
-        //         'master_barang.tipe as barang_tipe',
-        //         'master_barang.nomor_seri as barang_nomor_seri',
-        //         // 'master_barang.tahun_peroleh as barang_peroleh',
-        //         'master_ruangan.nama as ruangan_nama',
-        //         'master_sistem_operasi.nama as sistem_operasi_nama',
-        //         'master_sistem_operasi.arsitektur as sistem_operasi_arsitektur',
-        //         'master_jabatan.nama as jabatan_nama',
-        //         'master_jabatan.tingkat as jabatan_tingkat',
-        //         'master_jabatan.jenis as jabatan_jenis',
-        //         'users.nama_lengkap as users_nama_lengkap'
-        //     )
-        //     ->where('users.id', $user->id)
-        //     ->get();
+
 
         $data = MasterBarang::join('barang', 'barang.barang_id', 'master_barang.id')
             ->leftJoin('users', 'users.id', 'barang.users_id')
@@ -83,9 +50,7 @@ class BarangUserController extends Controller
             $row['bast_path'] = $row['bast_path'] ? str_replace('public', 'storage', Storage::url($row['bast_path'])) : NULL;
             return $row;
         });
-        return Inertia::render('Barang', ['history_barang' => $data]);
-
-        // return Inertia::render('Barang', ['daftar_barang' => DB::table('view_barang_details')->where('id_pengguna', $user->id)->get()]);
+        return Inertia::render('User/Barang/index', ['history_barang' => $data]);
     }
 
     /**
@@ -109,7 +74,8 @@ class BarangUserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $barang = Barang::with(['Barang', 'User', 'Riwayat'])->find($id);
+        return Inertia::render('User/Barang/Detail', ['barang' => $barang]);
     }
 
     /**

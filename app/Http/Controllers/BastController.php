@@ -6,6 +6,8 @@ use App\Models\BastModel;
 use App\Http\Requests\StoreBastModelRequest;
 use App\Http\Requests\UpdateBastModelRequest;
 use App\Models\Barang;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
@@ -89,7 +91,7 @@ class BastController extends Controller
                 Storage::delete($current_path);
                 $message = 'File deleted successfully.';
             }
-            
+
             // return response()->json($current_path, 200);
             $path = $request->file('file')->store('public/files/bast');
             Barang::where('id', $barang_id)->update(
@@ -123,5 +125,14 @@ class BastController extends Controller
             // Return a response with 404 status if the file is not found
             return response()->json([$filePath]);
         }
+    }
+    public function cetak(string $barang_id)
+    {
+
+        $barang = Barang::with(['User', 'Barang'])->where('id','=',$barang_id)->first();
+        $pihak1 = User::where('nama_lengkap', 'like', '%junitha%')->first();
+        $pihak2 = $barang->User;
+        $pdf = FacadePdf::loadView('laporan.bast', ['barang' => $barang, 'pihak1' => $pihak1, 'pihak2' => $pihak2]);
+        return $pdf->stream();
     }
 }

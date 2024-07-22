@@ -419,15 +419,15 @@ const BarangPage = () => {
         {
             title: "Nama Barang",
             dataIndex: "barang",
-            
-            render: value => <Link>{value.merk} / {value.tipe}</Link>,
+
+            render: (value, { id }) => <Link onClick={() => router.get(`barang/detail/${id}`)}>{value.merk} / {value.tipe}</Link>,
 
         },
         {
             title: "jenis",
             dataIndex: "barang",
             render: value => value.jenis,
-            
+
         },
         // {
         //     title: "merk",
@@ -436,7 +436,7 @@ const BarangPage = () => {
         //     render: value => value.merk,
         //     sorter: merkSorter as CompareFn<object>,
         // },
-      
+
         // {
         //     title: "tipe",
         //     dataIndex: "barang",
@@ -590,7 +590,7 @@ const BarangPage = () => {
 
     return (
         <div>
-            <Head title="History Barang" />
+            <Head title="Barang" />
             <Tour
                 open={openTour}
                 onClose={() => setOpenTour(false)}

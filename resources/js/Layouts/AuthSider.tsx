@@ -17,6 +17,7 @@ import {
     CarryOutOutlined,
     FolderOutlined,
     TableOutlined,
+    BookOutlined,
 } from "@ant-design/icons";
 import { User } from "@/types";
 type AuthSiderProps = {
@@ -76,6 +77,26 @@ const AuthSider: React.FC<AuthSiderProps> = ({
                 onClick: () => handleMenuClick("pengajuan"),
                 label: "Daftar Pengajuan",
             },
+            {
+                icon: <FileDoneOutlined />,
+                key:"user.pengajuan",
+                label:"Pengajuan",
+                children: [
+                    {
+                        key: "user.pengajuan.kuasa",
+                        // icon: <DatabaseOutlined />,
+                        label: "Kuasa",
+                        onClick: () => handleMenuClick("user.pengajuan.kuasa"),
+                    },
+                    {
+                        key: "user.pengajuan.maintenance",
+                        // icon: <HomeOutlined />,
+                        label: "Pemeliharaan",
+                        onClick: () => handleMenuClick("user.pengajuan.maintenance"),
+                    },
+                ]
+
+            },
 
             {
                 key: "admin.kelola.history_barang.index",
@@ -84,9 +105,10 @@ const AuthSider: React.FC<AuthSiderProps> = ({
                 onClick: () =>
                     handleMenuClick("admin.kelola.history_barang.index"),
             },
+          
             {
                 key: "admin.kelola.pengajuan",
-                icon: <FileDoneOutlined />,
+                icon:<BookOutlined/>,
                 label: "Kelola Pengajuan",
                 onClick: () => handleMenuClick("admin.kelola.pengajuan"),
             },
@@ -107,7 +129,7 @@ const AuthSider: React.FC<AuthSiderProps> = ({
                 key: "master",
                 label: "Kelola Master",
                 icon: <FolderOutlined />,
-                onClick: () => console.log(""),
+                // onClick: () => console.log(""),
                 children: [
                     {
                         key: "admin.master.barang",

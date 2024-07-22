@@ -212,6 +212,8 @@ Route::middleware('auth')->group(function () {
 
     //route barang untuk user
     route::get('/barang', [BarangUserController::class, 'index'])->name('barang');
+    route::get('/barang/detail/{id}', [BarangUserController::class, 'show'])->name('barang.detail');
+    route::get('/barang/detail/{id}/cetak', [BastController::class, 'cetak'])->name('barang.detail.cetak_bast');
     Route::patch('/barang', [BarangController::class, 'update'])->name('barang.update');
     Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
     Route::delete('/barang', [BarangController::class, 'destroy'])->name('barang.destroy');
@@ -220,6 +222,7 @@ Route::middleware('auth')->group(function () {
 
     //route untuk pengajuan
     route::get('/pengajuan', [MaintenanceController::class, 'index'])->name('pengajuan');
+    route::get('/pengajuan/maintenance', [MaintenanceController::class, 'index'])->name('pengajuan.maintenance');
     route::get('/pengajuan/riwayat/{sequence}', [MaintenanceController::class, 'riwayat'])->name('pengajuan.riwayat');
 
 
