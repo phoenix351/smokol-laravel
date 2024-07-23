@@ -6,14 +6,23 @@ import {
     JSXElementConstructor,
     ReactFragment,
     ReactPortal,
+    useState,
 } from "react";
-import { Button, Card, Col, Image, Row } from "antd";
+import { Button, Card, Col, Form, Image, Row } from "antd";
 
 import styles from "./barang.module.css";
+import { ExportOutlined } from "@ant-design/icons";
+import BastForm from "./BastForm";
 
 const Detail = ({ auth, barang }: { auth: any, barang: any }) => {
     console.clear();
-    console.log({ barang });
+    console.log({ auth});
+
+    const [form] = Form.useForm();
+
+    const [openBast, setOpenBast] = useState(false)
+
+
 
 
     return (
@@ -34,12 +43,13 @@ const Detail = ({ auth, barang }: { auth: any, barang: any }) => {
 
 
                                     <Button > Lihat Dokumen</Button></Row> : <>
-                                    Silahkan Unduh BAST disini
+                                    Silahkan membuat BAST disini
                                     <Button onClick={() => {
-                                        console.log("siiii");
-                                        window.open(`${barang.id}/cetak`, "_blank")
+
+                                        // window.open(`${barang.id}/cetak`, "_blank")
+                                        setOpenBast(true)
                                     }} className={styles.button} type="primary">
-                                        Draft
+                                        <ExportOutlined /> Buka Formulir
                                     </Button>
                                     <Row className={styles.row}>
                                         Kemudian Upload yang sudah ditandatangani
@@ -53,7 +63,7 @@ const Detail = ({ auth, barang }: { auth: any, barang: any }) => {
                 </Row >
             </Card >
 
-            <Image />
+            <BastForm form={form} open={openBast} onCancel={() => setOpenBast(false)} user={auth.user} key="bast-form" />
 
         </>
     );

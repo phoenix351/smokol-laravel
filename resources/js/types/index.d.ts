@@ -5,7 +5,8 @@ export interface User {
     email: string;
     email_verified_at: string;
     nip: string;
-    posisi: string;
+    jabatan_id: string;
+    updated_at:Date;
     bidang: string;
     role: string;
 }

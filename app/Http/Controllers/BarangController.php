@@ -220,6 +220,7 @@ class BarangController extends Controller
         $search = $request->get('searchText');
 
         $isUser = $request->get('isUser');
+        $userId = $request->get('userId') ?? $user->id;
         $searchText = "%$search%";
 
 
@@ -235,7 +236,8 @@ class BarangController extends Controller
             });
 
         if ($isUser == 1) {
-            $data->where('users_id', '=', $user->id);
+
+            $data->where('users_id', '=', $userId);
         }
         return $data;
     }
