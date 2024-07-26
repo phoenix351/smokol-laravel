@@ -208,12 +208,12 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Statistics');
     })->name('statistics');
 
-
+    // cetak bast 
+    route::get('/bast/cetak', [BastController::class, 'cetak'])->name('bast.cetak');
 
     //route barang untuk user
     route::get('/barang', [BarangUserController::class, 'index'])->name('barang');
     route::get('/barang/detail/{id}', [BarangUserController::class, 'show'])->name('barang.detail');
-    route::get('/barang/detail/{id}/cetak', [BastController::class, 'cetak'])->name('barang.detail.cetak_bast');
     Route::patch('/barang', [BarangController::class, 'update'])->name('barang.update');
     Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
     Route::delete('/barang', [BarangController::class, 'destroy'])->name('barang.destroy');

@@ -4,6 +4,55 @@
     Carbon::setLocale('id');
     Carbon::now()->formatLocalized('%A, %d %B %Y');
     $today = Carbon::now();
+    $daftar_hari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+    $daftar_bulan = [
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
+    ];
+
+    function angkaKeHuruf($angka)
+    {
+        $huruf = [
+            '',
+            'satu',
+            'dua',
+            'tiga',
+            'empat',
+            'lima',
+            'enam',
+            'tujuh',
+            'delapan',
+            'sembilan',
+            'sepuluh',
+            'sebelas',
+        ];
+        if ($angka < 12) {
+            return $huruf[$angka];
+        } elseif ($angka < 20) {
+            return $huruf[$angka - 10] . ' belas';
+        } elseif ($angka < 100) {
+            return $huruf[floor($angka / 10)] . ' puluh ' . $huruf[$angka % 10];
+        } elseif ($angka < 200) {
+            return 'seratus ' . angkaKeHuruf($angka % 100);
+        } elseif ($angka < 1000) {
+            return $huruf[floor($angka / 100)] . ' ratus ' . angkaKeHuruf($angka % 100);
+        } elseif ($angka < 2000) {
+            return 'seribu ' . angkaKeHuruf($angka % 1000);
+        } elseif ($angka < 10000) {
+            return $huruf[floor($angka / 1000)] . ' ribu ' . angkaKeHuruf($angka % 1000);
+        }
+        // Anda dapat melanjutkan dengan ribuan, jutaan, dan seterusnya
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -17,10 +66,16 @@
 <style>
     @page {
         size: A4;
+        /* margin: 100px; */
+        margin-top: 0.5in;
+        margin-left: 1in;
+        margin-right: 1in;
+        margin-bottom: 1in;
     }
 
     body {
-        font-size: 13px
+        font-size: 13px;
+        font-family: 'Times New Roman', Times, serif
     }
 
     .header {
@@ -35,12 +90,20 @@
 
     .title {
         text-align: center;
-        font-weight: 400;
-        text-transform: uppercase
+        font-weight: 600;
+        text-transform: uppercase;
+        white-space: pre-line;
+        width: 100%
+    }
+
+    .sub-title {
+        text-align: center;
+        font-weight: normal;
+        text-transform: uppercase;
     }
 
 
-    .table {
+    table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 5px;
@@ -114,30 +177,93 @@
     .materai {
         height: 5rem;
     }
+
+    .logo-container {
+        display: flex;
+    }
+
+    .logo-nama {
+        text-align: left;
+        font-weight: bold;
+        font-size: 1.3rem;
+        font-family: Arial, Helvetica, sans-serif;
+        font-style: italic;
+    }
+
+    .logo-image {
+        padding: 10px
+    }
+
+    .table-row,
+    .table-data {
+        border: 1px solid #000;
+        padding: 10px;
+        border-collapse: collapse;
+
+    }
+
+
+
+    .bold {
+        font-weight: bold;
+    }
+
+    .pasal {
+        font-size: 1.1rem;
+        padding: 10px;
+    }
 </style>
 
 <body>
-    <div class="header">
-        <img width="200" src="images/bps2.png" alt="logo garuda">
-        <h3 class="title">BADAN PUSAT STATISTIK</h3>
-        <h3 class="title">PROVINSI SULAWESI UTARA</h3>
-        Jl. 17 Agustus Manado, Sulawesu Utara
-        Telp : (0431) 847044, Fax : (0431) 862204
-        Homepage: http:\\sulut.bps.go.id, email : bps7100@bps.go.id
-    </div>
-    <hr>
-    <h3 class="title">BERITA ACARA SERAH TERIMA</h3>
-    <h3 class="title">PENATAAUSAHAAN BARANG MILIK NEGARA (BASTP-BMN)</h3>
 
-    <span class="title" style="margin-bottom:2rem">Nomor : XX/71000/XX.XX/YYYYY</span>
+    <table>
+        <tbody>
+            <tr>
+                <td rowspan="3"><img class="logo-image" width="100" src="images/bps2.png" alt="logo garuda"></td>
+                <td class="logo-nama">BADAN PUSAT STATISTIK</td>
+            </tr>
+            <tr>
+                <td class="logo-nama">PROVINSI SULAWESI UTARA</td>
+            </tr>
+            <tr>
+                <td>Jl. 17 Agustus Manado, Sulawesi Utara
+                    Telp : (0431) 847044, Fax : (0431) 862204
+                    Homepage: http:\\sulut.bps.go.id, email : bps7100@bps.go.id</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <table>
+        <tbody>
+            <tr>
+                <td class="title">
+                    BERITA ACARA SERAH TERIMA
+                </td>
+            </tr>
+            <tr>
+                <td class="title">
+                    PENATAAUSAHAAN BARANG MILIK NEGARA (BASTP-BMN)
+                </td>
+            </tr>
+            <tr>
+                <td class="sub-title">
+                    Nomor : XX/71000/XX.XX/YYYYY
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+
 
 
     <table>
         <tbody>
             <tr style="margin-bottom: 50px">
-                <td colspan="4">Pada Hari ini, {{ $today->format('l') }} tanggal
-                    {{ $today->format('d') }} tahun
-                    {{ $today->format('Y') }}
+                <td colspan="4">Pada Hari ini, {{ $daftar_hari[$today->format('w') - 1] }} tanggal
+                    {{ angkaKeHuruf($today->format('d')) }} bulan {{ $daftar_bulan[$today->format('n') - 1] }} tahun
+                    {{ angkaKeHuruf($today->format('Y')) }},
                     bertempat di Kota Manado, kami yang bertanda tangan di bawah ini : </td>
             </tr>
             <tr style="width: 100%">
@@ -152,19 +278,15 @@
                 <td>:</td>
                 <td>{{ $pihak1->nip }}</td>
             </tr>
-            
+
             <tr>
                 <td></td>
                 <td>Jabatan</td>
                 <td>:</td>
-                <td>{{ $pihak1->jabatan->nama . ' ' . $pihak1->tingkat }}</td>
+                <td>{{ $pihak1->jabatan->nama . ' ' . $pihak1->tingkat . ', untuk selanjutnya disebut PIHAK PERTAMA ' }}
+                </td>
             </tr>
-            <tr>
-                <td></td>
-                <td colspan="3">Dalam hal ini bertindak untuk dan atas nama Tim Pengelola Barang Milik Negara (BMN)
-                    untuk
-                    selanjutnya disebut sebagai Pihak Pertama</td>
-            </tr>
+
             <tr>
                 <td></td>
                 <td></td>
@@ -183,57 +305,120 @@
                 <td>:</td>
                 <td>{{ $pihak2->nip }}</td>
             </tr>
-            
+
             <tr>
                 <td></td>
                 <td>Jabatan</td>
                 <td>:</td>
-                <td>{{ $pihak2->jabatan->nama . ' ' . $pihak2->tingkat }}</td>
+                <td>{{ $pihak2->jabatan->nama . ' ' . $pihak2->tingkat . ', untuk selanjutnya disebut PIHAK KEDUA ' }}
+                </td>
             </tr>
-            <tr>
-                <td></td>
 
-                <td colspan="3">Dalam hal ini bertindak untuk dan atas nama Kuasa Pengguna Barang Milik Negara (BMN)
-                    untuk
-                    selanjutnya disebut sebagai Pihak Kedua</td>
-            </tr>
             <tr>
                 <td colspan="4">
 
-                    Telah melakukan serah terima Barang Milik Negara yang pengadaanya dilaksanakan dan menjadi tanggung
-                    jawab mutlak
-                    Kuasa Pengguna Barang Milik Negara (BMN) berdasarkan DIPA Belanja. Rincian Barang Milik Negara yang
-                    dimaksud adalah sebagai berikut:
+                    telah melakukan serah terima Barang Milik Negara dengan ketentuan sebagaimana disebutkan dalam pasal
+                    – pasal di bawah ini :
                 </td>
             </tr>
-            <tr>
-                <td></td>
-                <td>Jenis</td>
-                <td>:</td>
-                <td>{{ $barang->barang->jenis }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Merk/Tipe</td>
-                <td>:</td>
-                <td>{{ $barang->barang->merk }}/{{ $barang->barang->tipe }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Tahun Perolehan</td>
-                <td>:</td>
-                <td>2023</td>
-            </tr>
-            <tr>
-                <td colspan="4">
+        </tbody>
+    </table>
 
-                    Dengan ditandatanganinya Berita Acara Serah Terima ini maka tanggung jawab pengelolaan Barang Milik
-                    Negara beralih dari PIHAK PERTAMA kepada PIHAK KEDUA
+    <table>
+        <tbody>
+
+            <tr>
+
+                <th class="pasal">Pasal 1</th>
+            </tr>
+            <tr>
+
+                <td>PIHAK PERTAMA menyerahkan dan PIHAK KEDUA menerima hak atas Barang Milik Negara,
+                    berupa : </td>
+            </tr>
+        </tbody>
+    </table>
+    <table style="margin-top:1rem;border-collapse:collapse">
+        <tr>
+            <td></td>
+            <td class="table-data bold">No.</td>
+            <td class="table-data bold">Nama Barang</td>
+            <td class="table-data bold">Jenis</td>
+            <td class="table-data bold">Nomor Seri</td>
+            <td class="table-data bold">NUP</td>
+
+        </tr>
+        <tbody>
+            @foreach ($barangs as $index => $barang)
+                <tr>
+                    <td style="width:50px"></td>
+                    <td class="table-data">{{ $index + 1 }}</td>
+                    <td class="table-data">{{ $barang->barang->merk }}/{{ $barang->barang->tipe }}</td>
+                    <td class="table-data">{{ $barang->barang->jenis }}</td>
+                    <td class="table-data">{{ $barang->barang->nomor_seri }}</td>
+                    <td class="table-data">{{ $barang->barang->nomor_urut_pendaftaran }}</td>
+
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+    <table>
+        <tbody>
+            <tr>
+
+                <th class="pasal">Pasal 2</th>
+            </tr>
+            <tr>
+
+                <td>BMN tersebut hanya untuk dipinjamkan dan digunakan sebagai penunjang kegiatan
+                    perkantoran dan sewaktu-waktu BMN tersebut akan ditarik jika diperlukan atau tidak dimanfaatkan
+                    dengan baik. </td>
+            </tr>
+            <tr>
+
+                <th class="pasal">Pasal 3</th>
+            </tr>
+            <tr>
+
+                <td>Dalam pengoperasiannya Pihak Kedua bertanggung jawab penuh untuk memperbaiki atau
+                    mengganti atas kerusakan atau kehilangan BMN tersebut. </td>
+            </tr>
+            <tr>
+
+                <th class="pasal">Pasal 4</th>
+            </tr>
+            <tr>
+
+                <td>Ketika selesai tugas dan/atau dipindahtugaskan maka Laptop tersebut harus segera
+                    diserahkan kembali kepada kuasa pengguna barang dalam hal ini Kepala BPS Provinsi Sulawesi Utara.
                 </td>
+            </tr>
+            <tr>
+
+                <th class="pasal">Pasal 5</th>
+            </tr>
+            <tr>
+
+                <td>Dengan ditandatanganinya BAST ini, maka tanggung jawab atas pengurusan dalam
+                    pengelolaan dan pemeliharaannya sebagaimana tersebut dalam pasal 1 beralih dari Pihak Pertama ke
+                    Pihak Kedua selama masa pemanfaatannya. </td>
+            </tr>
+            <tr>
+
+                <th class="pasal">Pasal 6</th>
+            </tr>
+            <tr>
+
+                <td>BAST ini dibuat sebagai bukti yang sah dalam rangkap 2 (dua) untuk dipergunakan
+                    semestinya. </td>
             </tr>
 
         </tbody>
     </table>
+    {{-- 
+
+        </tbody>
+    </table> --}}
     <div style="width: 100%;display:flex;justify-content:center;margin-top:3rem">
 
         <table style="margin:auto">

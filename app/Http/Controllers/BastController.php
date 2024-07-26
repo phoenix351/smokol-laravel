@@ -126,13 +126,18 @@ class BastController extends Controller
             return response()->json([$filePath]);
         }
     }
-    public function cetak(string $barang_id)
+    public function cetak(Request $request)
     {
+        $pihak1_user_id = $request->get('pihak1_user_id');
+        $pihak2_user_id = $request->get('pihak2_user_id');
+        $daftar_id_barang = $request->get('barangs');
+        $barangs = Barang::with(['User', 'Barang'])->whereIn('id', $daftar_id_barang)->get();
+        // dd($barangs);
+        $pihak1 = User::find($pihak1_user_id);
+        $pihak2 = User::find($pihak2_user_id);
 
-        $barang = Barang::with(['User', 'Barang'])->where('id','=',$barang_id)->first();
-        $pihak1 = User::where('nama_lengkap', 'like', '%junitha%')->first();
-        $pihak2 = $barang->User;
-        $pdf = FacadePdf::loadView('laporan.bast', ['barang' => $barang, 'pihak1' => $pihak1, 'pihak2' => $pihak2]);
-        return $pdf->stream();
+        $pdf = FacadePdf::loadView('laporan.bast', ['barangs' => $barangs, 'pihak1' => $pihak1, 'pihak2' => $pihak2]);
+        // return view('laporan.bast', ['barangs' => $barangs, 'pihak1' => $pihak1, 'pihak2' => $pihak2]);
+        return $pdf->stream('bast.pdf');
     }
 }
