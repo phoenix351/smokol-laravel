@@ -9,6 +9,8 @@ use App\Http\Requests\StoreBarangRequest;
 use App\Http\Requests\UpdateBarangRequest;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Barryvdh\DomPDF\PDF;
+use League\Csv\Writer;
+use SplTempFileObject;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
@@ -256,11 +258,47 @@ class BarangController extends Controller
     public function cetak(Request $request)
     {
         $barang = $this->get_barang($request)->get();
+
         $barang->transform(function ($item, $key) {
             $item['kode_barang'] = $this->generate_code($item->Barang['jenis']);
             return $item;
         });
-        // dd($barang);
+        $isExcel = $request->get('isExcel');
+        if ($isExcel == 1) {
+            $headers = ['No', 'Kode Barang', 'Nama Barang', 'Jenis', 'NUP', 'Tahun Peroleh', 'Nomor Seri', 'Pegawai', 'Kondisi'];
+            $barangFlatten = [];
+            foreach ($barang as $key => $value) {
+                // $barangFlatten[] = [
+                //     'No' => $key + 1,
+                //     'Kode Barang' => $value['kode_barang'],
+                //     'Nama Barang' => $value->barang['merk'] . ' / ' . $value->barang['tipe'],
+                //     'Jenis' => $value->barang['jenis'],
+                //     'NUP' => $value->barang['nomor_urut_pendaftaran'],
+                //     'Tahun Peroleh' => $value->barang['tanggal_peroleh'] ?  \Carbon\Carbon::parse($value->barang['tanggal_peroleh'])->format('Y') : '',
+                //     'Nomor Seri' => $value->barang['nomor_seri'],
+                //     'Kondisi' => $value['kondisi'],
+                // ];
+                $barangFlatten[] = [
+                    $key + 1,
+                    $value['kode_barang'],
+                    $value->barang['merk'] . ' / ' . $value->barang['tipe'],
+                    $value->barang['jenis'],
+                    $value->barang['nomor_urut_pendaftaran'],
+                    $value->barang['tanggal_peroleh'] ?  \Carbon\Carbon::parse($value->barang['tanggal_peroleh'])->format('Y') : '',
+                    $value->barang['nomor_seri'],
+                    $value->user['nama_lengkap'],
+
+                    $value['kondisi'],
+                ];
+            }
+
+            $csv = Writer::createFromFileObject(new SplTempFileObject());
+            $csv->insertOne($headers);
+            $csv->insertAll($barangFlatten);
+            $csv->output('data_barang.csv');
+            return;
+        }
+
 
         $pdf = FacadePdf::loadView('laporan.barang', ['data' => $barang]);
         return $pdf->stream();
