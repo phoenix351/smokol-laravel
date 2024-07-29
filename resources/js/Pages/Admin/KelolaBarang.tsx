@@ -565,7 +565,8 @@ const BarangPage = ({
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
-                <Button type="primary" onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText }), "_blank")}><FilePdfOutlined />cetak hasil pencarian</Button>
+                <Button type="primary" onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText }), "_blank")}><FilePdfOutlined />cetak PDF</Button>
+                <Button type="primary" onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText,isExcel:1 }), "_blank")}><FilePdfOutlined />cetak CSV </Button>
             </Space>
 
             <Table

@@ -114,7 +114,7 @@ Route::middleware('auth')->group(function () {
     // route api for master barang just for admin
     route::get('/api/users', function () {
         $users = User::select('id', 'nama_lengkap')->get();
-        return response()->json([$users]);
+        return response()->json($users, 200);
     })->name('users.get');
     route::get('/api/jenis', function () {
         $jenisList = MasterBarang::select(["jenis"])->groupBy(['jenis'])->get();
@@ -208,10 +208,12 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Statistics');
     })->name('statistics');
 
-
+    // cetak bast 
+    route::get('/bast/cetak', [BastController::class, 'cetak'])->name('bast.cetak');
 
     //route barang untuk user
     route::get('/barang', [BarangUserController::class, 'index'])->name('barang');
+    route::get('/barang/detail/{id}', [BarangUserController::class, 'show'])->name('barang.detail');
     Route::patch('/barang', [BarangController::class, 'update'])->name('barang.update');
     Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
     Route::delete('/barang', [BarangController::class, 'destroy'])->name('barang.destroy');
@@ -220,6 +222,7 @@ Route::middleware('auth')->group(function () {
 
     //route untuk pengajuan
     route::get('/pengajuan', [MaintenanceController::class, 'index'])->name('pengajuan');
+    route::get('/pengajuan/maintenance', [MaintenanceController::class, 'index'])->name('pengajuan.maintenance');
     route::get('/pengajuan/riwayat/{sequence}', [MaintenanceController::class, 'riwayat'])->name('pengajuan.riwayat');
 
 

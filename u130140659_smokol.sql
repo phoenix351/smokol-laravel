@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jul 16, 2024 at 01:27 AM
+-- Generation Time: Jul 25, 2024 at 06:28 AM
 -- Server version: 10.11.8-MariaDB-cll-lve
 -- PHP Version: 7.2.34
 
@@ -136,7 +136,7 @@ INSERT INTO `barang` (`id`, `barang_id`, `sistem_operasi_id`, `users_id`, `ruang
 (688, 92, 5, 260, 4, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
 (689, 93, 5, 180, 4, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
 (690, 94, 5, 276, 4, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
-(691, 95, 5, 275, 4, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
+(691, 95, 5, 1, 4, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
 (692, 96, 5, 181, 4, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
 (693, 97, 5, 241, 4, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
 (694, 98, 5, 242, 12, '2024-02-04 23:37:19', 'Baik', NULL, NULL, NULL),
@@ -924,7 +924,8 @@ INSERT INTO `riwayat_barang` (`id`, `barang_id`, `modified_at`, `users_id`, `ori
 (239, 741, '2024-05-14 03:41:50', 5, '{\"id\":741,\"barang_id\":145,\"sistem_operasi_id\":5,\"users_id\":5,\"ruangan_id\":17,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}', '{\"id\":741,\"barang_id\":145,\"sistem_operasi_id\":5,\"users_id\":5,\"ruangan_id\":17,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Rusak Ringan\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}'),
 (240, 741, '2024-05-14 03:42:39', 5, '{\"id\":741,\"barang_id\":145,\"sistem_operasi_id\":5,\"users_id\":5,\"ruangan_id\":17,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Rusak Ringan\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}', '{\"id\":741,\"barang_id\":145,\"sistem_operasi_id\":5,\"users_id\":5,\"ruangan_id\":17,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}'),
 (241, 738, '2024-07-02 00:41:56', 257, '{\"id\":738,\"barang_id\":142,\"sistem_operasi_id\":5,\"users_id\":235,\"ruangan_id\":37,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}', '{\"id\":738,\"barang_id\":142,\"sistem_operasi_id\":5,\"users_id\":257,\"ruangan_id\":37,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}'),
-(242, 735, '2024-07-12 07:28:00', 315, '{\"id\":735,\"barang_id\":139,\"sistem_operasi_id\":5,\"users_id\":245,\"ruangan_id\":40,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}', '{\"id\":735,\"barang_id\":139,\"sistem_operasi_id\":5,\"users_id\":315,\"ruangan_id\":40,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}');
+(242, 735, '2024-07-12 07:28:00', 315, '{\"id\":735,\"barang_id\":139,\"sistem_operasi_id\":5,\"users_id\":245,\"ruangan_id\":40,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}', '{\"id\":735,\"barang_id\":139,\"sistem_operasi_id\":5,\"users_id\":315,\"ruangan_id\":40,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}'),
+(243, 691, '2024-07-18 00:17:56', 1, '{\"id\":691,\"barang_id\":95,\"sistem_operasi_id\":5,\"users_id\":275,\"ruangan_id\":4,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}', '{\"id\":691,\"barang_id\":95,\"sistem_operasi_id\":5,\"users_id\":1,\"ruangan_id\":4,\"record_time\":\"2024-02-04 23:37:19\",\"kondisi\":\"Baik\",\"bast_path\":null,\"is_approved\":null,\"bast_upload_date\":null}');
 
 -- --------------------------------------------------------
 
@@ -1031,7 +1032,7 @@ INSERT INTO `users` (`id`, `nama_lengkap`, `email`, `nip`, `bidang`, `jabatan_id
 (245, 'Inke Margareth Tambeo', 'inkemargareth@bps.go.id', '198403232007012003', 'Fungsi Neraca Wilayah dan Analisis Statistik', 5, 'basic', 'inke', 'default.jpg', NULL, '$2y$10$TYWHFlLaiBgxRvYxGhaGkO9sHm3pSawVJ6Yo.x2Va.O/FOKB4sVci', NULL, NULL, NULL),
 (246, 'Nurfadhila Fahmi', 'nurfadhila@bps.go.id', '199510092019032002', 'Fungsi Statistik Distribusi', 5, 'basic', 'dhila', 'default.jpg', NULL, '$2y$10$2ZcAMTjAXZyuQOUJZEO1CO4jOTB6R9r7Zo/Lq.5dwFe8pbUO9/FLy', NULL, NULL, NULL),
 (247, 'Eko Siswahto SST, M.SE', 'xsiswahto@bps.go.id', '198504202008011003', 'Fungsi Statistik Produksi', 5, 'basic', 'xsiswahto', 'default.jpg', NULL, '$2y$10$5crcdl/KuFn2CzxG3bAVWeDEFCCvfTIB9pa0HcLXO3.uIIwKMtJ1e', NULL, NULL, NULL),
-(249, 'Aidil Adha, SE., ME.', 'asim@bps.go.id', '197609271999011001', 'Kepala BPS Provinsi', 1, 'basic', 'aidil', 'default.jpg', NULL, '$2y$10$VyrMIDoRh2O0UzM/00zyQuP/o8xQALzXwC7xTNmTg2QVX699b3qBK', NULL, NULL, '2024-07-16 00:31:52'),
+(249, 'Aidil Adha, SE., ME.', 'aidil@bps.go.id', '196703221994011001', 'Kepala BPS Provinsi', 1, 'basic', 'aidil', 'default.jpg', NULL, '$2y$10$VyrMIDoRh2O0UzM/00zyQuP/o8xQALzXwC7xTNmTg2QVX699b3qBK', NULL, NULL, '2024-07-18 00:13:15'),
 (250, ' Anton Tri Wijayanto, S.ST, M.Si.', 'antontw@bps.go.id', '198001022002121003', 'Fungsi Neraca Wilayah dan Analisis Statistik', 5, 'basic', 'Anton', 'default.jpg', NULL, '$2y$10$VrxwGqlr3drlgDKXOCxiWOwpTWKRLgncaqHJqiuL0I/qAAgLPW0IW', NULL, NULL, NULL),
 (251, 'Dadan Sudarmadi, SST, M.Si.', 'dadan@bps.go.id', '197310141995121001', 'Bagian Umum', 5, 'basic', 'dadan', 'default.jpg', NULL, '$2y$10$kxnuRtvQ2znKGpj2NzDf7ezzudRR05noL5AeKxwBxTF9kLBmgJLQG', NULL, NULL, NULL),
 (252, 'Abdul Aziz Makhrus, S.Tr.Stat.', 'amakhrus@bps.go.id ', '199607082019011003', 'Fungsi Statistik Sosial', 5, 'basic', 'aziz', 'default.jpg', NULL, '$2y$10$eEYYcn3cNfSypQN5fpIL4ePM5NlPwHnsmDO/CH9EF90yvi47/pXBa', NULL, NULL, NULL),
@@ -1276,7 +1277,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `riwayat_barang`
 --
 ALTER TABLE `riwayat_barang`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=243;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=244;
 
 --
 -- AUTO_INCREMENT for table `users`
