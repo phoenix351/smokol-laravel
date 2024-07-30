@@ -6,7 +6,7 @@ export interface User {
     email_verified_at: string;
     nip: string;
     jabatan_id: string;
-    updated_at:Date;
+    updated_at: Date;
     bidang: string;
     role: string;
 }
@@ -51,9 +51,9 @@ export interface Barang {
     id: number;
     key: number;
     barang_id: number;
-    barang:any;
-    ruangan:any;
-    user:any;
+    barang: any;
+    ruangan: any;
+    user: any;
     jenis: string;
     tipe: string;
     merk: string;
@@ -69,6 +69,7 @@ export interface Barang {
     ruangan_id: number;
     sistem_operasi_id: number;
     created_at: string;
+    selected?: boolean;
 }
 
 export interface BastType {
@@ -119,15 +120,15 @@ export interface MaintenanceHistory {
     nomor_seri: string;
 }
 export interface PengajuanItem {
-    id:number;
+    id: number;
     kondisi_final: any;
     spek_path: any;
     problem_img_path: string | null;
     sequence_id: number;
-    user:any;
-    barang:any;
-    maintenance:any[];
-    perusahaan:any;
+    user: any;
+    barang: any;
+    maintenance: any[];
+    perusahaan: any;
     bidang: string;
     deskripsi: string;
     kode_status: string;

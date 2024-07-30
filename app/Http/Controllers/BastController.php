@@ -130,7 +130,7 @@ class BastController extends Controller
     {
         $pihak1_user_id = $request->get('pihak1_user_id');
         $pihak2_user_id = $request->get('pihak2_user_id');
-        $daftar_id_barang = $request->get('barangs');
+        $daftar_id_barang = explode(",", $request->get('barangs'));
         $barangs = Barang::with(['User', 'Barang'])->whereIn('id', $daftar_id_barang)->get();
         // dd($barangs);
         $pihak1 = User::find($pihak1_user_id);
