@@ -41,7 +41,7 @@ import {
     CompareFn,
     SortOrder,
 } from "antd/es/table/interface";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import MyModal from "@/Components/Modal";
 import HistoryBarangForm from "@/Forms/HistoryBarangForm";
 import { Barang, DataType } from "@/types";
@@ -82,13 +82,11 @@ const BarangPage = () => {
     const [confirmLoadingWarningModal, setConfirmLoadingWarningModal] =
         useState(false);
 
-    // table 
+    // table
     const [dataSource, setDataSource] = useState<Barang[]>([]);
     const [total, setTotal] = useState<number>(0);
     const [current, setCurrent] = useState<number>(1);
     const [pageSize, setPageSize] = useState<number>(10);
-
-
 
     // data for current barang bast
     // const [dataBast, setDataBast] = useState<BastType[]>([]);
@@ -100,8 +98,6 @@ const BarangPage = () => {
 
     const bastRef = useRef(null);
     const pemeliharaanRef = useRef(null);
-
-
 
     // const  = useRef(null);
 
@@ -176,13 +172,26 @@ const BarangPage = () => {
     const handleCancelPengajuan = () => {
         setOpenPengajuan(false);
     };
-    const fetchData = async (currentPage: number, pageSize: number, searchText: string) => {
+    const fetchData = async (
+        currentPage: number,
+        pageSize: number,
+        searchText: string
+    ) => {
         setDataLoading(true);
         try {
-            const response = await axios.get(route("api.barang", { page: currentPage, pageSize: pageSize, searchText: searchText, isUser: 1 }));
+            const response = await axios.get(
+                route("api.barang", {
+                    page: currentPage,
+                    pageSize: pageSize,
+                    searchText: searchText,
+                    isUser: 1,
+                })
+            );
             // console.log({ response });
-            const modifiedData = [...response.data.data].map(item => ({ ...item, bast_path: String(item.bast_path).replace('public', 'storage') }));
-
+            const modifiedData = [...response.data.data].map((item) => ({
+                ...item,
+                bast_path: String(item.bast_path).replace("public", "storage"),
+            }));
 
             setDataSource(modifiedData);
             setTotal(response.data.total);
@@ -192,10 +201,14 @@ const BarangPage = () => {
             setDataLoading(false);
         }
     };
-    function handlePageChange(current: number, pageSize: number, searchText: string): void {
-        setCurrent(current)
-        setPageSize(pageSize)
-        setSearchText(String(searchText))
+    function handlePageChange(
+        current: number,
+        pageSize: number,
+        searchText: string
+    ): void {
+        setCurrent(current);
+        setPageSize(pageSize);
+        setSearchText(String(searchText));
     }
     useEffect(() => {
         fetchData(current, pageSize, searchText);
@@ -206,9 +219,7 @@ const BarangPage = () => {
             csrfTokenRef.current = csrfTokenMeta.getAttribute("content");
         }
         fetchData(current, pageSize, searchText);
-
     }, []);
-
 
     type Sorter<T> = (a: T, b: T, sortOrder?: SortOrder) => number;
 
@@ -420,14 +431,16 @@ const BarangPage = () => {
             title: "Nama Barang",
             dataIndex: "barang",
 
-            render: (value, { id }) => <Link onClick={() => router.get(`barang/detail/${id}`)}>{value.merk} / {value.tipe}</Link>,
-
+            render: (value, { id }) => (
+                <Link onClick={() => router.get(`barang/detail/${id}`)}>
+                    {value.merk} / {value.tipe}
+                </Link>
+            ),
         },
         {
             title: "jenis",
             dataIndex: "barang",
-            render: value => value.jenis,
-
+            render: (value) => value.jenis,
         },
         // {
         //     title: "merk",
@@ -446,13 +459,13 @@ const BarangPage = () => {
         {
             title: "tanggal_peroleh",
             dataIndex: "record_time",
-            render: value => dayjs(new Date(value)).format('DD MMMM YYYY'),
+            render: (value) => dayjs(new Date(value)).format("DD MMMM YYYY"),
             sorter: recordTimeSorter as CompareFn<object>,
         },
         {
             title: "nomor_seri",
             dataIndex: "barang",
-            render: value => value.nomor_seri,
+            render: (value) => value.nomor_seri,
             sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
@@ -504,13 +517,13 @@ const BarangPage = () => {
         {
             title: "ruangan_nama",
             dataIndex: "ruangan",
-            render: value => value.nama,
+            render: (value) => value.nama,
         },
         {
             title: "File BAST",
             dataIndex: "bast_path",
             render: (value, record: Barang) =>
-                !value ? (
+                value ? (
                     <Button>
                         <Upload
                             ref={bastRef}
@@ -567,16 +580,19 @@ const BarangPage = () => {
                                 setOpenWarningModal(true);
                                 return false;
                             }
-                            pengajuanForm.setFieldValue(
-                                "barang_id",
-                                record.id
-                            );
+                            pengajuanForm.setFieldValue("barang_id", record.id);
                             pengajuanForm.setFieldValue(
                                 "users_id",
                                 record.users_id
                             );
-                            pengajuanForm.setFieldValue("merk", record.barang.merk);
-                            pengajuanForm.setFieldValue("tipe", record.barang.tipe);
+                            pengajuanForm.setFieldValue(
+                                "merk",
+                                record.barang.merk
+                            );
+                            pengajuanForm.setFieldValue(
+                                "tipe",
+                                record.barang.tipe
+                            );
 
                             setOpenPengajuan(true);
                         }}
@@ -684,9 +700,13 @@ const BarangPage = () => {
                 current={current}
                 pageSize={pageSize}
                 total={total}
-                onChange={(page, pageSize) => handlePageChange(page, pageSize, searchText)}
+                onChange={(page, pageSize) =>
+                    handlePageChange(page, pageSize, searchText)
+                }
                 showSizeChanger
-                onShowSizeChange={(current, pageSize) => handlePageChange(current, pageSize, searchText)}
+                onShowSizeChange={(current, pageSize) =>
+                    handlePageChange(current, pageSize, searchText)
+                }
             />
         </div>
     );

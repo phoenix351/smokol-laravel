@@ -79,23 +79,23 @@ const AuthSider: React.FC<AuthSiderProps> = ({
             },
             {
                 icon: <FileDoneOutlined />,
-                key:"user.pengajuan",
-                label:"Pengajuan",
+                key: "user.pengajuan",
+                label: "Pengajuan",
                 children: [
                     {
-                        key: "user.pengajuan.kuasa",
+                        key: "user.pengajuan.mutasi",
                         // icon: <DatabaseOutlined />,
-                        label: "Kuasa",
-                        onClick: () => handleMenuClick("user.pengajuan.kuasa"),
+                        label: "Mutasi (BAST)",
+                        onClick: () => handleMenuClick("user.pengajuan.mutasi"),
                     },
                     {
                         key: "user.pengajuan.maintenance",
                         // icon: <HomeOutlined />,
                         label: "Pemeliharaan",
-                        onClick: () => handleMenuClick("user.pengajuan.maintenance"),
+                        onClick: () =>
+                            handleMenuClick("user.pengajuan.maintenance"),
                     },
-                ]
-
+                ],
             },
 
             {
@@ -105,10 +105,10 @@ const AuthSider: React.FC<AuthSiderProps> = ({
                 onClick: () =>
                     handleMenuClick("admin.kelola.history_barang.index"),
             },
-          
+
             {
                 key: "admin.kelola.pengajuan",
-                icon:<BookOutlined/>,
+                icon: <BookOutlined />,
                 label: "Kelola Pengajuan",
                 onClick: () => handleMenuClick("admin.kelola.pengajuan"),
             },

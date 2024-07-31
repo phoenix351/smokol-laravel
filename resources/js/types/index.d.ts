@@ -70,6 +70,7 @@ export interface Barang {
     sistem_operasi_id: number;
     created_at: string;
     selected?: boolean;
+    filtered?: boolean;
 }
 
 export interface BastType {

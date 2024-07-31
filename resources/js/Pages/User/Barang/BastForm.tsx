@@ -4,6 +4,7 @@ import { router } from "@inertiajs/react";
 import {
     Col,
     Divider,
+    Empty,
     Form,
     FormInstance,
     Input,
@@ -11,8 +12,10 @@ import {
     Row,
     Select,
     Space,
+    Spin,
 } from "antd";
 import axios from "axios";
+import { join } from "path";
 import React, { useEffect, useState } from "react";
 
 // const BastForm = ({ open, onFinish, form }: { open: boolean, onFinish: (values: FormData) => void; form: FormInstance }) => {
@@ -43,28 +46,15 @@ const BastForm = ({
             let searchText = search ? `&searchText=${search}` : "";
             form.setFieldValue("barangs", []);
             const { data } = await axios.get(
-                `/api/barang?isUser=1&userId=${user_id}${searchText}`
+                `/api/barang?pageSize=999&isUser=1&userId=${user_id}`
             );
-            // console.log({ x: data.data[0] });
-            const convertedBarangs = data.data.map((item: any) => ({
-                label: (
-                    <Space
-                        direction="vertical"
-                        // style={{ border: "1px solid black" }}
-                    >
-                        <Space>
-                            {item.barang.merk}/{item.barang.tipe}
-                        </Space>
-                        {/* <Divider /> */}
-                        <Space>Nomor Seri : {item.barang.nomor_seri}</Space>
-                        <Space>
-                            NUP : {item.barang.nomor_urut_pendaftaran}
-                        </Space>
-                    </Space>
-                ),
-                value: item.id,
-            }));
-            setBarangs(data.data);
+            let copyBarangs = [...data.data];
+            copyBarangs = copyBarangs.map((barang) => {
+                barang["filtered"] = true;
+                return barang;
+            });
+
+            setBarangs(copyBarangs);
         } catch (error) {
         } finally {
             setBarangLoading(false);
@@ -91,7 +81,7 @@ const BastForm = ({
             .filter((barang) => barang.selected)
             .map((item) => item.id);
         values["barangs"] = String(selectedItems);
-        console.log({ values });
+        // console.log({ values });
 
         // return;
 
@@ -142,14 +132,20 @@ const BastForm = ({
             onOk={() => form.submit()}
             title="Formulir Pembuataan BAST"
             width={1000}
+            centered
         >
             <Form
                 onFinish={onFinish}
                 form={form}
                 labelCol={{ span: 10 }}
                 wrapperCol={{ span: 14 }}
+                style={{ height: "600px" }}
             >
-                <Form.Item label="Peran anda sebagai" name="role">
+                <Form.Item
+                    label="Peran anda sebagai"
+                    name="role"
+                    initialValue={1}
+                >
                     <Select
                         options={[
                             { label: "Pihak I (Pemberi BMN)", value: 1 },
@@ -181,67 +177,105 @@ const BastForm = ({
                         disabled={currentRole === 2}
                     />
                 </Form.Item>
-                <Form.Item label="Pilih Barang">
-                    <Input />
-                </Form.Item>
-                <Form.Item wrapperCol={{ offset: 10, span: 14 }}>
-                    <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-                        {" "}
-                        {barangLoading
-                            ? "memuat barang"
-                            : barangs.map((barang, index) => (
-                                  <Col
-                                      span={12}
-                                      style={{
-                                          border: "1px solid #ddd",
-                                          padding: "1rem",
-                                          //   width: "100%",
-                                          backgroundColor: barang.selected
-                                              ? "#85ede4"
-                                              : "",
-                                      }}
-                                      onClick={(value) => {
-                                          let copyBarangs = [...barangs];
-                                          copyBarangs[index]["selected"] =
-                                              !copyBarangs[index]["selected"];
-                                          //   console.log({ copyBarangs });
 
-                                          setBarangs(copyBarangs);
-                                      }}
-                                  >
-                                      <Space direction="vertical">
-                                          <Space>
-                                              {barang.barang.merk}/
-                                              {barang.barang.tipe}
-                                          </Space>
-                                          {/* <Divider /> */}
-                                          <Space>
-                                              Nomor Seri :{" "}
-                                              {barang.barang.nomor_seri}
-                                          </Space>
-                                          <Space>
-                                              NUP :{" "}
-                                              {
-                                                  barang.barang
-                                                      .nomor_urut_pendaftaran
-                                              }
-                                          </Space>
-                                      </Space>
-                                  </Col>
-                              ))}
+                <Form.Item label="Pilih barang">
+                    <Input
+                        placeholder="Cari berdasarkan NUP atau jenis atau tipe atau nomor seri"
+                        onChange={(event) => {
+                            if (String(event.target.value) === "") {
+                                let copyBarangs = [...barangs];
+                                copyBarangs.map((barang) => {
+                                    barang["filtered"] = true;
+                                    return barang;
+                                });
+                                setBarangs(copyBarangs);
+                                return;
+                            }
+                            let filteredBarangs = barangs.filter((barang) => {
+                                let joinedString = [
+                                    barang.barang.merk,
+                                    barang.barang.tipe,
+                                    barang.barang.nomor_seri,
+                                    barang.barang.nomor_urut_pendaftaran,
+                                ]
+                                    .join(" ")
+                                    .toLowerCase();
+                                return joinedString.includes(
+                                    String(event.target.value).toLowerCase()
+                                );
+                            });
+                            let copyBarangs = [...barangs];
+                            // reset
+                            copyBarangs = copyBarangs.map((barang) => {
+                                barang["filtered"] = false;
+                                return barang;
+                            });
+                            filteredBarangs.forEach((barang) => {
+                                // barang['filtered'] = true;
+                                let index = copyBarangs.findIndex(
+                                    (item) => item.id === barang.id
+                                );
+                                copyBarangs[index]["filtered"] = true;
+                            });
+                            setBarangs(copyBarangs);
+                        }}
+                        style={{ marginBottom: "1rem" }}
+                    />
+                    <Row style={{ height: "400px", overflowY: "scroll" }}>
+                        {" "}
+                        {barangLoading ? (
+                            <Spin spinning> Memuat Data</Spin>
+                        ) : barangs.length < 1 ? (
+                            <Empty
+                                style={{ margin: "auto", padding: "1rem" }}
+                                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                description="Pegawai tidak menguasai BMN TIK"
+                            />
+                        ) : (
+                            barangs.map((barang, index) => (
+                                <Col
+                                    span={12}
+                                    style={{
+                                        border: "1px solid #ddd",
+                                        padding: "1rem",
+                                        //   width: "100%",
+                                        backgroundColor: barang.selected
+                                            ? "#85ede4"
+                                            : "",
+                                        display: barang.filtered ? "" : "none",
+                                    }}
+                                    onClick={(value) => {
+                                        let copyBarangs = [...barangs];
+                                        copyBarangs[index]["selected"] =
+                                            !copyBarangs[index]["selected"];
+                                        //   console.log({ copyBarangs });
+
+                                        setBarangs(copyBarangs);
+                                    }}
+                                >
+                                    <Space direction="vertical">
+                                        <Space>
+                                            {barang.barang.merk}/
+                                            {barang.barang.tipe}
+                                        </Space>
+                                        {/* <Divider /> */}
+                                        <Space>
+                                            Nomor Seri :{" "}
+                                            {barang.barang.nomor_seri}
+                                        </Space>
+                                        <Space>
+                                            NUP :{" "}
+                                            {
+                                                barang.barang
+                                                    .nomor_urut_pendaftaran
+                                            }
+                                        </Space>
+                                    </Space>
+                                </Col>
+                            ))
+                        )}
                     </Row>
                 </Form.Item>
-                {/* <Form.Item label="Daftar Barang" name="barangs">
-                    <Select
-                        disabled
-                        mode="multiple"
-                        // options={barangs}
-                        loading={barangLoading}
-                        // onSearch={(text) => console.log({ text })}
-                        showSearch
-                        // optionFilterProp="label" // onChange={(value) => console.log({ value })}
-                    />
-                </Form.Item> */}
             </Form>
         </Modal>
     );
