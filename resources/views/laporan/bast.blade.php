@@ -92,7 +92,6 @@
         text-align: center;
         font-weight: 600;
         text-transform: uppercase;
-        white-space: pre-line;
         width: 100%
     }
 
@@ -212,6 +211,11 @@
         font-size: 1.1rem;
         padding: 10px;
     }
+
+    .sign {
+        page-break-inside: avoid;
+        margin-top: 2rem
+    }
 </style>
 
 <body>
@@ -233,7 +237,7 @@
         </tbody>
     </table>
     <hr>
-    <table>
+    <table style="margin-top: 2rem">
         <tbody>
             <tr>
                 <td class="title">
@@ -258,7 +262,7 @@
 
 
 
-    <table>
+    <table style="margin-top: 2rem">
         <tbody>
             <tr style="margin-bottom: 50px">
                 <td colspan="4">Pada Hari ini, {{ $daftar_hari[$today->format('w') - 1] }} tanggal
@@ -419,7 +423,7 @@
 
         </tbody>
     </table> --}}
-    <div style="width: 100%;display:flex;justify-content:center;margin-top:3rem">
+    <div class="sign" style="width: 100%;display:flex;justify-content:center;margin-top:3rem">
 
         <table style="margin:auto">
             <tbody style="text-center">

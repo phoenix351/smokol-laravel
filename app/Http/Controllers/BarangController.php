@@ -265,7 +265,7 @@ class BarangController extends Controller
         });
         $isExcel = $request->get('isExcel');
         if ($isExcel == 1) {
-            $headers = ['No', 'Kode Barang', 'Nama Barang', 'Jenis', 'NUP', 'Tahun Peroleh', 'Nomor Seri', 'Pegawai', 'Kondisi'];
+            $headers = ['No', 'Kode Barang', 'Nama Barang', 'Jenis', 'NUP', 'Tahun Peroleh', 'Nomor Seri', 'Pegawai', 'Kondisi', 'Ruangan'];
             $barangFlatten = [];
             foreach ($barang as $key => $value) {
                 // $barangFlatten[] = [
@@ -287,8 +287,8 @@ class BarangController extends Controller
                     $value->barang['tanggal_peroleh'] ?  \Carbon\Carbon::parse($value->barang['tanggal_peroleh'])->format('Y') : '',
                     $value->barang['nomor_seri'],
                     $value->user['nama_lengkap'],
-
                     $value['kondisi'],
+                    $value->ruangan['nama'],
                 ];
             }
 

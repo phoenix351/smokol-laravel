@@ -40,6 +40,7 @@ import {
     StopOutlined,
     ExportOutlined,
     FilePdfOutlined,
+    FileExcelOutlined,
 } from "@ant-design/icons";
 import React from "react";
 import {
@@ -58,7 +59,6 @@ import axios from "axios";
 import { handleExport } from "@/Functions/ExportTable";
 
 // const ExportableTablex = ExportableTable(Table);
-
 
 const { Search } = Input;
 const BarangPage = ({
@@ -92,7 +92,7 @@ const BarangPage = ({
             itemEditForm.submit();
             setOpenModalUbah(false);
             setConfirmLoadingModalUbah(false);
-        } catch (error) { }
+        } catch (error) {}
     };
     const handleCancel = () => {
         setOpenModal(false);
@@ -120,7 +120,6 @@ const BarangPage = ({
         fetchData(current, pageSize, searchText);
     }, [current, pageSize, searchText]);
 
-
     const handleAdd = () => {
         itemAddForm.resetFields();
         setOpenModal(true);
@@ -147,10 +146,20 @@ const BarangPage = ({
         };
     }
 
-    const fetchData = async (currentPage: number, pageSize: number, searchText: string) => {
+    const fetchData = async (
+        currentPage: number,
+        pageSize: number,
+        searchText: string
+    ) => {
         setDataLoading(true);
         try {
-            const response = await axios.get(route("api.barang", { page: currentPage, pageSize: pageSize, searchText: searchText }));
+            const response = await axios.get(
+                route("api.barang", {
+                    page: currentPage,
+                    pageSize: pageSize,
+                    searchText: searchText,
+                })
+            );
             console.log({ response });
 
             setDataSource(response.data.data);
@@ -189,7 +198,7 @@ const BarangPage = ({
                 });
                 return 1;
             },
-            onFinish: () => { },
+            onFinish: () => {},
 
             onError: (event) => console.log(`Error! ${event}`),
         });
@@ -248,7 +257,7 @@ const BarangPage = ({
                 content: "Berhasil menyimpan perubahan data",
                 type: "success",
             });
-            fetchData(current, pageSize, searchText)
+            fetchData(current, pageSize, searchText);
         } catch (error: any) {
             // console.log({ error });
 
@@ -376,13 +385,13 @@ const BarangPage = ({
         {
             title: "ruangan_nama",
             dataIndex: "ruangan",
-            render: (value) => value.nama
+            render: (value) => value.nama,
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
             title: "Nama Pemegang",
             dataIndex: "user",
-            render: (value) => value.nama_lengkap
+            render: (value) => value.nama_lengkap,
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
@@ -395,7 +404,10 @@ const BarangPage = ({
 
                         // itemEditForm.setFieldsValue(record);
                         itemEditForm.setFieldValue("id", record.id);
-                        itemEditForm.setFieldValue("jenis", record.barang.jenis);
+                        itemEditForm.setFieldValue(
+                            "jenis",
+                            record.barang.jenis
+                        );
                         itemEditForm.setFieldValue("merk", record.barang.merk);
                         itemEditForm.setFieldValue("tipe", record.barang.tipe);
                         itemEditForm.setFieldValue("users_id", record.users_id);
@@ -507,24 +519,26 @@ const BarangPage = ({
         {
             title: "ruangan_nama",
             dataIndex: "ruangan",
-            render: (value) => value.nama
+            render: (value) => value.nama,
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
         {
             title: "Nama Pemegang",
             dataIndex: "user",
-            render: (value) => value.nama_lengkap
+            render: (value) => value.nama_lengkap,
             // sorter: nomorSeriSorter as CompareFn<object>,
         },
-
     ];
 
-    function handlePageChange(current: number, pageSize: number, searchText: string): void {
-        setCurrent(current)
-        setPageSize(pageSize)
-        setSearchText(String(searchText))
+    function handlePageChange(
+        current: number,
+        pageSize: number,
+        searchText: string
+    ): void {
+        setCurrent(current);
+        setPageSize(pageSize);
+        setSearchText(String(searchText));
     }
-
 
     return (
         <Space direction="vertical" style={{ width: "100%" }}>
@@ -561,12 +575,41 @@ const BarangPage = ({
                 <Search
                     placeholder="Cari barang ..."
                     allowClear
-                    onSearch={(value: string) => handlePageChange(current, pageSize, value)}
+                    onSearch={(value: string) =>
+                        handlePageChange(current, pageSize, value)
+                    }
                     loading={searchLoading}
                     style={{ width: 200, marginBottom: "20px" }}
                 />
-                <Button type="primary" onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText }), "_blank")}><FilePdfOutlined />cetak PDF</Button>
-                <Button type="primary" onClick={() => window.open(route('admin.kelola.history_barang.cetak', { searchText: searchText,isExcel:1 }), "_blank")}><FilePdfOutlined />cetak CSV </Button>
+                <Button
+                    type="primary"
+                    onClick={() =>
+                        window.open(
+                            route("admin.kelola.history_barang.cetak", {
+                                searchText: searchText,
+                            }),
+                            "_blank"
+                        )
+                    }
+                >
+                    <FilePdfOutlined />
+                    cetak PDF
+                </Button>
+                <Button
+                    type="primary"
+                    onClick={() =>
+                        window.open(
+                            route("admin.kelola.history_barang.cetak", {
+                                searchText: searchText,
+                                isExcel: 1,
+                            }),
+                            "_blank"
+                        )
+                    }
+                >
+                    <FileExcelOutlined />
+                    cetak CSV{" "}
+                </Button>
             </Space>
 
             <Table
@@ -582,9 +625,13 @@ const BarangPage = ({
                 current={current}
                 pageSize={pageSize}
                 total={total}
-                onChange={(page, pageSize) => handlePageChange(page, pageSize, searchText)}
+                onChange={(page, pageSize) =>
+                    handlePageChange(page, pageSize, searchText)
+                }
                 showSizeChanger
-                onShowSizeChange={(current, pageSize) => handlePageChange(current, pageSize, searchText)}
+                onShowSizeChange={(current, pageSize) =>
+                    handlePageChange(current, pageSize, searchText)
+                }
             />
         </Space>
     );
