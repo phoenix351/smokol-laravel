@@ -44,8 +44,8 @@ class BarangController extends Controller
      */
     public function store(StoreBarangRequest $request)
     {
+        $validatedData = $request->validate($request->rules());
         try {
-            $validatedData = $request->validate($request->rules());
             // $validatedData['tahun_peroleh'] = Carbon::parse($validatedData['tahun_peroleh'])->format('Y-m-d H:i:s');
             $response = [
                 'message' => 'Data berhasil ditambahkan',
@@ -265,7 +265,33 @@ class BarangController extends Controller
         });
         $isExcel = $request->get('isExcel');
         if ($isExcel == 1) {
-            $headers = ['No', 'Kode Barang', 'Nama Barang', 'Jenis', 'NUP', 'Tahun Peroleh', 'Nomor Seri', 'Pegawai', 'Kondisi', 'Ruangan'];
+            $headers = [
+                'No',
+                'Kode Satker',
+                'Nama Satker',
+                'Kode Barang',
+                'Nama Barang',
+                'NUP',
+                'Nomor BMN',
+                'Merk',
+                'Tipe',
+                'Serial Number',
+                'Tanggal Rekam Pertama',
+                'Tanggal Perolehan Nilai',
+                'Nilai Perolehan Pertama',
+                'Nilai Mutasi',
+                'Nilai Perolehan',
+                'Nilai Penyusutan',
+                'Nilai Buku',
+                'Kuantitas',
+                'NIP Lama Pengguna',
+                'Nama Pengguna',
+                'Kondisi',
+                'Status Penggunaan',
+                "No PSP",
+                'Tgl PSP'
+            ];
+            // $headers = ['No','Nama Satker', 'Kode Barang', 'Nama Barang', 'NUP', 'Tahun Peroleh', 'Nomor Seri', 'Pegawai', 'Kondisi', 'Ruangan'];
             $barangFlatten = [];
             foreach ($barang as $key => $value) {
                 // $barangFlatten[] = [
@@ -280,15 +306,30 @@ class BarangController extends Controller
                 // ];
                 $barangFlatten[] = [
                     $key + 1,
+                    "054011700428701000KD",
+                    "BPS PROVINSI SULAWESI UTARA",
                     $value['kode_barang'],
-                    $value->barang['merk'] . ' / ' . $value->barang['tipe'],
+                    // $value->barang['merk'] . ' / ' . $value->barang['tipe'],
                     $value->barang['jenis'],
                     $value->barang['nomor_urut_pendaftaran'],
-                    $value->barang['tanggal_peroleh'] ?  \Carbon\Carbon::parse($value->barang['tanggal_peroleh'])->format('Y') : '',
+                    $value['kode_barang'] . "-???",
+                    $value->barang['merk'],
+                    $value->barang['tipe'],
                     $value->barang['nomor_seri'],
+                    $value->barang['tanggal_peroleh'] ?  \Carbon\Carbon::parse($value->barang['tanggal_peroleh'])->format('Y-m-d') : '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '1',
+                    '-',
                     $value->user['nama_lengkap'],
                     $value['kondisi'],
-                    $value->ruangan['nama'],
+                    'Digunakan sendiri untuk operasional',
+                    '-',
+                    '-',
                 ];
             }
 
