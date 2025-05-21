@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { router } from "@inertiajs/react";
+import RupiahInput from "@/Components/RupiahInput";
 
 const PemeriksaanForm: React.FC<{
     form: any;
@@ -45,6 +46,14 @@ const PemeriksaanForm: React.FC<{
         }
     };
     const [showSolution, setShowSolution] = useState(false);
+    const [value, setValue] = useState<number>(0);
+
+    const handleChange = (newValue: number | undefined) => {
+        if (newValue !== undefined) {
+            setValue(newValue ? newValue : 0);
+        }
+        console.log({ value });
+    };
     return (
         <>
             <Form
@@ -143,13 +152,34 @@ const PemeriksaanForm: React.FC<{
                 </Form.Item>
 
                 {showSolution && (
+                    <>
                     <Form.Item
                         label="Solusi yang Diterapkan"
                         name="solution"
                         id="solution"
-                    >
+                        >
                         <Input.TextArea />
                     </Form.Item>
+                     <Form.Item
+                    {...formItemLayout}
+                    label="Biaya Perbaikan"
+                    name="biaya"
+                    required
+                    rules={[
+                        // {
+                            //     min: 1000,
+                            //     message:
+                            //         "Biaya perbaikan minimum value must be greater than 1000",
+                            // },
+                            {
+                                required: true,
+                                message: "Biaya perbaikan must be filled",
+                            },
+                    ]}
+                >
+                    <RupiahInput value={value} onChange={handleChange} />
+                    </Form.Item>
+                            </>
                 )}
             </Form>
         </>

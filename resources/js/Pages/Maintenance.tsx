@@ -113,7 +113,7 @@ const KelolaPengajuanPage = () => {
             const dataPengajuan = await response.json();
             console.log({ dataPengajuan });
             // Update the state with the fetched items
-            setItems(dataPengajuan.data);
+            setItems(dataPengajuan);
             setSearchLoading(false);
         } catch (error) {
             console.error("Error fetching data:", error);

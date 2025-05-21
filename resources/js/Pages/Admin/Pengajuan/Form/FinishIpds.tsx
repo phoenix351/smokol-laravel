@@ -162,6 +162,25 @@ const FinishIpds: React.FC<{
                         </Radio.Button>
                     </Radio.Group>
                 </Form.Item>
+                 <Form.Item
+                    {...formItemLayout}
+                    label="Biaya Perbaikan"
+                    name="biaya"
+                    required
+                    rules={[
+                        // {
+                        //     min: 1000,
+                        //     message:
+                        //         "Biaya perbaikan minimum value must be greater than 1000",
+                        // },
+                        {
+                            required: true,
+                            message: "Biaya perbaikan must be filled",
+                        },
+                    ]}
+                >
+                    <RupiahInput value={value} onChange={handleChange} />
+                </Form.Item>
             </Form>
         </>
     );

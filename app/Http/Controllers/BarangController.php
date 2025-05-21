@@ -230,6 +230,8 @@ class BarangController extends Controller
             ->where(function ($query) use ($searchText) {
                 $query->whereRelation('Barang', 'jenis', 'like', $searchText)
                     ->orWhereRelation('Barang', 'merk', 'like', $searchText)
+                    ->orWhereRelation('Barang', 'tipe', 'like', $searchText)
+                    ->orWhereRelation('Barang', 'nomor_seri', 'like', $searchText)
                     ->orWhereRelation('Barang', 'nomor_urut_pendaftaran', 'like', $searchText)
                     ->orWhereRelation('Ruangan', 'nama', 'like', $searchText)
                     ->orWhereRelation('SistemOperasi', 'nama', 'like', $searchText)

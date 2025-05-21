@@ -74,26 +74,26 @@ class MaintenanceController extends Controller
         }
 
 
-        // return Inertia::render('Barang', ['history_barang' => DB::table('barang_view')->where('pengguna_id', $user->id)->get()]);
+        // // return Inertia::render('Barang', ['history_barang' => DB::table('barang_view')->where('pengguna_id', $user->id)->get()]);
 
-        $maintenance_list = DB::table('maintenance_sequences')->select(
-            'maintenance_sequences.*',
-            'maintenances.id as maintenance_id',
-            'status_pemeliharaan.deskripsi as status',
-            'master_barang.jenis',
-            'master_barang.merk',
-            "master_barang.tipe",
-            'master_barang.nomor_seri'
-        )
-            ->leftJoin('maintenances', 'maintenances.sequence_id', '=', 'maintenance_sequences.id')
-            ->leftJoin('status_pemeliharaan', 'maintenances.kode_status', 'status_pemeliharaan.kode_status')
-            ->leftJoin('barang', 'maintenance_sequences.barang_id', '=', 'barang.id')
-            ->leftJoin('master_barang', 'barang.barang_id', '=', 'master_barang.id')
+        // $maintenance_list = DB::table('maintenance_sequences')->select(
+        //     'maintenance_sequences.*',
+        //     'maintenances.id as maintenance_id',
+        //     'status_pemeliharaan.deskripsi as status',
+        //     'master_barang.jenis',
+        //     'master_barang.merk',
+        //     "master_barang.tipe",
+        //     'master_barang.nomor_seri'
+        // )
+        //     ->leftJoin('maintenances', 'maintenances.sequence_id', '=', 'maintenance_sequences.id')
+        //     ->leftJoin('status_pemeliharaan', 'maintenances.kode_status', 'status_pemeliharaan.kode_status')
+        //     ->leftJoin('barang', 'maintenance_sequences.barang_id', '=', 'barang.id')
+        //     ->leftJoin('master_barang', 'barang.barang_id', '=', 'master_barang.id')
 
-            ->get();
-        $maintenance_list = MaintenanceSequence::all();
+        //     ->get();
+        // $maintenance_list = MaintenanceSequence::all();
         // $maintenance_list = DB::table('maintenances')->where('users_id', $user->id);
-        return Inertia::render('Admin/KelolaPengajuan', ['maintenance_list' => ['asu']]);
+        return Inertia::render('Admin/KelolaPengajuan');
     }
 
     /**
@@ -278,15 +278,19 @@ class MaintenanceController extends Controller
         $keyword = "%$query_search%";
         $is_user = $request->query('isUser'); // Retrieve the 'id' query parameter
         $user = auth()->user();
-
+        // dd($type);
 
         $query = MaintenanceSequence::with(['User', 'Barang', 'Barang.Barang', 'Perusahaan', 'Maintenance', 'Maintenance.Status']);
         if ($type !== '99') {
-            if ($type === '0') {
-
+            if ($type == '0') {
+                // dd(["amaaan000"]);
                 $query = $query->whereRelation('Maintenance', 'kode_status', 'in', ['0', '1', '2']);
             }
-            $query = $query->where('maintenances.kode_status', $type);
+            else{
+                
+                $query = $query->whereRelation('Maintenance', 'kode_status', '=',$type );
+                
+            }
         }
         if ($is_user == '1') {
             $query = $query->whereRelation('User', 'id', '=', $user->id);
@@ -372,6 +376,7 @@ class MaintenanceController extends Controller
 
             $maintenance['kode_status'] = '5';
             $updatedSequence['solution'] = $validatedData['solution'];
+            $updatedSequence['biaya'] = $validatedData['biaya'];
             // MaintenanceSequence::where('id', $validatedData['sequence_id'])->update($updatedSequence);
         }
         $maintenanceStored = Maintenance::create($maintenance);
@@ -393,7 +398,7 @@ class MaintenanceController extends Controller
             Maintenance::create([
                 'sequence_id' => $validatedData['sequence_id'],
                 'kode_status' => '1',
-                'users_id' => $user->id,
+                'users_id' => $validatedData['user_id'],
             ]);
 
 

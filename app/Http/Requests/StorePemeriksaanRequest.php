@@ -27,6 +27,7 @@ class StorePemeriksaanRequest extends FormRequest
             'solution' => 'nullable|string',
             'next_step' => 'required',
             'problems' => 'required|string',
+            'biaya'=>'required'
 
 
         ];
