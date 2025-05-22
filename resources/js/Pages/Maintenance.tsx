@@ -48,7 +48,6 @@ const KelolaPengajuanPage = () => {
                     route("admin.pengajuan.fetch", { type: "99", isUser: "1" })
                 );
                 const { data } = await axios.get(route("admin.pengajuan.fetch", { type: "99", isUser: "1" }));
-                console.log({ data });
                 
                 // Parse the JSON response
                 // const dataPengajuan = await response.json();
@@ -70,31 +69,7 @@ const KelolaPengajuanPage = () => {
             label: "Semua",
             key: "99",
         },
-        {
-            label: "Menunggu Persetujuan",
-            key: "0",
-        },
-        // {
-        //     label: "Diperiksa",
-        //     key: "1",
-        // },
-
-        {
-            label: "Menunggu Penyedia",
-            key: "3",
-        },
-        {
-            label: "Diproses Penyedia",
-            key: "4",
-        },
-        {
-            label: "Diperiksa Kembali",
-            key: "5",
-        },
-        {
-            label: "Selesai",
-            key: "6",
-        },
+       
     ];
     const [selectedVerticalMenu, setSelectedVerticalMenu] = useState("99");
 
@@ -185,13 +160,7 @@ const KelolaPengajuanPage = () => {
 
             <h1 style={{ marginBottom: "10px" }}>Daftar Pengajuan Pegawai</h1>
 
-            <Menu
-                selectedKeys={[selectedVerticalMenu]}
-                mode="horizontal"
-                items={verticalMenuItems}
-                style={{ display: "flex" }} // This makes the Menu take up all available space
-                onClick={handleVerticalMenuClick}
-            />
+            
 
             {/* <Divider /> */}
             <Space

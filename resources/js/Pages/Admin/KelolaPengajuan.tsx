@@ -31,6 +31,7 @@ import PemeriksaanPBJPPK from "@/Forms/PemeriksaanPBJPPK";
 import PemeriksaanBMN from "@/Forms/PemeriksaanBMN";
 import FinishPenyedia from "./Pengajuan/Form/FinishPenyedia";
 import FinishIpds from "./Pengajuan/Form/FinishIpds";
+import { isoToIndonesiaDate } from "@/Functions/DateFormatter";
 
 const { Search } = Input;
 
@@ -187,15 +188,20 @@ const KelolaPengajuanPage = () => {
             dataIndex: "problems",
         },
         {
-            title: "Perusahaan",
-            dataIndex: "perusahaan",
-            render: (value) => value?.nama,
+            title: "Tanggal Mulai",
+            dataIndex: "maintenance",
+
+            render: (value, record: PengajuanItem) =>
+                record.maintenance.length > 0 ? `${ isoToIndonesiaDate(value[0].created_at)}` : "-",
         },
         {
-            title: "PJ Perusahaan",
+            title: "Tanggal Selesai",
+            dataIndex: "maintenance",
 
-            dataIndex: "perusahaan",
-            render: (value) => value?.nama_pj,
+            render: (value, record: PengajuanItem) =>
+                record.maintenance.length > 0
+                    ? `${isoToIndonesiaDate(value[value.length - 1].updated_at)}`
+                    : "-",
         },
         {
             title: "Solusi yang diambil",

@@ -157,7 +157,7 @@ const UserPengajuanCard: React.FC<{
                                 <Space style={{ alignItems: "start" }}>
                                     <Text
                                         style={{ color: "#26aa99" }}
-                                    >{`${item.maintenance[0].status.deskripsi}`}</Text>{" "}
+                                    >{`${item.maintenance[item.maintenance.length-1].status.deskripsi}`}</Text>{" "}
                                 </Space>
                             </Space>
                             <Divider />
