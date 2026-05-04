@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MasterPenanggungJawab extends Model
+class Penanggungjawab extends Model
 {
     use HasFactory;
     protected $table = 'master_pj_perusahaan';
@@ -17,4 +18,10 @@ class MasterPenanggungJawab extends Model
         'nomor_wa',
         'email'
     ];
+    
+    public function Perusahaan():BelongsTo
+    {
+        return $this->belongsTo(Perusahaan::class);
+    }
+
 }

@@ -7,14 +7,17 @@ use App\Models\Barang;
 use App\Models\MasterBarang;
 use App\Http\Requests\StoreBarangRequest;
 use App\Http\Requests\UpdateBarangRequest;
-
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\PDF;
+use League\Csv\Writer;
+use SplTempFileObject;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Storage;
 
 class BarangController extends Controller
 {
@@ -23,26 +26,9 @@ class BarangController extends Controller
      */
     public function index()
     {
-        $data = MasterBarang::join('barang', 'barang.barang_id', 'master_barang.id')
-            ->leftJoin('users', 'users.id', 'barang.users_id')
-            ->leftJoin('master_ruangan', 'master_ruangan.id', 'barang.ruangan_id')
-            ->select(
-                'barang.id',
-                'barang.users_id',
-                'barang.ruangan_id',
-                'barang.kondisi',
-                'barang.sistem_operasi_id',
-                'master_barang.jenis',
-                'master_barang.merk',
-                'master_barang.tipe',
-                'master_barang.nomor_seri',
-                'master_barang.nomor_urut_pendaftaran',
-                'master_barang.tanggal_peroleh',
-                'users.nama_lengkap',
-                'master_ruangan.nama as ruangan_nama'
-            )
-            ->get();
-        return Inertia::render('Admin/KelolaBarang', ['history_barang' => $data]);
+
+        // $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])->paginate(10);
+        return Inertia::render('Admin/KelolaBarang');
     }
 
     /**
@@ -58,8 +44,8 @@ class BarangController extends Controller
      */
     public function store(StoreBarangRequest $request)
     {
+        $validatedData = $request->validate($request->rules());
         try {
-            $validatedData = $request->validate($request->rules());
             // $validatedData['tahun_peroleh'] = Carbon::parse($validatedData['tahun_peroleh'])->format('Y-m-d H:i:s');
             $response = [
                 'message' => 'Data berhasil ditambahkan',
@@ -205,5 +191,159 @@ class BarangController extends Controller
             'response' => $response,
             'history_barang' => $history_barang
         ]);
+    }
+    public function fetch(Request $request)
+    {
+        // $current = $request->get('current');
+        $user = auth()->user();
+        $data = $this->get_barang($request);
+        $pageSize = $request->get('pageSize') ?? 10;
+        $search = $request->get('searchText');
+
+        $isUser = $request->get('isUser');
+
+        $searchText = "%$search%";
+
+        $data = $data->paginate($pageSize);
+        return response()->json([
+            'data' => $data->items(),
+            'searchText' => $searchText,
+            'total' => $data->total(),
+            'user' => $user->id,
+            // 'current' => $current,
+            // 'pageSize' => $pageSize,
+        ]);
+    }
+
+    public function get_barang(Request $request)
+    {
+        $user = auth()->user();
+        $pageSize = $request->get('pageSize') ?? 10;
+        $search = $request->get('searchText');
+
+        $isUser = $request->get('isUser');
+        $userId = $request->get('userId') ?? $user->id;
+        $searchText = "%$search%";
+
+
+        $data = Barang::with(['Barang', 'Ruangan', 'SistemOperasi', 'User'])
+            ->where(function ($query) use ($searchText) {
+                $query->whereRelation('Barang', 'jenis', 'like', $searchText)
+                    ->orWhereRelation('Barang', 'merk', 'like', $searchText)
+                    ->orWhereRelation('Barang', 'tipe', 'like', $searchText)
+                    ->orWhereRelation('Barang', 'nomor_seri', 'like', $searchText)
+                    ->orWhereRelation('Barang', 'nomor_urut_pendaftaran', 'like', $searchText)
+                    ->orWhereRelation('Ruangan', 'nama', 'like', $searchText)
+                    ->orWhereRelation('SistemOperasi', 'nama', 'like', $searchText)
+                    ->orWhereRelation('User', 'nama_lengkap', 'like', $searchText)
+                    ->orWhere('kondisi', 'like', $searchText);
+            });
+
+        if ($isUser == 1) {
+
+            $data->where('users_id', '=', $userId);
+        }
+        return $data;
+    }
+    private function generate_code(string $jenis)
+    {
+        $jenis_kode  = [
+            "PC Workstation" => "3100101007",
+            "P.C Unit" => "3100102001",
+            "Lap Top" => "3100102002",
+            "Note Book" => "3100102003",
+            "Printer" => "3100203003",
+            "Scanner" => "3100203004",
+        ];
+        return $jenis_kode[$jenis];
+    }
+    public function cetak(Request $request)
+    {
+        $barang = $this->get_barang($request)->get();
+
+        $barang->transform(function ($item, $key) {
+            $item['kode_barang'] = $this->generate_code($item->Barang['jenis']);
+            return $item;
+        });
+        $isExcel = $request->get('isExcel');
+        if ($isExcel == 1) {
+            $headers = [
+                'No',
+                'Kode Satker',
+                'Nama Satker',
+                'Kode Barang',
+                'Nama Barang',
+                'NUP',
+                'Nomor BMN',
+                'Merk',
+                'Tipe',
+                'Serial Number',
+                'Tanggal Rekam Pertama',
+                'Tanggal Perolehan Nilai',
+                'Nilai Perolehan Pertama',
+                'Nilai Mutasi',
+                'Nilai Perolehan',
+                'Nilai Penyusutan',
+                'Nilai Buku',
+                'Kuantitas',
+                'NIP Lama Pengguna',
+                'Nama Pengguna',
+                'Kondisi',
+                'Status Penggunaan',
+                "No PSP",
+                'Tgl PSP'
+            ];
+            // $headers = ['No','Nama Satker', 'Kode Barang', 'Nama Barang', 'NUP', 'Tahun Peroleh', 'Nomor Seri', 'Pegawai', 'Kondisi', 'Ruangan'];
+            $barangFlatten = [];
+            foreach ($barang as $key => $value) {
+                // $barangFlatten[] = [
+                //     'No' => $key + 1,
+                //     'Kode Barang' => $value['kode_barang'],
+                //     'Nama Barang' => $value->barang['merk'] . ' / ' . $value->barang['tipe'],
+                //     'Jenis' => $value->barang['jenis'],
+                //     'NUP' => $value->barang['nomor_urut_pendaftaran'],
+                //     'Tahun Peroleh' => $value->barang['tanggal_peroleh'] ?  \Carbon\Carbon::parse($value->barang['tanggal_peroleh'])->format('Y') : '',
+                //     'Nomor Seri' => $value->barang['nomor_seri'],
+                //     'Kondisi' => $value['kondisi'],
+                // ];
+                $barangFlatten[] = [
+                    $key + 1,
+                    "054011700428701000KD",
+                    "BPS PROVINSI SULAWESI UTARA",
+                    $value['kode_barang'],
+                    // $value->barang['merk'] . ' / ' . $value->barang['tipe'],
+                    $value->barang['jenis'],
+                    $value->barang['nomor_urut_pendaftaran'],
+                    $value['kode_barang'] . "-???",
+                    $value->barang['merk'],
+                    $value->barang['tipe'],
+                    $value->barang['nomor_seri'],
+                    $value->barang['tanggal_peroleh'] ?  \Carbon\Carbon::parse($value->barang['tanggal_peroleh'])->format('Y-m-d') : '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '1',
+                    '-',
+                    $value->user['nama_lengkap'],
+                    $value['kondisi'],
+                    'Digunakan sendiri untuk operasional',
+                    '-',
+                    '-',
+                ];
+            }
+
+            $csv = Writer::createFromFileObject(new SplTempFileObject());
+            $csv->insertOne($headers);
+            $csv->insertAll($barangFlatten);
+            $csv->output('data_barang.csv');
+            return;
+        }
+
+
+        $pdf = FacadePdf::loadView('laporan.barang', ['data' => $barang]);
+        return $pdf->stream();
     }
 }

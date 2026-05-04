@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use Illuminate\Http\Request;
@@ -10,17 +11,24 @@ use Inertia\Inertia;
 
 use App\Models\MasterBarang;
 use App\Models\MasterRuangan;
+use App\Models\Ruangan;
+use App\Models\User;
 
 class LaporanController extends Controller
 {
-    protected $jenis_kode  = [
-        "PC Workstation" => "3100101007",
-        "P.C Unit" => "3100102001",
-        "Lap Top" => "3100102002",
-        "Note Book" => "3100102003",
-        "Printer" => "3100203003",
-        "Scanner" => "3100203004",
-    ];
+    
+    private function generate_code(string $jenis) 
+    {
+        $jenis_kode  = [
+            "PC Workstation" => "3100101007",
+            "P.C Unit" => "3100102001",
+            "Lap Top" => "3100102002",
+            "Note Book" => "3100102003",
+            "Printer" => "3100203003",
+            "Scanner" => "3100203004",
+        ];
+        return $jenis_kode[$jenis];
+    }
     private function get_dbr($id_ruangan = 0)
     {
         $jenis_kode = [
@@ -31,7 +39,7 @@ class LaporanController extends Controller
             "Printer" => "3100203003",
             "Scanner" => "3100203004",
         ];
-        $ruangan = MasterRuangan::where('master_ruangan.id', $id_ruangan)
+        $ruangan = Ruangan::where('master_ruangan.id', $id_ruangan)
             ->leftJoin('users', 'users.id', 'master_ruangan.users_id')
             ->select('master_ruangan.*', 'users.nama_lengkap', 'users.nip')->first();
 
@@ -58,7 +66,7 @@ class LaporanController extends Controller
             ->orderBy('nomor_urut_pendaftaran', 'asc')
             ->get();
         $data->transform(function ($item, $key) {
-            $item['kode_barang'] = $this->jenis_kode[$item['jenis']];
+            $item['kode_barang'] = $this->generate_code($item['jenis']);
             return $item;
         });
 
@@ -67,19 +75,19 @@ class LaporanController extends Controller
     public function dbr()
     {
         $dbr = $this->get_dbr();
-        $daftar_ruangan = MasterRuangan::select('id', 'nama')->get();
+        $daftar_ruangan = Ruangan::select('id', 'nama')->get();
         return Inertia::render('Admin/Laporan/Dbr', ['daftar_ruangan' => $daftar_ruangan]);
     }
     public function cetak_dbr($id_ruangan)
     {
         $dbr = $this->get_dbr($id_ruangan);
 
+        $kepala = User::whereRelation('Jabatan', 'nama', 'like', '%kepala%')->first();
+        $nama_kepala = $kepala->nama_lengkap;
+        $nip_kepala = $kepala->nip;
 
-        $nama_kepala = "Asim Saputra, S.ST, M.Ec.Dev";
-        $nip_kepala = "19760927 199901 1 001";
 
-
-        $pdf = Pdf::loadView('laporan.cetak', ['data' => $dbr['dbr'], 'jenis_kode' => $this->jenis_kode, 'nama_kepala' => $nama_kepala, 'nip_kepala' => $nip_kepala, 'ruangan' => $dbr['ruangan']]);
+        $pdf = Pdf::loadView('laporan.cetak', ['data' => $dbr['dbr'],  'nama_kepala' => $nama_kepala, 'nip_kepala' => $nip_kepala, 'ruangan' => $dbr['ruangan']]);
         return $pdf->stream();
     }
     public function fetch_dbr($id_ruangan)
@@ -87,4 +95,5 @@ class LaporanController extends Controller
         $dbr = $this->get_dbr($id_ruangan);
         return response()->json($dbr, 200);
     }
+
 }

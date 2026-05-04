@@ -26,7 +26,9 @@ const Dashboard = ({
     ruangan_summary: Summary[];
     jenis_summary: Summary[];
 }) => {
-    useEffect(() => {}, [kondisi]);
+    // useEffect(() => {}, [kondisi]);
+    console.log({kondisi});
+    
 
     return (
         <>
@@ -47,7 +49,7 @@ const Dashboard = ({
                     <Card bordered={false}>
                         <Statistic
                             title="Barang TIK Kondisi Baik"
-                            value={kondisi.jumlah}
+                            value={kondisi.baik}
                             valueStyle={{ color: "green" }}
                             prefix={<CheckCircleOutlined />}
                             suffix="Unit"

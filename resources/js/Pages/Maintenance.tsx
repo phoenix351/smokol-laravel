@@ -25,6 +25,7 @@ import {
 import UserPengajuanCard from "@/Components/UserPengajuanCard";
 import PemeliharaanForm from "@/Forms/PemeliharaanForm";
 import MyModal from "@/Components/Modal";
+import axios from "axios";
 
 const { Search } = Input;
 
@@ -46,14 +47,13 @@ const KelolaPengajuanPage = () => {
                 const response = await fetch(
                     route("admin.pengajuan.fetch", { type: "99", isUser: "1" })
                 );
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
+                const { data } = await axios.get(route("admin.pengajuan.fetch", { type: "99", isUser: "1" }));
+                
                 // Parse the JSON response
-                const dataPengajuan = await response.json();
+                // const dataPengajuan = await response.json();
 
                 // Update the state with the fetched items
-                setItems(dataPengajuan.data);
+                setItems(data);
                 setSearchLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -69,31 +69,7 @@ const KelolaPengajuanPage = () => {
             label: "Semua",
             key: "99",
         },
-        {
-            label: "Menunggu Persetujuan",
-            key: "0",
-        },
-        // {
-        //     label: "Diperiksa",
-        //     key: "1",
-        // },
-
-        {
-            label: "Menunggu Penyedia",
-            key: "3",
-        },
-        {
-            label: "Diproses Penyedia",
-            key: "4",
-        },
-        {
-            label: "Diperiksa Kembali",
-            key: "5",
-        },
-        {
-            label: "Selesai",
-            key: "6",
-        },
+       
     ];
     const [selectedVerticalMenu, setSelectedVerticalMenu] = useState("99");
 
@@ -112,7 +88,7 @@ const KelolaPengajuanPage = () => {
             const dataPengajuan = await response.json();
             console.log({ dataPengajuan });
             // Update the state with the fetched items
-            setItems(dataPengajuan.data);
+            setItems(dataPengajuan);
             setSearchLoading(false);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -184,13 +160,7 @@ const KelolaPengajuanPage = () => {
 
             <h1 style={{ marginBottom: "10px" }}>Daftar Pengajuan Pegawai</h1>
 
-            <Menu
-                selectedKeys={[selectedVerticalMenu]}
-                mode="horizontal"
-                items={verticalMenuItems}
-                style={{ display: "flex" }} // This makes the Menu take up all available space
-                onClick={handleVerticalMenuClick}
-            />
+            
 
             {/* <Divider /> */}
             <Space

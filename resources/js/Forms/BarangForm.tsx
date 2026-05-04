@@ -65,8 +65,8 @@ const HistoryBarangForm: React.FC<{
                 const lokasiResponse = await axios.get(route("lokasi.get"));
                 const osResponse = await axios.get(route("os.get"));
 
-                // console.log({ arr: response.data[0] });
-                let penggunaItemsDB = penggunaResponse.data[0].map(
+                console.log({ penggunaResponse });
+                let penggunaItemsDB = penggunaResponse.data.map(
                     (item: any) => ({
                         id: item.id,
                         nama_lengkap: item.nama_lengkap,
@@ -246,9 +246,9 @@ const HistoryBarangForm: React.FC<{
             <Form.Item
                 {...formItemLayout}
                 label="Tanggal Peroleh"
-                name="tanggal_peroleh"
+                name="record_time"
             >
-                <DatePicker disabled style={disabledStyle} />
+                <DatePicker disabled style={disabledStyle} format={"DD MMMM YYYY"} />
             </Form.Item>
             <Form.Item {...formItemLayout} label="Nomor Seri" name="nomor_seri">
                 <Input disabled style={disabledStyle} />

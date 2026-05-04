@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MasterSistemOperasi;
-use App\Http\Requests\StoreMasterSistemOperasiRequest;
-use App\Http\Requests\UpdateMasterSistemOperasiRequest;
-
+use App\Models\MasterRuangan;
+use App\Http\Requests\StoreMasterRuanganRequest;
+use App\Http\Requests\StoreRuanganRequest;
+use App\Http\Requests\UpdateMasterRuanganRequest;
+use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-
-class MasterSistemOperasiController extends Controller
+class RuanganController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Admin/Master/SistemOperasi', ['master_sistem_operasi' => MasterSistemOperasi::all()]);
+        $master_ruangan = Ruangan::join('users', 'users.id', 'master_ruangan.users_id')
+            ->select('master_ruangan.*', 'users.nama_lengkap as users_nama', 'users.id as users_id')->get();
+        return Inertia::render('Admin/Master/Ruangan', ['master_ruangan' => $master_ruangan]);
     }
 
     /**
@@ -34,7 +36,7 @@ class MasterSistemOperasiController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMasterSistemOperasiRequest $request)
+    public function store(StoreRuanganRequest $request)
     {
         try {
             $validatedData = $request->validate($request->rules());
@@ -43,39 +45,39 @@ class MasterSistemOperasiController extends Controller
                 'message' => 'Data berhasil ditambahkan',
             ];
 
-            MasterSistemOperasi::create($validatedData);
-            $master_sistem_operasi = MasterSistemOperasi::all();
+            Ruangan::create($validatedData);
+            $master_ruangan = Ruangan::all();
         } catch (QueryException $e) {
             $response = [
                 'message' => 'Koneksi gagal',
                 'data_sent' => $validatedData,
                 'errors' => $e->getMessage(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (ValidationException $e) {
             $response = [
                 'message' => 'Validation error',
                 'errors' => $e->errors(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (\Exception $e) {
             $response = [
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         }
 
-        return Inertia::render('Admin/MasterSistemOperasi', [
+        return Inertia::render('Admin/MasterRuangan', [
             'response' => $response,
-            'master_sistem_operasi' => $master_sistem_operasi
+            'master_ruangan' => $master_ruangan
         ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(MasterSistemOperasi $masterSistemOperasi)
+    public function show(Ruangan $masterRuangan)
     {
         //
     }
@@ -83,7 +85,7 @@ class MasterSistemOperasiController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(MasterSistemOperasi $masterSistemOperasi)
+    public function edit(Ruangan $masterRuangan)
     {
         //
     }
@@ -91,48 +93,64 @@ class MasterSistemOperasiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMasterSistemOperasiRequest $request, MasterSistemOperasi $masterSistemOperasi)
+    public function update(UpdateMasterRuanganRequest $request, Ruangan $masterRuangan)
     {
         try {
             $validatedData = $request->validate($request->rules());
-            $updateRecord = MasterSistemOperasi::findOrFail($request->id);
 
-            $updateRecord->update($validatedData);
+            $updateRecord = Ruangan::findOrFail($request->id);
+
+            $updateRecord->update(
+                [
+                    'nama' => $validatedData['nama'],
+                    'users_id' => $validatedData['users_id'],
+                    'kode_siman' => $validatedData['kode_siman'],
+                    'kode_baru' => $validatedData['kode_baru'],
+                    'gedung' => isset($validatedData['gedung']) ? $validatedData['gedung'] : '',
+                    'lantai' => isset($validatedData['lantai']) ? $validatedData['lantai'] : '',
+                    // 'lantai' => $validatedData['lantai'],
+                    // 'id'=>$validatedData['id'],
+                ]
+            );
 
             $response = [
                 'message' => 'Berhasil melakukan update data'
             ];
 
-            $master_sistem_operasi = MasterSistemOperasi::all();
+
+            $master_ruangan = Ruangan::join('users', 'users.id', 'master_ruangan.users_id')
+                ->select('master_ruangan.id', 'master_ruangan.nama', 'users.nama_lengkap as users_nama', 'users.id as users_id')->get();
         } catch (QueryException $e) {
             $response = [
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (ModelNotFoundException $e) {
             $response = [
                 'errors' => 'Record not found',
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (ValidationException $e) {
             $response = [
                 'message' => 'Validation error',
                 'errors' => $e->errors(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (\Exception $e) {
             $response = [
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         }
-
-        return Inertia::render('Admin/MasterSistemOperasi', [
-            'response' => $response,
-            'master_sistem_operasi' => $master_sistem_operasi
-        ]);
+        return response()->json([
+            'message' => 'Berhasil menyimpan perubahan',
+        ], 201);
+        // return Inertia::render('Admin/MasterRuangan', [
+        //     'response' => $response,
+        //     'master_ruangan' => $master_ruangan
+        // ]);
     }
 
     /**
@@ -142,7 +160,7 @@ class MasterSistemOperasiController extends Controller
     {
         try {
 
-            $deleted_record = MasterSistemOperasi::findOrFail($request->query('id'));
+            $deleted_record = Ruangan::findOrFail($request->query('id'));
 
             $deleted_record->delete();
 
@@ -151,34 +169,34 @@ class MasterSistemOperasiController extends Controller
                 'req' => $request->query('id')
             ];
 
-            $master_sistem_operasi = MasterSistemOperasi::all();
+            $master_ruangan = Ruangan::all();
         } catch (QueryException $e) {
             $response = [
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (ModelNotFoundException $e) {
             $response = [
                 'errors' => 'Record not founsadsadd' . $request->query('id'),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (ValidationException $e) {
             $response = [
                 'message' => 'Validation error',
                 'errors' => $e->errors(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         } catch (\Exception $e) {
             $response = [
                 'message' => 'An error occurred',
                 'errors' => $e->getMessage(),
             ];
-            $master_sistem_operasi = [];
+            $master_ruangan = [];
         }
-        return Inertia::render('Admin/MasterSistemOperasi', [
+        return Inertia::render('Admin/MasterRuangan', [
             'response' => $response,
-            'master_sistem_operasi' => $master_sistem_operasi
+            'master_ruangan' => $master_ruangan
         ]);
     }
 }

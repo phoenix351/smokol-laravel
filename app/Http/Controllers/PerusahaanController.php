@@ -4,20 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePerusahaanRequest;
 use App\Http\Requests\UpdatePerusahaanRequest;
-use App\Models\MasterPenanggungJawab;
-use App\Models\MasterPerusahaan;
+use App\Models\Penanggungjawab;
+use App\Models\Perusahaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
-class MasterPerusahaanController extends Controller
+class PerusahaanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Admin/Master/Perusahaan/index', ['master_perusahaan' => MasterPerusahaan::all(), 'master_pj' => MasterPenanggungJawab::all()]);
+        return Inertia::render('Admin/Master/Perusahaan/index', ['master_perusahaan' => Perusahaan::all(), 'master_pj' => Penanggungjawab::all()]);
     }
 
     /**
@@ -39,7 +39,7 @@ class MasterPerusahaanController extends Controller
             //code...
             DB::beginTransaction();
 
-            MasterPerusahaan::create($validatedRequest);
+            Perusahaan::create($validatedRequest);
             DB::commit();
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -74,7 +74,7 @@ class MasterPerusahaanController extends Controller
             //code...
             DB::beginTransaction();
 
-            $perusahaan = MasterPerusahaan::find($validatedRequest['id']);
+            $perusahaan = Perusahaan::find($validatedRequest['id']);
             $perusahaan->nama = $validatedRequest['nama'];
             $perusahaan->alamat = $validatedRequest['alamat'];
             $perusahaan->npwp = $validatedRequest['npwp'];
@@ -98,7 +98,7 @@ class MasterPerusahaanController extends Controller
             //code...
             DB::beginTransaction();
 
-            $perusahaan = MasterPerusahaan::find($id);
+            $perusahaan = Perusahaan::find($id);
 
             $perusahaan->delete();
             DB::commit();
@@ -112,12 +112,12 @@ class MasterPerusahaanController extends Controller
         $perusahaan_id = $request->input('perusahaan_id');
 
         if (strlen($perusahaan_id) > 0) {
-            $data = MasterPerusahaan::where('master_perusahaan.id', $perusahaan_id)
+            $data = Perusahaan::where('master_perusahaan.id', $perusahaan_id)
                 ->join('master_pj_perusahaan', 'master_pj_perusahaan.id', 'master_perusahaan.id')
                 ->select('master_perusahaan.*', 'master_pj_perusahaan.nama as nama_pj', 'master_pj_perusahaan.jabatan as jabatan_pj')
                 ->first();
         } else {
-            $data = MasterPerusahaan::get();
+            $data = Perusahaan::get();
         }
         return response()->json([
             'data' => $data

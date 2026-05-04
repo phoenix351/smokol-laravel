@@ -59,16 +59,16 @@ const PemeriksaanBMN: React.FC<{
                     {...formItemLayout}
                     label="sequence_id"
                     name="sequence_id"
-                    hidden
+                    // hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
 
                 <Form.Item
                     {...formItemLayout}
-                    label="users_id"
-                    name="users_id"
-                    hidden
+                    label="user_id"
+                    name="user_id"
+                    // hidden
                 >
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
@@ -76,6 +76,9 @@ const PemeriksaanBMN: React.FC<{
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
                 <Form.Item {...formItemLayout} label="tipe" name="tipe">
+                    <Input disabled={true} style={{ color: "#000" }} />
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="keluhan" name="keluhan">
                     <Input disabled={true} style={{ color: "#000" }} />
                 </Form.Item>
             </Form>
